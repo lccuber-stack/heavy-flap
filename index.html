@@ -3195,9 +3195,13 @@
       const spacing = state.width < 600 ? 275 : 315;
       const firstSpawnX = Math.max(state.player.x + 410, Math.min(state.width + 40, state.player.x + 460));
       spawnObstaclePair(firstSpawnX);
+      let lastSpawnX = firstSpawnX;
       if (firstSpawnX + spacing <= state.width + 180) {
-        spawnObstaclePair(firstSpawnX + spacing);
+        lastSpawnX = firstSpawnX + spacing;
+        spawnObstaclePair(lastSpawnX);
       }
+      // Align spawnTimer so the next obstacle arrives at the exact same spacing on all screen widths
+      state.spawnTimer = Math.max(0, (state.width + 40) - lastSpawnX);
 
       state.player.y = Math.round((state.height - state.groundHeight) * 0.46);
       state.player.vy = 0;
