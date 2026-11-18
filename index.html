@@ -1376,17 +1376,23 @@
     // 6. OBSTACLE & COLLECTIBLE SPAWNING (Steel I-Beams, Wrecking Balls, Hardhats)
     // =========================================================================
     function getDifficultyParams() {
-      // Distance-based pacing guarantees identical horizontal spacing on 60Hz, 120Hz ProMotion, and desktop
-      const level = Math.min(25, state.obstaclesPassed);
-      const speed = Math.min(325, 210 + level * 4.2);
-      const baseGap = Math.max(152, 192 - level * 1.45);
-      // Scale gap proportionally to playable height so short mobile screens remain 100% fair
+      // Smooth, capped progression so high-score runs remain rhythmic, readable, and 100% passable
+      const level = Math.min(30, state.obstaclesPassed);
+      const speed = Math.min(285, 200 + level * 2.8);
+
+      const baseGap = Math.max(158, 196 - level * 1.15);
       const playH = getPlayableHeight();
-      const screenFactor = Math.max(0.88, Math.min(1.18, playH / 640));
-      const minSafeGap = state.player.radius * 2 + 104;
+      const screenFactor = Math.max(0.9, Math.min(1.18, playH / 640));
+      const minSafeGap = state.player.radius * 2 + 110;
       const gapHeight = Math.max(minSafeGap, Math.round(baseGap * screenFactor));
-      // Fixed horizontal distance between beam centers (never crowds together)
-      const spacingPx = Math.max(295, Math.min(390, Math.round(viewW * 0.62)));
+
+      // Time-coupled horizontal spacing: as speed increases, spacing scales proportionally
+      // so the player always has at least ~1.48 seconds of reaction/climb time between beams
+      const minReactionSeconds = viewW < 640 ? 1.48 : 1.56;
+      const speedBasedSpacing = Math.round(speed * minReactionSeconds);
+      const screenBasedSpacing = Math.max(320, Math.min(440, Math.round(viewW * 0.68)));
+      const spacingPx = Math.max(speedBasedSpacing, screenBasedSpacing);
+
       return {
         speed,
         gapHeight,
@@ -1396,15 +1402,16 @@
 
     function spawnBeamPair() {
       const playH = getPlayableHeight();
-      const { gapHeight, spacingPx } = getDifficultyParams();
+      const { speed, gapHeight, spacingPx } = getDifficultyParams();
       const beamWidth = 66;
-      const minMargin = Math.max(52, Math.round(playH * 0.09));
+      const minMargin = Math.max(54, Math.round(playH * 0.095));
       const minCenterY = minMargin + gapHeight * 0.5;
       const maxCenterY = Math.max(minCenterY + 10, playH - minMargin - gapHeight * 0.5);
 
-      // Constrain vertical delta from previous gap so the player never faces an impossible steep climb/drop
+      // Constrain vertical delta based on travel time between beams so steep climbs are always reachable
+      const travelTime = spacingPx / speed;
       const prevCenterY = state.lastGapCenterY !== null ? state.lastGapCenterY : playH * 0.48;
-      const maxReachableDelta = Math.min(maxCenterY - minCenterY, Math.max(135, playH * 0.34));
+      const maxReachableDelta = Math.min(maxCenterY - minCenterY, Math.max(125, Math.min(playH * 0.32, travelTime * 125)));
       const rawCenterY = prevCenterY + (Math.random() * 2 - 1) * maxReachableDelta;
       const clampedCenterY = Math.max(minCenterY, Math.min(maxCenterY, rawCenterY));
       state.lastGapCenterY = clampedCenterY;
@@ -1412,12 +1419,12 @@
       const topHeight = clampedCenterY - gapHeight * 0.5;
       const bottomY = clampedCenterY + gapHeight * 0.5;
 
-      // Make all beams gently oscillate up and down while keeping wrecking balls safe
+      // Oscillate beams gently without narrowing the effective safe corridor
       const allowMoving = true;
-      const hasWreckingBall = state.obstaclesPassed >= 5 && gapHeight >= 165 && Math.random() < 0.25;
+      const hasWreckingBall = state.obstaclesPassed >= 6 && gapHeight >= 170 && Math.random() < 0.22;
 
       // Clamp moving amplitude so top & bottom beams always stay inside safe playable bounds
-      const maxSafeAmp = Math.max(14, Math.min(38, clampedCenterY - minCenterY - 4, maxCenterY - clampedCenterY - 4));
+      const maxSafeAmp = Math.max(12, Math.min(32, clampedCenterY - minCenterY - 6, maxCenterY - clampedCenterY - 6));
 
       const obs = {
         x: viewW + 90,
@@ -1430,10 +1437,10 @@
         moving: allowMoving,
         movePhase: Math.random() * Math.PI * 2,
         moveAmp: maxSafeAmp,
-        moveSpeed: 1.55 + Math.random() * 0.65,
+        moveSpeed: 1.45 + Math.random() * 0.55,
         hasWreckingBall,
         ballPhase: Math.random() * Math.PI * 2,
-        ballRadius: 11
+        ballRadius: 10
       };
 
       state.obstacles.push(obs);
@@ -1441,8 +1448,8 @@
 
       // Always spawn a Golden Hardhat bonus safely inside every passable gap (synced to beam movement)
       const ballClearance = hasWreckingBall ? 36 : 0;
-      const safeZoneTop = topHeight + ballClearance + 20;
-      const safeZoneBot = bottomY - 20;
+      const safeZoneTop = topHeight + ballClearance + 22;
+      const safeZoneBot = bottomY - 22;
       const hardhatY = safeZoneBot > safeZoneTop
         ? safeZoneTop + (0.25 + Math.random() * 0.5) * (safeZoneBot - safeZoneTop)
         : (topHeight + ballClearance + bottomY) * 0.5;
@@ -1993,8 +2000,8 @@
         if (state.player.vy < 0) state.player.vy = 40;
       }
 
-      // Ground Impact Check
-      if (state.player.y + state.player.radius >= playH) {
+      // Ground Impact Check (small 2px forgiveness margin so grazing the curb feels fair)
+      if (state.player.y + state.player.radius - 2 >= playH) {
         state.player.y = playH - state.player.radius;
         triggerGameOver('GROUND CRASH!');
         return;
@@ -2007,7 +2014,7 @@
       }
 
       // Update Obstacles & Forgiving Hitboxes
-      const hitR = state.player.radius - 3;
+      const hitR = state.player.radius - 3.5;
       for (let i = state.obstacles.length - 1; i >= 0; i--) {
         const obs = state.obstacles[i];
         obs.x -= speed * dt;
