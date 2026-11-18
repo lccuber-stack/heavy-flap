@@ -5,12 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Crane Flap" />
+  <meta name="application-name" content="Crane Flap" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#0f172a" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>CRANE FLAP — Construction Site Arcade</title>
+  <title>Crane Flap</title>
+  <link id="apple-touch-icon" rel="apple-touch-icon" sizes="512x512" href="" />
+  <link id="app-favicon" rel="icon" type="image/png" sizes="512x512" href="" />
+  <link id="app-manifest" rel="manifest" href="" />
 
   <!-- Typography: Chakra Petch (Industrial Display) & Inter (Clean UI) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -737,6 +742,159 @@
     const audio = new ConstructionAudio();
 
     // =========================================================================
+    // 1B. CUSTOM HOME SCREEN APP ICON & WEB MANIFEST GENERATOR ("Crane Flap")
+    // =========================================================================
+    function generateHomeScreenAppIcon() {
+      try {
+        const size = 512;
+        const iconCanvas = document.createElement('canvas');
+        iconCanvas.width = size;
+        iconCanvas.height = size;
+        const ic = iconCanvas.getContext('2d');
+
+        // Rich Industrial Twilight-to-Sky Gradient Background
+        const bgGrad = ic.createLinearGradient(0, 0, size, size);
+        bgGrad.addColorStop(0, '#0f172a');
+        bgGrad.addColorStop(0.55, '#1e3a8a');
+        bgGrad.addColorStop(1, '#0284c7');
+        ic.fillStyle = bgGrad;
+        ic.fillRect(0, 0, size, size);
+
+        // Subtle Radial Sunburst Glow behind Rig
+        const glow = ic.createRadialGradient(256, 240, 24, 256, 240, 240);
+        glow.addColorStop(0, 'rgba(251, 191, 36, 0.42)');
+        glow.addColorStop(0.6, 'rgba(245, 158, 11, 0.12)');
+        glow.addColorStop(1, 'rgba(15, 23, 42, 0)');
+        ic.fillStyle = glow;
+        ic.fillRect(0, 0, size, size);
+
+        // Blueprint Grid Lines (Subtle Engineering Detail)
+        ic.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+        ic.lineWidth = 2;
+        for (let g = 64; g < size; g += 64) {
+          ic.beginPath();
+          ic.moveTo(g, 0);
+          ic.lineTo(g, size);
+          ic.stroke();
+          ic.beginPath();
+          ic.moveTo(0, g);
+          ic.lineTo(size, g);
+          ic.stroke();
+        }
+
+        // Top & Bottom Diagonal Construction Hazard Trim Bands
+        const drawHazardStrip = (yPos, h) => {
+          ic.save();
+          ic.beginPath();
+          ic.rect(0, yPos, size, h);
+          ic.clip();
+          ic.fillStyle = '#0f172a';
+          ic.fillRect(0, yPos, size, h);
+          ic.fillStyle = '#fbbf24';
+          for (let sx = -64; sx < size + 64; sx += 48) {
+            ic.beginPath();
+            ic.moveTo(sx, yPos);
+            ic.lineTo(sx + 24, yPos);
+            ic.lineTo(sx + 10, yPos + h);
+            ic.lineTo(sx - 14, yPos + h);
+            ic.closePath();
+            ic.fill();
+          }
+          ic.restore();
+        };
+        drawHazardStrip(0, 28);
+        drawHazardStrip(size - 28, 28);
+
+        // Silhouette Tower Crane on Left Background
+        ic.strokeStyle = 'rgba(251, 191, 36, 0.32)';
+        ic.lineWidth = 7;
+        ic.beginPath();
+        ic.moveTo(86, size - 28);
+        ic.lineTo(86, 86);
+        ic.moveTo(46, 108);
+        ic.lineTo(270, 108);
+        ic.stroke();
+
+        // Steel I-Beam Framing on Right Edge
+        ic.fillStyle = '#334155';
+        ic.fillRect(412, 28, 52, 118);
+        ic.fillStyle = '#64748b';
+        ic.fillRect(418, 28, 10, 118);
+        ic.fillStyle = '#475569';
+        ic.beginPath();
+        ic.roundRect(398, 130, 80, 24, 6);
+        ic.fill();
+        ic.fillStyle = '#fbbf24';
+        ic.fillRect(402, 146, 72, 6);
+
+        ic.fillStyle = '#334155';
+        ic.fillRect(412, 366, 52, 118);
+        ic.fillStyle = '#64748b';
+        ic.fillRect(418, 366, 10, 118);
+        ic.fillStyle = '#475569';
+        ic.beginPath();
+        ic.roundRect(398, 358, 80, 24, 6);
+        ic.fill();
+        ic.fillStyle = '#fbbf24';
+        ic.fillRect(402, 360, 72, 6);
+
+        // Golden Hardhat Floating in Upper-Right Gap
+        ic.save();
+        ic.translate(344, 178);
+        ic.rotate(0.14);
+        ic.fillStyle = 'rgba(251, 191, 36, 0.25)';
+        ic.beginPath();
+        ic.arc(0, 0, 42, 0, Math.PI * 2);
+        ic.fill();
+        ic.fillStyle = '#fbbf24';
+        ic.beginPath();
+        ic.arc(0, 4, 28, Math.PI, 0);
+        ic.fill();
+        ic.fillStyle = '#fef08a';
+        ic.fillRect(-5, -26, 10, 26);
+        ic.fillStyle = '#d97706';
+        ic.beginPath();
+        ic.roundRect(-35, 2, 70, 10, 5);
+        ic.fill();
+        ic.restore();
+
+        // Hero Turbo Digger Rig Soaring Center-Stage
+        ic.save();
+        ic.translate(226, 276);
+        ic.scale(5.4, 5.4);
+        drawConstructionRig(ic, 'excavator', 0, 0, 17, -0.22, 0.45, 0, 1);
+        ic.restore();
+
+        const dataUrl = iconCanvas.toDataURL('image/png');
+        const touchLink = document.getElementById('apple-touch-icon');
+        const favLink = document.getElementById('app-favicon');
+        if (touchLink) touchLink.href = dataUrl;
+        if (favLink) favLink.href = dataUrl;
+
+        // Dynamic Web App Manifest so iOS/Android/Desktop use "Crane Flap" & custom icon
+        const manifest = {
+          name: 'Crane Flap',
+          short_name: 'Crane Flap',
+          start_url: window.location.href.split('?')[0].split('#')[0],
+          display: 'standalone',
+          background_color: '#0f172a',
+          theme_color: '#0f172a',
+          icons: [
+            {
+              src: dataUrl,
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'any maskable'
+            }
+          ]
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+        const manifestLink = document.getElementById('app-manifest');
+        if (manifestLink) manifestLink.href = URL.createObjectURL(manifestBlob);
+      } catch (e) {}
+    }
+
+    // =========================================================================
     // 2. RIG CONFIGURATIONS & SHIFT ATMOSPHERE THEMES
     // =========================================================================
     const RIG_SPECS = {
@@ -1203,11 +1361,15 @@
       });
     }
 
-    // Ensure previews render immediately once DOM & fonts are ready
+    // Ensure previews and home screen icon render immediately once DOM is ready
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', renderGaragePreviews);
+      document.addEventListener('DOMContentLoaded', () => {
+        renderGaragePreviews();
+        generateHomeScreenAppIcon();
+      });
     } else {
       renderGaragePreviews();
+      generateHomeScreenAppIcon();
     }
 
     // =========================================================================
