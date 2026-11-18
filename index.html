@@ -837,16 +837,16 @@
           <div id="go-leaderboard-list"></div>
         </div>
 
-        <div style="display:flex; gap:0.55rem; margin-top:0.9rem;">
-          <button type="button" class="btn-secondary" id="btn-go-garage" style="flex:1;">
+        <div style="display:flex; align-items:stretch; gap:0.45rem; margin-top:0.85rem;">
+          <button type="button" class="btn-secondary" id="btn-go-garage" style="flex:0.9; padding:0.7rem 0.5rem; font-size:0.86rem; white-space:nowrap;">
             Garage
           </button>
-          <button type="button" class="btn-secondary" id="btn-share-score" style="flex:1.25; border-color:rgba(56,189,248,0.45); color:#7dd3fc;">
-            📤 Share Score
+          <button type="button" class="btn-secondary" id="btn-share-score" style="flex:1.15; padding:0.7rem 0.55rem; font-size:0.84rem; border-color:rgba(56,189,248,0.45); color:#7dd3fc; white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:0.3rem;">
+            <span>📤</span><span>Share</span>
           </button>
-          <button type="button" class="btn-launch" id="btn-retry-shift" style="flex:1.65; margin-top:0;">
+          <button type="button" class="btn-launch" id="btn-retry-shift" style="flex:1.65; margin-top:0; padding:0.7rem 0.75rem; font-size:0.92rem; white-space:nowrap;">
             <span id="btn-retry-label">Retry Shift</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="19" height="19" style="flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
               <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
               <path d="M3 3v5h5"></path>
             </svg>
@@ -1312,208 +1312,35 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v2.7';
+    const APP_VERSION = 'v2.8';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
+    const MAX_LEADERBOARD_ENTRIES = 10;
 
     function getRankDetails(score) {
-      if (score >= 100) return { title: 'LEGENDARY SITE MASTER', icon: '👑' };
-      if (score >= 75)  return { title: 'CHIEF INFRASTRUCTURE TITAN', icon: '💎' };
-      if (score >= 55)  return { title: 'GRAND EARTHMOVING DIRECTOR', icon: '🏛️' };
-      if (score >= 40)  return { title: 'MASTER EARTHMOVER', icon: '🏆' };
-      if (score >= 26)  return { title: 'HEAVY FLEET COMMANDER', icon: '🎖️' };
-      if (score >= 15)  return { title: 'SENIOR SITE FOREMAN', icon: '⭐' };
-      if (score >= 6)   return { title: 'CERTIFIED RIG OPERATOR', icon: '🚧' };
-      return { title: 'APPRENTICE OPERATOR', icon: '🦺' };
-    }
-
-    function loadSavedRoster() {
-      const fallback = {
-        playerCount: 1,
-        playerNames: ['Player 1', 'Player 2', 'Player 3', 'Player 4']
-      };
-      try {
-        const match = document.cookie.match(new RegExp('(?:^|; )' + ROSTER_COOKIE + '=([^;]*)'));
-        if (match) {
-          const parsed = JSON.parse(decodeURIComponent(match[1]));
-          if (parsed && Array.isArray(parsed.playerNames)) {
-            return {
-              playerCount: Math.min(4, Math.max(1, Number(parsed.playerCount) || 1)),
-              playerNames: [0, 1, 2, 3].map((i) => {
-                const n = typeof parsed.playerNames[i] === 'string' ? parsed.playerNames[i].trim().slice(0, 18) : '';
-                return n || `Player ${i + 1}`;
-              })
-            };
-          }
-        }
-      } catch (e) {}
-      try {
-        if (window.name && window.name.includes('HEAVY_ROSTER:')) {
-          const raw = window.name.split('HEAVY_ROSTER:')[1].split('|')[0];
-          const parsed = JSON.parse(raw);
-          if (parsed && Array.isArray(parsed.playerNames)) {
-            return {
-              playerCount: Math.min(4, Math.max(1, Number(parsed.playerCount) || 1)),
-              playerNames: [0, 1, 2, 3].map((i) => {
-                const n = typeof parsed.playerNames[i] === 'string' ? parsed.playerNames[i].trim().slice(0, 18) : '';
-                return n || `Player ${i + 1}`;
-              })
-            };
-          }
-        }
-      } catch (e) {}
-      return fallback;
-    }
-
-    function saveRosterData() {
-      const payload = {
-        playerCount: state.playerCount,
-        playerNames: state.playerNames.map((n, i) => (n || `Player ${i + 1}`).trim().slice(0, 18) || `Player ${i + 1}`)
-      };
-      try {
-        const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
-        document.cookie = `${ROSTER_COOKIE}=${encodeURIComponent(JSON.stringify(payload))}; expires=${expires}; path=/; SameSite=Lax`;
-      } catch (e) {}
-      try {
-        const lbPart = state.leaderboard ? `HEAVY_LB:${JSON.stringify(state.leaderboard)}` : '';
-        window.name = `${lbPart}|HEAVY_ROSTER:${JSON.stringify(payload)}`;
-      } catch (e) {}
-    }
-
-    function loadLeaderboardData() {
-      let records = [];
-      try {
-        const match = document.cookie.match(new RegExp('(?:^|; )' + LEADERBOARD_COOKIE + '=([^;]*)'));
-        if (match) {
-          const parsed = JSON.parse(decodeURIComponent(match[1]));
-          if (Array.isArray(parsed)) records = parsed;
-        }
-      } catch (e) {}
-      try {
-        if (!records.length && window.name && window.name.includes('HEAVY_LB:')) {
-          const raw = window.name.split('HEAVY_LB:')[1].split('|')[0];
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) records = parsed;
-        }
-      } catch (e) {}
-      return records
-        .filter((r) => r && typeof r.name === 'string' && typeof r.score === 'number')
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 10);
-    }
-
-    function saveLeaderboardData(records) {
-      const clean = records
-        .filter((r) => r && typeof r.name === 'string' && typeof r.score === 'number')
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 10);
-      try {
-        const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
-        document.cookie = `${LEADERBOARD_COOKIE}=${encodeURIComponent(JSON.stringify(clean))}; expires=${expires}; path=/; SameSite=Lax`;
-      } catch (e) {}
-      try {
-        const rosterPayload = {
-          playerCount: state.playerCount,
-          playerNames: state.playerNames
-        };
-        window.name = `HEAVY_LB:${JSON.stringify(clean)}|HEAVY_ROSTER:${JSON.stringify(rosterPayload)}`;
-      } catch (e) {}
-      return clean;
-    }
-
-    function recordPlayerScore(playerName, score, rigKey = 'loader', modeLabel = 'Solo') {
-      const trimmed = (playerName || 'Player 1').trim().slice(0, 18) || 'Player 1';
-      const rigName = (RIG_SPECS[rigKey] && RIG_SPECS[rigKey].name) || 'Wheel Loader';
-      let records = loadLeaderboardData();
-      const entryId = `${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
-
-      if (score > 0 || records.length === 0) {
-        records.push({
-          id: entryId,
-          name: trimmed,
-          score,
-          rig: rigName,
-          mode: modeLabel
-        });
-      }
-
-      records = saveLeaderboardData(records);
-      state.leaderboard = records;
-      state.bestScore = records.length ? records[0].score : 0;
-      state.bestHolder = records.length && records[0].score > 0 ? records[0].name : '—';
-      state.lastRunEntryId = entryId;
-
-      const rankIndex = records.findIndex((r) => r.id === entryId);
-      return rankIndex >= 0 ? rankIndex + 1 : null;
-    }
-
-    function buildShareScoreUrl() {
-      const cleanUrl = window.location.href.split('?')[0].split('#')[0];
-      const currentName = (state.playerNames[state.lastScoredPlayerIdx ?? state.activePlayerIdx] || 'Player 1').trim().slice(0, 18);
-      const rigName = (RIG_SPECS[state.selectedRig] && RIG_SPECS[state.selectedRig].name) || 'Wheel Loader';
-      const payload = {
-        n: currentName,
-        s: state.score,
-        r: rigName,
-        t: Date.now()
-      };
-      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-      return `${cleanUrl}?challenge=${encodeURIComponent(encoded)}`;
-    }
-
-    function importSharedChallengeFromUrl() {
-      try {
-        const params = new URLSearchParams(window.location.search);
-        const raw = params.get('challenge');
-        if (!raw) return null;
-        const decoded = JSON.parse(decodeURIComponent(escape(atob(raw))));
-        if (!decoded || typeof decoded.n !== 'string' || typeof decoded.s !== 'number' || decoded.s <= 0) {
-          return null;
-        }
-        const sharedName = decoded.n.trim().slice(0, 18) || 'Challenger';
-        const sharedScore = Math.min(9999, Math.max(1, Math.round(decoded.s)));
-        const sharedRig = typeof decoded.r === 'string' ? decoded.r.slice(0, 24) : 'Wheel Loader';
-        const challengeId = `shared_${decoded.t || sharedName}_${sharedScore}`;
-
-        let records = loadLeaderboardData();
-        const alreadyImported = records.some((r) => r.id === challengeId);
-        if (!alreadyImported) {
-          records.push({
-            id: challengeId,
-            name: sharedName,
-            score: sharedScore,
-            rig: sharedRig,
-            mode: 'Shared Link'
-          });
-          records = saveLeaderboardData(records);
-          state.leaderboard = records;
-          state.bestScore = records.length ? records[0].score : 0;
-          state.bestHolder = records.length && records[0].score > 0 ? records[0].name : '—';
-          state.lastRunEntryId = challengeId;
-        }
-
-        // Clean URL parameter so refreshing doesn't re-trigger
-        const cleanUrl = window.location.href.split('?')[0].split('#')[0];
-        window.history.replaceState({}, document.title, cleanUrl);
-        return { name: sharedName, score: sharedScore, rig: sharedRig };
-      } catch (e) {
-        return null;
-      }
+      if (score >= 100) return { icon: '👑', title: 'LEGENDARY SITE MASTER' };
+      if (score >= 75) return { icon: '💎', title: 'CHIEF INFRASTRUCTURE TITAN' };
+      if (score >= 55) return { icon: '🏛️', title: 'GRAND EARTHMOVING DIRECTOR' };
+      if (score >= 40) return { icon: '🏆', title: 'MASTER EARTHMOVER' };
+      if (score >= 26) return { icon: '🎖️', title: 'HEAVY FLEET COMMANDER' };
+      if (score >= 15) return { icon: '⭐', title: 'SENIOR SITE FOREMAN' };
+      if (score >= 6) return { icon: '🚧', title: 'CERTIFIED RIG OPERATOR' };
+      return { icon: '🦺', title: 'APPRENTICE OPERATOR' };
     }
 
     let initialSignature = null;
 
-    function setSyncButtonFeedback(text, tone = 'default') {
+    function setSyncButtonFeedback(text, stateType = 'default') {
       const btn = document.getElementById('btn-sync-latest');
       const label = document.getElementById('sync-status-text');
-      if (!btn || !label) return;
-      label.textContent = text;
-      if (tone === 'latest') {
-        btn.style.background = 'rgba(16, 185, 129, 0.22)';
+      if (label) label.textContent = text;
+      if (!btn) return;
+      if (stateType === 'latest') {
+        btn.style.background = 'rgba(16, 185, 129, 0.2)';
         btn.style.borderColor = '#34d399';
         btn.style.color = '#6ee7b7';
-      } else if (tone === 'checking') {
-        btn.style.background = 'rgba(251, 191, 36, 0.2)';
+      } else if (stateType === 'warn') {
+        btn.style.background = 'rgba(245, 158, 11, 0.2)';
         btn.style.borderColor = '#fbbf24';
         btn.style.color = '#fde68a';
       } else {
@@ -1525,903 +1352,1240 @@
 
     async function checkAndApplyLatestBuild(manual = false) {
       if (manual) {
-        setSyncButtonFeedback('↻ Checking GitHub...', 'checking');
+        setSyncButtonFeedback('⏳ Checking GitHub...', 'default');
       }
       try {
-        const cleanUrl = window.location.href.split('?')[0].split('#')[0];
-        if (!cleanUrl.startsWith('http')) {
-          if (manual) setSyncButtonFeedback(`✅ You have the latest (${APP_VERSION})`, 'latest');
+        const baseUrl = window.location.href.split('?')[0].split('#')[0];
+        if (!baseUrl.startsWith('http')) {
+          if (manual) setSyncButtonFeedback(`✅ Latest (${APP_VERSION})`, 'latest');
           return;
         }
-        const res = await fetch(`${cleanUrl}?_cb=${Date.now()}`, {
+        const bustUrl = `${baseUrl}?v=${Date.now()}`;
+        const response = await fetch(bustUrl, {
           cache: 'no-store',
           headers: { 'Cache-Control': 'no-cache' }
         });
-        if (!res.ok) {
-          if (manual) setSyncButtonFeedback(`✅ Up to date (${APP_VERSION})`, 'latest');
+        if (!response.ok) throw new Error('Network check failed');
+        const htmlText = await response.text();
+        if (!htmlText || htmlText.length < 1500) return;
+
+        const signature = `${htmlText.length}:${htmlText.slice(0, 180)}:${htmlText.slice(-180)}`;
+        if (initialSignature === null) {
+          initialSignature = signature;
+          if (manual) {
+            setSyncButtonFeedback(`✅ You have the latest (${APP_VERSION})`, 'latest');
+          }
           return;
         }
-        const html = await res.text();
-        const sig = `${html.length}_${html.slice(0, 180)}_${html.slice(-180)}`;
-        if (initialSignature === null) {
-          initialSignature = sig;
-          if (manual) setSyncButtonFeedback(`✅ You have the latest (${APP_VERSION})`, 'latest');
-        } else if (sig !== initialSignature) {
-          if (manual) setSyncButtonFeedback('⬇ New version found! Reloading...', 'checking');
-          window.location.replace(`${cleanUrl}?v=${Date.now()}`);
+        if (signature !== initialSignature) {
+          if (manual) setSyncButtonFeedback('🔄 Installing update...', 'default');
+          const cleanUrl = `${baseUrl}?updated=${Date.now()}`;
+          window.location.replace(cleanUrl);
         } else if (manual) {
           setSyncButtonFeedback(`✅ You have the latest (${APP_VERSION})`, 'latest');
         }
-      } catch (e) {
-        if (manual) setSyncButtonFeedback(`✅ Up to date (${APP_VERSION})`, 'latest');
+      } catch (err) {
+        if (manual) {
+          setSyncButtonFeedback('⚠️ Offline / Retry', 'warn');
+        }
       }
     }
 
-    function renderLeaderboardList(containerId, limit = 5, detailed = false, highlightId = null) {
-      const container = document.getElementById(containerId);
-      if (!container) return;
-      const list = state.leaderboard.slice(0, limit);
-      if (!list.length) {
-        container.innerHTML = `<div style="font-size:0.76rem; color:#94a3b8; padding:0.35rem 0;">No shifts recorded yet — grab golden hardhats in Solo or Multiplayer to claim #1!</div>`;
-        return;
+    function loadLeaderboard() {
+      let entries = [];
+      try {
+        const match = document.cookie.split('; ').find((row) => row.startsWith(`${LEADERBOARD_COOKIE}=`));
+        if (match) {
+          entries = JSON.parse(decodeURIComponent(match.split('=')[1]));
+        }
+      } catch (e) {}
+
+      if ((!Array.isArray(entries) || entries.length === 0) && window.name) {
+        try {
+          const parsed = JSON.parse(window.name);
+          if (parsed && Array.isArray(parsed.leaderboard)) {
+            entries = parsed.leaderboard;
+          }
+        } catch (e) {}
       }
-      container.innerHTML = list.map((entry, idx) => {
-        const medal = idx === 0 ? '🏆' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
-        const rankInfo = getRankDetails(entry.score);
-        const isCurrentRun = highlightId && entry.id === highlightId;
-        const rowHighlightStyle = isCurrentRun
-          ? 'background:rgba(56,189,248,0.16); border:1px solid rgba(56,189,248,0.45); border-radius:9px; padding:0.34rem 0.45rem; margin:2px -0.25rem;'
-          : (detailed ? 'padding:0.42rem 0;' : 'padding:0.3rem 0;');
-        const youBadge = isCurrentRun
-          ? `<span style="background:#38bdf8; color:#0f172a; font-size:0.56rem; font-weight:800; padding:1px 5px; border-radius:999px; margin-left:6px; vertical-align:middle;">THIS SHIFT</span>`
-          : '';
-        const rankSubtitle = `<div style="font-size:0.62rem; font-weight:700; color:#38bdf8; margin-top:1px;">${rankInfo.icon} ${rankInfo.title}${detailed && entry.rig ? ` • ${entry.rig}` : ''}${detailed && entry.mode ? ` (${entry.mode})` : ''}</div>`;
-        return `
-          <div class="lb-row" style="${rowHighlightStyle}">
-            <div style="min-width:0; padding-right:0.5rem;">
-              <div style="color:#e2e8f0; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><strong style="color:#fbbf24; margin-right:6px;">${medal}</strong>${entry.name}${youBadge}</div>
-              ${rankSubtitle}
-            </div>
-            <span class="font-display" style="font-weight:700; font-size:${detailed ? '1.05rem' : '0.88rem'}; color:#fbbf24; flex-shrink:0;">${entry.score}</span>
-          </div>
-        `;
-      }).join('');
+
+      if (!Array.isArray(entries)) return [];
+      return entries
+        .filter((item) => item && typeof item.name === 'string' && typeof item.score === 'number')
+        .sort((a, b) => b.score - a.score || (b.ts || 0) - (a.ts || 0))
+        .slice(0, MAX_LEADERBOARD_ENTRIES);
     }
 
-    function openTop10Leaderboard() {
-      audio.playClick();
-      if (state.phase === 'PLAYING') {
-        state.phase = 'PAUSED';
-      }
-      renderLeaderboardList('top10-leaderboard-list', 10, true, state.lastRunEntryId || null);
-      document.getElementById('leaderboard-modal').classList.remove('hidden');
+    function saveLeaderboard(entries) {
+      const clean = entries
+        .sort((a, b) => b.score - a.score || (b.ts || 0) - (a.ts || 0))
+        .slice(0, MAX_LEADERBOARD_ENTRIES);
+      const serialized = JSON.stringify(clean);
+      try {
+        document.cookie = `${LEADERBOARD_COOKIE}=${encodeURIComponent(serialized)}; max-age=31536000; path=/; SameSite=Lax`;
+      } catch (e) {}
+      try {
+        const existing = window.name && window.name.startsWith('{') ? JSON.parse(window.name) : {};
+        window.name = JSON.stringify({ ...existing, leaderboard: clean });
+      } catch (e) {}
+      return clean;
     }
 
-    function closeTop10Leaderboard() {
-      audio.playClick();
-      document.getElementById('leaderboard-modal').classList.add('hidden');
-      if (state.phase === 'PAUSED' && document.getElementById('pause-modal').classList.contains('hidden')) {
-        state.phase = 'PLAYING';
+    function loadSavedRoster() {
+      let data = null;
+      try {
+        const match = document.cookie.split('; ').find((row) => row.startsWith(`${ROSTER_COOKIE}=`));
+        if (match) {
+          data = JSON.parse(decodeURIComponent(match.split('=')[1]));
+        }
+      } catch (e) {}
+
+      if (!data && window.name && window.name.startsWith('{')) {
+        try {
+          const parsed = JSON.parse(window.name);
+          if (parsed && parsed.roster) data = parsed.roster;
+        } catch (e) {}
       }
+
+      if (data && Array.isArray(data.names)) {
+        const names = [0, 1, 2, 3].map((i) => {
+          const val = typeof data.names[i] === 'string' ? data.names[i].trim() : '';
+          return val ? val.slice(0, 14) : `Player ${i + 1}`;
+        });
+        const count = [1, 2, 3, 4].includes(data.count) ? data.count : 1;
+        return { count, names };
+      }
+      return {
+        count: 1,
+        names: ['Player 1', 'Player 2', 'Player 3', 'Player 4']
+      };
     }
 
-    const initialLeaderboard = loadLeaderboardData();
+    function saveRosterToStorage() {
+      const payload = {
+        count: state.playerCount,
+        names: state.playerNames.slice(0, 4)
+      };
+      try {
+        document.cookie = `${ROSTER_COOKIE}=${encodeURIComponent(JSON.stringify(payload))}; max-age=31536000; path=/; SameSite=Lax`;
+      } catch (e) {}
+      try {
+        const existing = window.name && window.name.startsWith('{') ? JSON.parse(window.name) : {};
+        window.name = JSON.stringify({ ...existing, roster: payload });
+      } catch (e) {}
+    }
+
+    function encodeChallengePayload(payload) {
+      const json = JSON.stringify(payload);
+      const bytes = new TextEncoder().encode(json);
+      let bin = '';
+      bytes.forEach((b) => { bin += String.fromCharCode(b); });
+      return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    function decodeChallengePayload(token) {
+      const b64 = token.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = b64 + '==='.slice((b64.length + 3) % 4);
+      const bin = atob(padded);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return JSON.parse(new TextDecoder().decode(bytes));
+    }
+
+    function importSharedChallengeFromUrl() {
+      try {
+        const url = new URL(window.location.href);
+        const token = url.searchParams.get('challenge');
+        if (!token) return null;
+
+        const data = decodeChallengePayload(token);
+        url.searchParams.delete('challenge');
+        window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+
+        if (!data || typeof data.n !== 'string' || typeof data.s !== 'number') return null;
+        const cleanName = data.n.trim().slice(0, 14) || 'Friend';
+        const cleanScore = Math.max(0, Math.min(9999, Math.floor(data.s)));
+        const validRig = ['loader', 'excavator', 'hauler'].includes(data.r) ? data.r : 'loader';
+        const ts = typeof data.t === 'number' ? data.t : Date.now();
+        const entryId = `shared_${cleanName}_${cleanScore}_${ts}`;
+
+        const list = loadLeaderboard();
+        if (!list.some((item) => item.id === entryId)) {
+          list.push({
+            id: entryId,
+            name: cleanName,
+            score: cleanScore,
+            rig: validRig,
+            isMultiplayer: false,
+            shared: true,
+            ts
+          });
+          const updated = saveLeaderboard(list);
+          state.leaderboard = updated;
+          state.bestScore = updated.length > 0 ? updated[0].score : 0;
+          state.lastRunEntryId = entryId;
+          return { name: cleanName, score: cleanScore };
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function recordPlayerScore(playerName, score, rigKey, isMultiplayer = false) {
+      const cleanName = (playerName || 'Player 1').trim() || 'Player 1';
+      const entryId = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+      const entry = {
+        id: entryId,
+        name: cleanName,
+        score,
+        rig: rigKey,
+        isMultiplayer,
+        ts: Date.now()
+      };
+      const list = loadLeaderboard();
+      list.push(entry);
+      const updated = saveLeaderboard(list);
+      state.leaderboard = updated;
+      state.bestScore = updated.length > 0 ? updated[0].score : 0;
+      state.lastRunEntryId = entryId;
+      const rankIdx = updated.findIndex((item) => item.id === entryId);
+      return rankIdx >= 0 ? rankIdx + 1 : null;
+    }
+
+    const initialLeaderboard = loadLeaderboard();
     const initialRoster = loadSavedRoster();
 
     const state = {
-      phase: 'MENU', // MENU, READY, PLAYING, PAUSED, GAMEOVER
-      selectedRig: 'loader',
-      selectedShift: 'day',
-      currentBiome: PROCEDURAL_BIOMES[0],
-      playerCount: initialRoster.playerCount,
-      playerNames: initialRoster.playerNames,
-      activePlayerIdx: 0,
-      lastScoredPlayerIdx: 0,
+      mode: 'menu', // 'menu' | 'ready' | 'playing' | 'paused' | 'gameover'
+      rig: 'loader',
+      shift: 'day',
+      biome: PROCEDURAL_BIOMES[0],
+      biomeSeed: Math.random() * 1000,
       score: 0,
-      bonusPoints: 0,
-      hardhatsCollected: 0,
-      hardhatStreak: 0,
+      bestScore: initialLeaderboard.length > 0 ? initialLeaderboard[0].score : 0,
       leaderboard: initialLeaderboard,
-      bestScore: initialLeaderboard.length ? initialLeaderboard[0].score : 0,
-      bestHolder: initialLeaderboard.length && initialLeaderboard[0].score > 0 ? initialLeaderboard[0].name : '—',
-      shakeTime: 0,
-      shakeIntensity: 0,
-      flashAlpha: 0,
+      lastRunEntryId: null,
+      playerCount: initialRoster.count,
+      playerNames: initialRoster.names,
+      activePlayerIndex: 0,
+      hardhatsCollected: 0,
+      streak: 0,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      groundHeight: 84,
+      scrollSpeed: 235,
+      bgScrollFar: 0,
+      bgScrollMid: 0,
       groundScroll: 0,
-      skylineScroll: 0,
-      cloudScroll: 0,
-      spawnDistance: 120,
-      lastGapCenterY: null,
-      obstaclesPassed: 0,
-      difficultyTier: 1,
-      hazardTimer: 4.5,
-      droneTimer: 7.0,
-      deathReason: 'BEAM IMPACT!',
+      time: 0,
       player: {
-        x: 100,
+        x: 120,
         y: 260,
         vy: 0,
         radius: 17,
         rotation: 0,
-        thrustAnim: 0,
-        wheelAngle: 0,
-        bobPhase: 0
+        bucketAngle: 0,
+        wheelSpin: 0
       },
       obstacles: [],
-      fallingHazards: [],
-      airDrones: [],
       collectibles: [],
+      fallingHazards: [],
       particles: [],
-      floatingTexts: []
+      floatingTexts: [],
+      clouds: [],
+      stars: [],
+      spawnTimer: 0,
+      hazardTimer: 2.8,
+      lastTier: 1
     };
 
+    function getDifficultyTier() {
+      const s = state.score;
+      if (s >= 26) {
+        return {
+          tier: 5,
+          label: 'PHASE 5 • OVERDRIVE',
+          color: '#fb7185',
+          speedMult: 1.32,
+          gapScale: 0.84,
+          movingChance: 0.72,
+          movingSpeedMult: 1.55,
+          ballChance: 0.44,
+          wireChance: 0.34,
+          droneChance: 0.42,
+          hazardIntervalMin: 2.1,
+          hazardIntervalRange: 1.8,
+          doubleHazardChance: 0.35,
+          hazardMult: 1.35
+        };
+      }
+      if (s >= 18) {
+        return {
+          tier: 4,
+          label: 'PHASE 4 • HEAVY SURGE',
+          color: '#fb923c',
+          speedMult: 1.24,
+          gapScale: 0.88,
+          movingChance: 0.58,
+          movingSpeedMult: 1.38,
+          ballChance: 0.36,
+          wireChance: 0.28,
+          droneChance: 0.32,
+          hazardIntervalMin: 2.5,
+          hazardIntervalRange: 2.1,
+          doubleHazardChance: 0.22,
+          hazardMult: 1.25
+        };
+      }
+      if (s >= 11) {
+        return {
+          tier: 3,
+          label: 'PHASE 3 • RUSH HOUR',
+          color: '#fbbf24',
+          speedMult: 1.16,
+          gapScale: 0.92,
+          movingChance: 0.42,
+          movingSpeedMult: 1.22,
+          ballChance: 0.28,
+          wireChance: 0.22,
+          droneChance: 0.22,
+          hazardIntervalMin: 3.0,
+          hazardIntervalRange: 2.4,
+          doubleHazardChance: 0.1,
+          hazardMult: 1.15
+        };
+      }
+      if (s >= 5) {
+        return {
+          tier: 2,
+          label: 'PHASE 2 • DOUBLE SHIFT',
+          color: '#34d399',
+          speedMult: 1.08,
+          gapScale: 0.96,
+          movingChance: 0.24,
+          movingSpeedMult: 1.1,
+          ballChance: 0.2,
+          wireChance: 0.16,
+          droneChance: 0.14,
+          hazardIntervalMin: 3.5,
+          hazardIntervalRange: 2.8,
+          doubleHazardChance: 0,
+          hazardMult: 1.06
+        };
+      }
+      return {
+        tier: 1,
+        label: 'PHASE 1 • STEADY',
+        color: '#7dd3fc',
+        speedMult: 1.0,
+        gapScale: 1.0,
+        movingChance: 0,
+        movingSpeedMult: 1.0,
+        ballChance: 0.14,
+        wireChance: 0,
+        droneChance: 0,
+        hazardIntervalMin: 4.1,
+        hazardIntervalRange: 3.2,
+        doubleHazardChance: 0,
+        hazardMult: 1.0
+      };
+    }
+
+    function rollNewProceduralBiome(excludeCurrent = false) {
+      let pool = PROCEDURAL_BIOMES;
+      if (excludeCurrent && PROCEDURAL_BIOMES.length > 1 && state.biome) {
+        pool = PROCEDURAL_BIOMES.filter((b) => b.id !== state.biome.id);
+      }
+      state.biome = pool[Math.floor(Math.random() * pool.length)];
+      state.biomeSeed = Math.random() * 1000;
+      const biomePill = document.getElementById('hud-biome-pill');
+      if (biomePill) {
+        biomePill.textContent = state.biome.label;
+      }
+    }
+
     // =========================================================================
-    // 4. RESPONSIVE CANVAS & SCENERY INITIALIZATION
+    // 4. CANVAS SETUP & RESPONSIVE RESIZING (iPhone, iPad, Desktop)
     // =========================================================================
     const canvas = document.getElementById('game-canvas');
     const ctx = canvas.getContext('2d');
 
-    let viewW = window.innerWidth;
-    let viewH = window.innerHeight;
-    let groundHeight = 76;
-
-    const skylineBuildings = [];
-    const clouds = [];
-    const stars = [];
-
-    function initScenery() {
-      skylineBuildings.length = 0;
-      let bx = 0;
-      while (bx < 2200) {
-        const w = 48 + Math.random() * 58;
-        const h = 75 + Math.random() * 145;
-        skylineBuildings.push({
-          x: bx,
-          w,
-          h,
-          hasCrane: Math.random() < 0.34,
-          craneLen: 46 + Math.random() * 34,
-          winSeed: Math.floor(Math.random() * 100)
-        });
-        bx += w + 8 + Math.random() * 18;
-      }
-
-      clouds.length = 0;
-      for (let i = 0; i < 8; i++) {
-        clouds.push({
-          x: Math.random() * 1600,
-          y: 45 + Math.random() * 190,
-          scale: 0.65 + Math.random() * 0.75,
-          speed: 12 + Math.random() * 16
-        });
-      }
-
-      stars.length = 0;
-      for (let i = 0; i < 55; i++) {
-        stars.push({
-          x: Math.random() * 1800,
-          y: Math.random() * 420,
-          r: 0.8 + Math.random() * 1.4,
-          twinkle: Math.random() * Math.PI * 2
-        });
-      }
+    function getSafeBottomInset() {
+      const probe = document.createElement('div');
+      probe.style.cssText = 'position:fixed;bottom:0;height:env(safe-area-inset-bottom,0px);pointer-events:none;visibility:hidden;';
+      document.body.appendChild(probe);
+      const val = probe.offsetHeight || 0;
+      document.body.removeChild(probe);
+      return val;
     }
 
     function resizeCanvas() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+      const safeBottom = getSafeBottomInset();
       const rect = canvas.getBoundingClientRect();
-      const safeBottomPx = Math.max(0, Math.round(rect.height - window.innerHeight));
-      viewW = Math.max(320, Math.round(rect.width || window.innerWidth));
-      viewH = Math.max(480, Math.round(rect.height || (window.innerHeight + safeBottomPx)));
+      state.width = Math.max(window.innerWidth, Math.round(rect.width || 0));
+      state.height = Math.max(window.innerHeight + safeBottom, Math.round(rect.height || 0));
 
-      canvas.width = Math.round(viewW * dpr);
-      canvas.height = Math.round(viewH * dpr);
+      canvas.width = Math.floor(state.width * dpr);
+      canvas.height = Math.floor(state.height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      groundHeight = Math.max(64, Math.min(90, Math.round((viewH - safeBottomPx) * 0.11))) + safeBottomPx;
+      const baseGround = Math.max(66, Math.min(92, Math.round((state.height - safeBottom) * 0.115)));
+      state.groundHeight = baseGround + safeBottom;
+      state.player.x = state.width < 600
+        ? Math.round(state.width * 0.25)
+        : Math.max(150, Math.min(260, Math.round(state.width * 0.22)));
 
-      state.player.x = viewW < 600
-        ? Math.max(74, Math.round(viewW * 0.25))
-        : Math.min(220, Math.round(viewW * 0.23));
-
-      if (state.phase === 'MENU' || state.phase === 'READY') {
-        state.player.y = (viewH - groundHeight) * 0.46;
+      if (state.mode === 'menu' || state.mode === 'ready') {
+        state.player.y = Math.round((state.height - state.groundHeight) * 0.46);
       }
     }
 
-    // =========================================================================
-    // 5. VECTOR HEAVY MACHINERY RENDERING (Wheel Loader, Excavator, Hauler)
-    // =========================================================================
-    function drawConstructionRig(targetCtx, rigKey, x, y, radius, rotation, thrustAnim, wheelAngle, scale = 1) {
-      const spec = RIG_SPECS[rigKey] || RIG_SPECS.loader;
-      targetCtx.save();
-      targetCtx.translate(x, y);
-      targetCtx.rotate(rotation);
-      targetCtx.scale(scale, scale);
-
-      // Subtle dark contrast halo so yellow/orange machines stand out clearly against bright/orange skies
-      targetCtx.shadowColor = 'rgba(15, 23, 42, 0.55)';
-      targetCtx.shadowBlur = 7;
-      targetCtx.shadowOffsetY = 2;
-
-      if (thrustAnim > 0.05) {
-        targetCtx.save();
-        const flameLen = (12 + thrustAnim * 18);
-        const grad = targetCtx.createLinearGradient(-14, 4, -14 - flameLen, 12);
-        grad.addColorStop(0, '#fef08a');
-        grad.addColorStop(0.5, '#f97316');
-        grad.addColorStop(1, 'rgba(239, 68, 68, 0)');
-        targetCtx.fillStyle = grad;
-        targetCtx.beginPath();
-        targetCtx.moveTo(-14, 0);
-        targetCtx.lineTo(-14 - flameLen, 7 + Math.sin(thrustAnim * 20) * 3);
-        targetCtx.lineTo(-14, 11);
-        targetCtx.closePath();
-        targetCtx.fill();
-        targetCtx.restore();
+    function initScenery() {
+      state.clouds = [];
+      for (let i = 0; i < 7; i++) {
+        state.clouds.push({
+          x: Math.random() * (state.width + 200),
+          y: 40 + Math.random() * (state.height * 0.36),
+          scale: 0.65 + Math.random() * 0.75,
+          speed: 14 + Math.random() * 20
+        });
       }
-
-      if (rigKey === 'loader') {
-        targetCtx.fillStyle = spec.primaryColor;
-        targetCtx.beginPath();
-        targetCtx.roundRect(-21, -7, 22, 16, 4);
-        targetCtx.fill();
-        targetCtx.strokeStyle = '#0f172a';
-        targetCtx.lineWidth = 1.8;
-        targetCtx.stroke();
-
-        targetCtx.fillStyle = '#0f172a';
-        targetCtx.fillRect(-19, -4, 3, 10);
-        targetCtx.fillRect(-14, -4, 3, 10);
-
-        targetCtx.fillStyle = spec.cabColor;
-        targetCtx.beginPath();
-        targetCtx.roundRect(-7, -17, 15, 12, 3);
-        targetCtx.fill();
-        targetCtx.fillStyle = '#38bdf8';
-        targetCtx.beginPath();
-        targetCtx.roundRect(-4, -15, 10, 8, 2);
-        targetCtx.fill();
-
-        targetCtx.fillStyle = '#f97316';
-        targetCtx.beginPath();
-        targetCtx.arc(0, -19, 2.5, 0, Math.PI * 2);
-        targetCtx.fill();
-
-        const armLift = -thrustAnim * 0.35;
-        targetCtx.save();
-        targetCtx.translate(6, -3);
-        targetCtx.rotate(armLift);
-        targetCtx.lineCap = 'round';
-        // Dark steel outline behind loader lift arm for high contrast on all skies
-        targetCtx.strokeStyle = '#0f172a';
-        targetCtx.lineWidth = 6.5;
-        targetCtx.beginPath();
-        targetCtx.moveTo(0, 0);
-        targetCtx.lineTo(13, 4);
-        targetCtx.stroke();
-
-        targetCtx.strokeStyle = spec.secondaryColor;
-        targetCtx.lineWidth = 3.6;
-        targetCtx.beginPath();
-        targetCtx.moveTo(0, 0);
-        targetCtx.lineTo(13, 4);
-        targetCtx.stroke();
-
-        targetCtx.fillStyle = '#334155';
-        targetCtx.beginPath();
-        targetCtx.moveTo(11, -4);
-        targetCtx.lineTo(22, -2);
-        targetCtx.lineTo(24, 10);
-        targetCtx.lineTo(10, 10);
-        targetCtx.closePath();
-        targetCtx.fill();
-        targetCtx.strokeStyle = '#0f172a';
-        targetCtx.lineWidth = 1.5;
-        targetCtx.stroke();
-        targetCtx.restore();
-
-        [-11, 6].forEach((wx) => {
-          targetCtx.save();
-          targetCtx.translate(wx, 11);
-          targetCtx.rotate(wheelAngle);
-          targetCtx.fillStyle = '#0f172a';
-          targetCtx.beginPath();
-          targetCtx.arc(0, 0, 7.5, 0, Math.PI * 2);
-          targetCtx.fill();
-          targetCtx.fillStyle = '#eab308';
-          targetCtx.beginPath();
-          targetCtx.arc(0, 0, 3.8, 0, Math.PI * 2);
-          targetCtx.fill();
-          targetCtx.fillStyle = '#0f172a';
-          targetCtx.fillRect(-1, -3.5, 2, 7);
-          targetCtx.restore();
+      state.stars = [];
+      for (let i = 0; i < 45; i++) {
+        state.stars.push({
+          x: Math.random() * state.width,
+          y: Math.random() * (state.height * 0.55),
+          r: 1 + Math.random() * 1.8,
+          phase: Math.random() * Math.PI * 2
         });
-      } else if (rigKey === 'excavator') {
-        targetCtx.fillStyle = '#1e293b';
-        targetCtx.beginPath();
-        targetCtx.roundRect(-18, 7, 32, 9, 4.5);
-        targetCtx.fill();
-        targetCtx.strokeStyle = '#0f172a';
-        targetCtx.lineWidth = 1.6;
-        targetCtx.stroke();
+      }
+    }
 
-        targetCtx.fillStyle = '#eab308';
-        [-12, -4, 4, 10].forEach((rx) => {
-          targetCtx.beginPath();
-          targetCtx.arc(rx, 11.5, 2.1, 0, Math.PI * 2);
-          targetCtx.fill();
+    window.addEventListener('resize', resizeCanvas);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', resizeCanvas);
+    }
+    resizeCanvas();
+    initScenery();
+
+    // =========================================================================
+    // 5. PROCEDURAL VECTOR DRAWING (Rigs, Beams, Wrecking Balls, Hardhats)
+    // =========================================================================
+    function drawConstructionRig(context, rigType, x, y, radius, rotation, bucketAngle, wheelSpin, dir = 1) {
+      const spec = RIG_SPECS[rigType] || RIG_SPECS.loader;
+      context.save();
+      context.translate(x, y);
+      context.rotate(rotation);
+      context.scale(dir, 1);
+
+      const r = radius;
+
+      // Subtle dark contrast aura so all machines pop clearly against bright orange/blue skies
+      context.shadowColor = 'rgba(15, 23, 42, 0.55)';
+      context.shadowBlur = 7;
+      context.shadowOffsetY = 2;
+
+      // Exhaust puff pipe
+      context.fillStyle = '#0f172a';
+      context.fillRect(-r * 0.68, -r * 0.98, r * 0.18, r * 0.48);
+
+      if (rigType === 'loader') {
+        // --- WHEEL LOADER ---
+        context.fillStyle = '#0f172a';
+        context.beginPath();
+        context.roundRect(-r * 0.92, -r * 0.42, r * 1.65, r * 0.72, 6);
+        context.fill();
+        context.fillStyle = spec.primaryColor;
+        context.beginPath();
+        context.roundRect(-r * 0.87, -r * 0.37, r * 1.55, r * 0.62, 5);
+        context.fill();
+
+        context.fillStyle = '#0f172a';
+        context.fillRect(-r * 0.82, -r * 0.3, r * 0.48, r * 0.42);
+        context.fillStyle = spec.secondaryColor;
+        context.fillRect(-r * 0.78, -r * 0.26, r * 0.4, r * 0.34);
+        context.fillStyle = '#1e293b';
+        context.fillRect(-r * 0.72, -r * 0.2, r * 0.28, r * 0.06);
+        context.fillRect(-r * 0.72, -r * 0.08, r * 0.28, r * 0.06);
+
+        context.fillStyle = spec.cabColor;
+        context.beginPath();
+        context.roundRect(-r * 0.32, -r * 0.96, r * 0.74, r * 0.58, 5);
+        context.fill();
+        context.fillStyle = '#38bdf8';
+        context.beginPath();
+        context.roundRect(-r * 0.24, -r * 0.86, r * 0.58, r * 0.4, 3);
+        context.fill();
+
+        context.fillStyle = '#fb923c';
+        context.beginPath();
+        context.arc(-r * 0.02, -r * 1.08, r * 0.13, 0, Math.PI * 2);
+        context.fill();
+
+        context.save();
+        context.translate(r * 0.44, -r * 0.14);
+        context.rotate(-0.26 + bucketAngle * 0.55);
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = r * 0.3;
+        context.lineCap = 'round';
+        context.beginPath();
+        context.moveTo(0, 0);
+        context.lineTo(r * 0.86, r * 0.12);
+        context.stroke();
+
+        context.strokeStyle = '#fbbf24';
+        context.lineWidth = r * 0.18;
+        context.beginPath();
+        context.moveTo(0, 0);
+        context.lineTo(r * 0.86, r * 0.12);
+        context.stroke();
+
+        context.translate(r * 0.88, r * 0.12);
+        context.rotate(bucketAngle * 0.45);
+        context.fillStyle = '#334155';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 2;
+        context.beginPath();
+        context.moveTo(-r * 0.05, -r * 0.42);
+        context.lineTo(r * 0.44, -r * 0.25);
+        context.lineTo(r * 0.52, r * 0.36);
+        context.lineTo(-r * 0.12, r * 0.36);
+        context.closePath();
+        context.fill();
+        context.stroke();
+        context.fillStyle = '#f8fafc';
+        context.fillRect(r * 0.45, -r * 0.2, r * 0.08, r * 0.52);
+        context.restore();
+
+        [-r * 0.46, r * 0.34].forEach((wx) => {
+          context.save();
+          context.translate(wx, r * 0.46);
+          context.rotate(wheelSpin);
+          context.fillStyle = '#0f172a';
+          context.beginPath();
+          context.arc(0, 0, r * 0.42, 0, Math.PI * 2);
+          context.fill();
+          context.fillStyle = '#eab308';
+          context.beginPath();
+          context.arc(0, 0, r * 0.22, 0, Math.PI * 2);
+          context.fill();
+          context.fillStyle = '#0f172a';
+          context.beginPath();
+          context.arc(0, 0, r * 0.08, 0, Math.PI * 2);
+          context.fill();
+          context.restore();
+        });
+      } else if (rigType === 'excavator') {
+        // --- CRAWLER EXCAVATOR (High-contrast boom & stick so it pops on all skies) ---
+        context.fillStyle = '#0f172a';
+        context.beginPath();
+        context.roundRect(-r * 0.92, r * 0.22, r * 1.66, r * 0.5, 9);
+        context.fill();
+        context.fillStyle = '#475569';
+        context.beginPath();
+        context.roundRect(-r * 0.82, r * 0.31, r * 1.46, r * 0.32, 6);
+        context.fill();
+        [-r * 0.56, -r * 0.18, r * 0.2, r * 0.54].forEach((rx) => {
+          context.fillStyle = '#eab308';
+          context.beginPath();
+          context.arc(rx, r * 0.47, r * 0.11, 0, Math.PI * 2);
+          context.fill();
         });
 
-        targetCtx.fillStyle = spec.primaryColor;
-        targetCtx.beginPath();
-        targetCtx.roundRect(-19, -6, 24, 13, 4);
-        targetCtx.fill();
-        targetCtx.strokeStyle = '#0f172a';
-        targetCtx.lineWidth = 1.8;
-        targetCtx.stroke();
+        // Counterweight & House with bold dark outline
+        context.fillStyle = '#0f172a';
+        context.beginPath();
+        context.roundRect(-r * 0.9, -r * 0.44, r * 1.44, r * 0.68, 7);
+        context.fill();
+        context.fillStyle = spec.primaryColor;
+        context.beginPath();
+        context.roundRect(-r * 0.85, -r * 0.39, r * 1.34, r * 0.58, 5);
+        context.fill();
 
-        targetCtx.fillStyle = spec.cabColor;
-        targetCtx.beginPath();
-        targetCtx.roundRect(-5, -16, 13, 11, 3);
-        targetCtx.fill();
-        targetCtx.fillStyle = '#38bdf8';
-        targetCtx.fillRect(-2, -14, 8, 7);
+        context.fillStyle = '#1e293b';
+        context.beginPath();
+        context.roundRect(-r * 0.92, -r * 0.36, r * 0.36, r * 0.52, 4);
+        context.fill();
+        context.fillStyle = '#f8fafc';
+        context.fillRect(-r * 0.84, -r * 0.16, r * 0.22, r * 0.08);
 
-        const boomAngle = -0.35 - thrustAnim * 0.35;
-        targetCtx.save();
-        targetCtx.translate(4, -4);
-        targetCtx.rotate(boomAngle);
-        targetCtx.lineCap = 'round';
-        targetCtx.lineJoin = 'round';
+        // Operator Cab
+        context.fillStyle = spec.cabColor;
+        context.beginPath();
+        context.roundRect(-r * 0.36, -r * 0.96, r * 0.68, r * 0.56, 5);
+        context.fill();
+        context.fillStyle = '#38bdf8';
+        context.beginPath();
+        context.roundRect(-r * 0.28, -r * 0.86, r * 0.52, r * 0.38, 3);
+        context.fill();
 
-        // Bold dark outline around excavator boom & stick so it pops against orange canyon skies
-        targetCtx.strokeStyle = '#0f172a';
-        targetCtx.lineWidth = 7.4;
-        targetCtx.beginPath();
-        targetCtx.moveTo(0, 0);
-        targetCtx.lineTo(13, -7);
-        targetCtx.lineTo(20, 5);
-        targetCtx.stroke();
+        // Heavy Outlined Excavator Boom, Stick & Bucket
+        context.save();
+        context.translate(r * 0.3, -r * 0.22);
+        context.rotate(-0.48 + bucketAngle * 0.42);
 
-        // Inner golden-yellow boom core
-        targetCtx.strokeStyle = '#fbbf24';
-        targetCtx.lineWidth = 4.2;
-        targetCtx.beginPath();
-        targetCtx.moveTo(0, 0);
-        targetCtx.lineTo(13, -7);
-        targetCtx.lineTo(20, 5);
-        targetCtx.stroke();
+        // Outer dark steel border for Boom
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = r * 0.36;
+        context.lineCap = 'round';
+        context.beginPath();
+        context.moveTo(0, 0);
+        context.lineTo(r * 0.84, -r * 0.36);
+        context.stroke();
 
-        // Hydraulic cylinder accent along top of boom
-        targetCtx.strokeStyle = '#cbd5e1';
-        targetCtx.lineWidth = 1.6;
-        targetCtx.beginPath();
-        targetCtx.moveTo(3, -3);
-        targetCtx.lineTo(12, -8.5);
-        targetCtx.stroke();
+        // Bright yellow inner Boom
+        context.strokeStyle = '#fde047';
+        context.lineWidth = r * 0.22;
+        context.beginPath();
+        context.moveTo(0, 0);
+        context.lineTo(r * 0.84, -r * 0.36);
+        context.stroke();
 
-        targetCtx.fillStyle = '#1e293b';
-        targetCtx.beginPath();
-        targetCtx.arc(20, 8, 5.8, 0.2, Math.PI * 1.15);
-        targetCtx.fill();
-        targetCtx.strokeStyle = '#0f172a';
-        targetCtx.lineWidth = 1.4;
-        targetCtx.stroke();
-        targetCtx.restore();
+        // Hydraulic cylinder accent
+        context.strokeStyle = '#cbd5e1';
+        context.lineWidth = r * 0.08;
+        context.beginPath();
+        context.moveTo(r * 0.14, r * 0.12);
+        context.lineTo(r * 0.58, -r * 0.14);
+        context.stroke();
+
+        // Pivot pin
+        context.fillStyle = '#0f172a';
+        context.beginPath();
+        context.arc(r * 0.84, -r * 0.36, r * 0.16, 0, Math.PI * 2);
+        context.fill();
+
+        // Stick / Dipper Arm
+        context.translate(r * 0.84, -r * 0.36);
+        context.rotate(0.95 + bucketAngle * 0.42);
+
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = r * 0.28;
+        context.beginPath();
+        context.moveTo(0, 0);
+        context.lineTo(r * 0.72, r * 0.28);
+        context.stroke();
+
+        context.strokeStyle = '#facc15';
+        context.lineWidth = r * 0.16;
+        context.beginPath();
+        context.moveTo(0, 0);
+        context.lineTo(r * 0.72, r * 0.28);
+        context.stroke();
+
+        // Digging Bucket with Teeth
+        context.translate(r * 0.72, r * 0.28);
+        context.fillStyle = '#1e293b';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 2;
+        context.beginPath();
+        context.arc(0, r * 0.1, r * 0.28, -0.2, Math.PI * 1.15);
+        context.closePath();
+        context.fill();
+        context.stroke();
+        context.restore();
       } else {
-        targetCtx.save();
-        targetCtx.translate(-6, 4);
-        targetCtx.rotate(-thrustAnim * 0.28);
-        targetCtx.fillStyle = spec.primaryColor;
-        targetCtx.beginPath();
-        targetCtx.moveTo(-16, -13);
-        targetCtx.lineTo(8, -11);
-        targetCtx.lineTo(6, 2);
-        targetCtx.lineTo(-14, 2);
-        targetCtx.closePath();
-        targetCtx.fill();
-        targetCtx.strokeStyle = '#0f172a';
-        targetCtx.lineWidth = 1.8;
-        targetCtx.stroke();
-        targetCtx.restore();
+        // --- ARTICULATED HAULER (6x6 Dump Truck) ---
+        context.fillStyle = '#0f172a';
+        context.beginPath();
+        context.roundRect(-r * 0.96, r * 0.06, r * 1.72, r * 0.32, 4);
+        context.fill();
 
-        targetCtx.fillStyle = '#1e293b';
-        targetCtx.fillRect(1, -2, 5, 8);
+        context.save();
+        context.translate(-r * 0.14, r * 0.05);
+        context.rotate(-0.08 + bucketAngle * 0.38);
+        context.fillStyle = '#0f172a';
+        context.beginPath();
+        context.moveTo(-r * 0.88, -r * 0.68);
+        context.lineTo(r * 0.16, -r * 0.68);
+        context.lineTo(r * 0.06, r * 0.06);
+        context.lineTo(-r * 0.76, r * 0.06);
+        context.closePath();
+        context.fill();
 
-        targetCtx.fillStyle = spec.primaryColor;
-        targetCtx.beginPath();
-        targetCtx.roundRect(5, -6, 15, 12, 3);
-        targetCtx.fill();
-        targetCtx.strokeStyle = '#0f172a';
-        targetCtx.lineWidth = 1.8;
-        targetCtx.stroke();
+        context.fillStyle = spec.primaryColor;
+        context.beginPath();
+        context.moveTo(-r * 0.83, -r * 0.63);
+        context.lineTo(r * 0.11, -r * 0.63);
+        context.lineTo(r * 0.02, r * 0.02);
+        context.lineTo(-r * 0.72, r * 0.02);
+        context.closePath();
+        context.fill();
 
-        targetCtx.fillStyle = spec.cabColor;
-        targetCtx.beginPath();
-        targetCtx.roundRect(5, -15, 11, 10, 2.5);
-        targetCtx.fill();
-        targetCtx.fillStyle = '#38bdf8';
-        targetCtx.fillRect(8, -13, 6, 6);
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 2;
+        context.beginPath();
+        context.moveTo(-r * 0.56, -r * 0.6);
+        context.lineTo(-r * 0.48, -r * 0.02);
+        context.moveTo(-r * 0.26, -r * 0.6);
+        context.lineTo(-r * 0.2, -r * 0.02);
+        context.stroke();
+        context.restore();
 
-        [-14, -4, 13].forEach((wx) => {
-          targetCtx.save();
-          targetCtx.translate(wx, 11);
-          targetCtx.rotate(wheelAngle);
-          targetCtx.fillStyle = '#0f172a';
-          targetCtx.beginPath();
-          targetCtx.arc(0, 0, 6.2, 0, Math.PI * 2);
-          targetCtx.fill();
-          targetCtx.fillStyle = '#eab308';
-          targetCtx.beginPath();
-          targetCtx.arc(0, 0, 3, 0, Math.PI * 2);
-          targetCtx.fill();
-          targetCtx.restore();
+        context.fillStyle = '#0f172a';
+        context.beginPath();
+        context.roundRect(r * 0.16, -r * 0.9, r * 0.62, r * 1.0, 6);
+        context.fill();
+        context.fillStyle = spec.cabColor;
+        context.beginPath();
+        context.roundRect(r * 0.2, -r * 0.85, r * 0.54, r * 0.58, 5);
+        context.fill();
+        context.fillStyle = '#38bdf8';
+        context.beginPath();
+        context.roundRect(r * 0.3, -r * 0.76, r * 0.38, r * 0.38, 3);
+        context.fill();
+        context.fillStyle = spec.primaryColor;
+        context.beginPath();
+        context.roundRect(r * 0.2, -r * 0.28, r * 0.6, r * 0.36, 4);
+        context.fill();
+
+        [-r * 0.66, -r * 0.18, r * 0.46].forEach((wx) => {
+          context.save();
+          context.translate(wx, r * 0.46);
+          context.rotate(wheelSpin);
+          context.fillStyle = '#0f172a';
+          context.beginPath();
+          context.arc(0, 0, r * 0.34, 0, Math.PI * 2);
+          context.fill();
+          context.fillStyle = '#eab308';
+          context.beginPath();
+          context.arc(0, 0, r * 0.17, 0, Math.PI * 2);
+          context.fill();
+          context.restore();
         });
       }
 
-      targetCtx.restore();
+      context.restore();
     }
 
-    function renderGaragePreviews() {
+    function renderRigPreviews() {
       ['loader', 'excavator', 'hauler'].forEach((rigKey) => {
         const pCanvas = document.getElementById(`preview-${rigKey}`);
         if (!pCanvas) return;
         const pCtx = pCanvas.getContext('2d');
         pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
-        drawConstructionRig(pCtx, rigKey, pCanvas.width * 0.48, pCanvas.height * 0.56, 17, -0.06, 0.25, 0.4, 1.55);
+        drawConstructionRig(pCtx, rigKey, 54, 48, 22, -0.05, 0.2, 0.4, 1);
       });
     }
 
-    // =========================================================================
-    // 6. BACKGROUND, STEEL BEAMS, WRECKING BALLS & COLLECTIBLE RENDERING
-    // =========================================================================
-    function drawScene() {
-      const biome = state.currentBiome || PROCEDURAL_BIOMES[0];
-      const light = SHIFT_LIGHTING[state.selectedShift] || SHIFT_LIGHTING.day;
-      const playH = viewH - groundHeight;
+    function drawProceduralBackdrop(biome, lighting, horizonY) {
+      const isNight = lighting.isNight;
+      const farColor = isNight ? biome.nightFar : biome.dayFar;
+      const midColor = isNight ? biome.nightMid : biome.dayMid;
 
-      ctx.save();
-      if (state.shakeTime > 0) {
-        const mag = state.shakeIntensity * (state.shakeTime / 0.28);
-        ctx.translate((Math.random() - 0.5) * mag, (Math.random() - 0.5) * mag);
-      }
-
-      const skyGrad = ctx.createLinearGradient(0, 0, 0, playH);
-      skyGrad.addColorStop(0, light.isNight ? light.skyTop : biome.daySkyTop);
-      skyGrad.addColorStop(1, light.isNight ? light.skyBottom : biome.daySkyBottom);
-      ctx.fillStyle = skyGrad;
-      ctx.fillRect(0, 0, viewW, playH);
-
-      if (light.isNight) {
-        stars.forEach((st) => {
-          const sx = (st.x - state.skylineScroll * 0.08) % (viewW + 60);
-          const drawX = sx < 0 ? sx + viewW + 60 : sx;
-          const alpha = 0.45 + Math.sin(performance.now() * 0.003 + st.twinkle) * 0.45;
-          ctx.fillStyle = `rgba(248, 250, 252, ${alpha.toFixed(2)})`;
-          ctx.beginPath();
-          ctx.arc(drawX, st.y % (playH * 0.7), st.r, 0, Math.PI * 2);
-          ctx.fill();
-        });
-      }
-
-      const sunX = viewW * 0.78;
-      const sunY = playH * light.sunY;
-      ctx.save();
-      ctx.fillStyle = light.sunColor;
-      ctx.shadowColor = light.sunColor;
-      ctx.shadowBlur = light.isNight ? 24 : 36;
-      ctx.beginPath();
-      ctx.arc(sunX, sunY, light.isNight ? 22 : 32, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-
-      clouds.forEach((cl) => {
-        const cx = ((cl.x - state.cloudScroll * (cl.speed / 20)) % (viewW + 220)) - 110;
-        const drawX = cx < -110 ? cx + viewW + 220 : cx;
-        ctx.fillStyle = light.isNight ? 'rgba(148, 163, 184, 0.14)' : 'rgba(255, 255, 255, 0.65)';
+      if (biome.id === 'forest') {
+        // Distant rolling pine ridges
+        ctx.fillStyle = farColor;
         ctx.beginPath();
-        ctx.arc(drawX, cl.y, 24 * cl.scale, 0, Math.PI * 2);
-        ctx.arc(drawX + 20 * cl.scale, cl.y - 6 * cl.scale, 28 * cl.scale, 0, Math.PI * 2);
-        ctx.arc(drawX + 44 * cl.scale, cl.y, 22 * cl.scale, 0, Math.PI * 2);
+        ctx.moveTo(0, horizonY);
+        for (let x = -220; x <= state.width + 260; x += 220) {
+          const sx = x - (state.bgScrollFar % 220);
+          ctx.lineTo(sx + 110, horizonY - 125);
+          ctx.lineTo(sx + 220, horizonY - 55);
+        }
+        ctx.lineTo(state.width, horizonY);
+        ctx.closePath();
         ctx.fill();
-      });
 
-      ctx.fillStyle = light.isNight ? biome.nightFar : biome.dayFar;
-      ctx.globalAlpha = 0.55;
-      ctx.beginPath();
-      ctx.moveTo(0, playH);
-      for (let x = 0; x <= viewW + 80; x += 80) {
-        const worldX = x + state.skylineScroll * 0.18;
-        const peak = biome.id === 'alpine'
-          ? Math.abs(Math.sin(worldX * 0.0045)) * 135 + 35
-          : biome.id === 'canyon'
-            ? (Math.floor(worldX / 140) % 2 === 0 ? 95 : 55)
-            : Math.sin(worldX * 0.004) * 45 + 65;
-        ctx.lineTo(x, playH - peak);
-      }
-      ctx.lineTo(viewW + 80, playH);
-      ctx.closePath();
-      ctx.fill();
-      ctx.globalAlpha = 1;
+        // Midground dense pine forest silhouettes
+        ctx.fillStyle = midColor;
+        ctx.fillRect(0, horizonY - 26, state.width, 30);
+        const step = 46;
+        const startX = -(state.bgScrollMid % step) - step;
+        let idx = Math.floor(state.bgScrollMid / step);
+        for (let x = startX; x < state.width + step; x += step) {
+          const treeH = 52 + ((Math.abs(Math.sin(idx * 12.9898 + state.biomeSeed)) * 46) | 0);
+          ctx.beginPath();
+          ctx.moveTo(x, horizonY - 16);
+          ctx.lineTo(x + 18, horizonY - 16 - treeH);
+          ctx.lineTo(x + 36, horizonY - 16);
+          ctx.closePath();
+          ctx.fill();
+          idx++;
+        }
+      } else if (biome.id === 'alpine') {
+        // Jagged snow-capped mountain peaks
+        const peakW = 280;
+        const startFar = -(state.bgScrollFar % peakW) - peakW;
+        let pIdx = Math.floor(state.bgScrollFar / peakW);
+        for (let x = startFar; x < state.width + peakW; x += peakW) {
+          const h = 155 + ((Math.abs(Math.sin(pIdx * 7.31 + state.biomeSeed)) * 65) | 0);
+          ctx.fillStyle = farColor;
+          ctx.beginPath();
+          ctx.moveTo(x, horizonY);
+          ctx.lineTo(x + peakW * 0.5, horizonY - h);
+          ctx.lineTo(x + peakW, horizonY);
+          ctx.closePath();
+          ctx.fill();
 
-      const midColor = light.isNight ? biome.nightMid : biome.dayMid;
-      if (biome.id === 'city' || biome.id === 'harbor') {
-        const span = 2200;
-        skylineBuildings.forEach((b) => {
-          let bx = (b.x - state.skylineScroll * 0.42) % span;
-          if (bx < -120) bx += span;
-          if (bx > viewW + 80) return;
+          // Snow cap
+          ctx.fillStyle = isNight ? 'rgba(226, 232, 240, 0.35)' : 'rgba(255, 255, 255, 0.85)';
+          ctx.beginPath();
+          ctx.moveTo(x + peakW * 0.5, horizonY - h);
+          ctx.lineTo(x + peakW * 0.37, horizonY - h * 0.68);
+          ctx.lineTo(x + peakW * 0.46, horizonY - h * 0.74);
+          ctx.lineTo(x + peakW * 0.53, horizonY - h * 0.66);
+          ctx.lineTo(x + peakW * 0.63, horizonY - h * 0.68);
+          ctx.closePath();
+          ctx.fill();
+          pIdx++;
+        }
 
+        // Foothills
+        ctx.fillStyle = midColor;
+        ctx.beginPath();
+        ctx.moveTo(0, horizonY);
+        for (let x = -200; x <= state.width + 240; x += 200) {
+          const sx = x - (state.bgScrollMid % 200);
+          ctx.lineTo(sx + 100, horizonY - 78);
+          ctx.lineTo(sx + 200, horizonY - 28);
+        }
+        ctx.lineTo(state.width, horizonY);
+        ctx.closePath();
+        ctx.fill();
+      } else if (biome.id === 'city') {
+        // Distant high-rises & tower cranes
+        const bStep = 74;
+        const startFar = -(state.bgScrollFar % bStep) - bStep;
+        let bIdx = Math.floor(state.bgScrollFar / bStep);
+        for (let x = startFar; x < state.width + bStep; x += bStep) {
+          const bh = 85 + ((Math.abs(Math.sin(bIdx * 4.19 + state.biomeSeed)) * 115) | 0);
+          ctx.fillStyle = farColor;
+          ctx.fillRect(x + 4, horizonY - bh, bStep - 10, bh);
+          if (bIdx % 4 === 0) {
+            ctx.strokeStyle = isNight ? 'rgba(250, 204, 21, 0.35)' : 'rgba(234, 179, 8, 0.55)';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(x + 28, horizonY - bh);
+            ctx.lineTo(x + 28, horizonY - bh - 44);
+            ctx.moveTo(x + 8, horizonY - bh - 36);
+            ctx.lineTo(x + 68, horizonY - bh - 36);
+            ctx.stroke();
+          }
+          bIdx++;
+        }
+
+        // Foreground city blocks with lit windows
+        const mStep = 64;
+        const startMid = -(state.bgScrollMid % mStep) - mStep;
+        let mIdx = Math.floor(state.bgScrollMid / mStep);
+        for (let x = startMid; x < state.width + mStep; x += mStep) {
+          const mh = 55 + ((Math.abs(Math.cos(mIdx * 9.13 + state.biomeSeed)) * 75) | 0);
           ctx.fillStyle = midColor;
-          ctx.fillRect(bx, playH - b.h, b.w, b.h);
-
-          ctx.fillStyle = light.isNight ? 'rgba(251, 191, 36, 0.55)' : 'rgba(255, 255, 255, 0.22)';
-          for (let wy = playH - b.h + 12; wy < playH - 16; wy += 16) {
-            for (let wx = bx + 8; wx < bx + b.w - 10; wx += 12) {
-              if ((wx + wy + b.winSeed) % 3 !== 0) {
+          ctx.fillRect(x + 3, horizonY - mh, mStep - 8, mh);
+          ctx.fillStyle = isNight ? 'rgba(253, 224, 71, 0.45)' : 'rgba(255, 255, 255, 0.25)';
+          for (let wy = horizonY - mh + 10; wy < horizonY - 12; wy += 14) {
+            for (let wx = x + 10; wx < x + mStep - 14; wx += 12) {
+              if ((wx + wy + mIdx) % 3 !== 0) {
                 ctx.fillRect(wx, wy, 5, 7);
               }
             }
           }
+          mIdx++;
+        }
+      } else if (biome.id === 'harbor') {
+        // Suspension bridge towers & harbor cranes
+        const span = 320;
+        const startFar = -(state.bgScrollFar % span) - span;
+        for (let x = startFar; x < state.width + span; x += span) {
+          ctx.strokeStyle = farColor;
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.moveTo(x + 60, horizonY);
+          ctx.lineTo(x + 60, horizonY - 145);
+          ctx.moveTo(x + 240, horizonY);
+          ctx.lineTo(x + 240, horizonY - 145);
+          ctx.stroke();
 
-          if (b.hasCrane) {
-            const mastX = bx + b.w * 0.5;
-            const mastTop = playH - b.h - 46;
-            ctx.strokeStyle = light.craneColor;
-            ctx.lineWidth = 2.2;
-            ctx.beginPath();
-            ctx.moveTo(mastX, playH - b.h);
-            ctx.lineTo(mastX, mastTop);
-            ctx.moveTo(mastX - 14, mastTop + 6);
-            ctx.lineTo(mastX + b.craneLen, mastTop + 6);
-            ctx.stroke();
-          }
-        });
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(x, horizonY - 65);
+          ctx.quadraticCurveTo(x + 60, horizonY - 135, x + 150, horizonY - 52);
+          ctx.quadraticCurveTo(x + 240, horizonY - 135, x + span, horizonY - 65);
+          ctx.stroke();
+        }
+
+        // Waterfront container stacks & gantry cranes
+        const cStep = 95;
+        const startMid = -(state.bgScrollMid % cStep) - cStep;
+        let cIdx = Math.floor(state.bgScrollMid / cStep);
+        for (let x = startMid; x < state.width + cStep; x += cStep) {
+          ctx.fillStyle = midColor;
+          ctx.fillRect(x + 6, horizonY - 34, 38, 34);
+          ctx.fillStyle = cIdx % 2 === 0 ? '#ea580c' : '#0284c7';
+          ctx.fillRect(x + 48, horizonY - 22, 34, 22);
+          cIdx++;
+        }
       } else {
+        // Red Rock Canyon Mesas & Buttes
+        const mesaW = 260;
+        const startFar = -(state.bgScrollFar % mesaW) - mesaW;
+        let rIdx = Math.floor(state.bgScrollFar / mesaW);
+        for (let x = startFar; x < state.width + mesaW; x += mesaW) {
+          const h = 110 + ((Math.abs(Math.sin(rIdx * 5.77 + state.biomeSeed)) * 60) | 0);
+          ctx.fillStyle = farColor;
+          ctx.beginPath();
+          ctx.moveTo(x + 10, horizonY);
+          ctx.lineTo(x + 48, horizonY - h);
+          ctx.lineTo(x + mesaW - 55, horizonY - h);
+          ctx.lineTo(x + mesaW - 10, horizonY);
+          ctx.closePath();
+          ctx.fill();
+          rIdx++;
+        }
+
         ctx.fillStyle = midColor;
         ctx.beginPath();
-        ctx.moveTo(0, playH);
-        for (let x = 0; x <= viewW + 60; x += 60) {
-          const wx = x + state.skylineScroll * 0.42;
-          const h = biome.id === 'alpine'
-            ? Math.abs(Math.cos(wx * 0.006)) * 105 + 28
-            : Math.sin(wx * 0.007) * 32 + 48;
-          ctx.lineTo(x, playH - h);
+        ctx.moveTo(0, horizonY);
+        for (let x = -210; x <= state.width + 240; x += 210) {
+          const sx = x - (state.bgScrollMid % 210);
+          ctx.lineTo(sx + 55, horizonY - 68);
+          ctx.lineTo(sx + 135, horizonY - 68);
+          ctx.lineTo(sx + 210, horizonY - 20);
         }
-        ctx.lineTo(viewW + 60, playH);
+        ctx.lineTo(state.width, horizonY);
         ctx.closePath();
         ctx.fill();
+      }
+    }
 
-        if (biome.id === 'forest') {
-          for (let tx = -((state.skylineScroll * 0.55) % 44); tx < viewW + 44; tx += 44) {
-            const treeH = 34 + (Math.abs(Math.sin(tx * 0.13)) * 24);
-            ctx.fillStyle = light.isNight ? '#022c22' : '#14532d';
-            ctx.beginPath();
-            ctx.moveTo(tx, playH - treeH);
-            ctx.lineTo(tx + 14, playH);
-            ctx.lineTo(tx - 14, playH);
-            ctx.closePath();
-            ctx.fill();
-          }
-        }
+    function drawScene() {
+      const biome = state.biome || PROCEDURAL_BIOMES[0];
+      const lighting = SHIFT_LIGHTING[state.shift] || SHIFT_LIGHTING.day;
+      const horizonY = state.height - state.groundHeight;
+
+      // 1. Sky Gradient
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, horizonY);
+      skyGrad.addColorStop(0, lighting.isNight ? lighting.skyTop : biome.daySkyTop);
+      skyGrad.addColorStop(1, lighting.isNight ? lighting.skyBottom : biome.daySkyBottom);
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, state.width, state.height);
+
+      // Stars if night
+      if (lighting.isNight) {
+        state.stars.forEach((st) => {
+          const alpha = 0.45 + 0.55 * Math.sin(state.time * 2.5 + st.phase);
+          ctx.fillStyle = `rgba(255, 255, 255, ${alpha.toFixed(2)})`;
+          ctx.beginPath();
+          ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
       }
 
-      // Steel I-Beam Obstacles & Swinging Wrecking Balls
+      // Sun / Moon
+      ctx.save();
+      ctx.fillStyle = lighting.sunColor;
+      ctx.shadowColor = lighting.sunColor;
+      ctx.shadowBlur = 35;
+      ctx.beginPath();
+      ctx.arc(state.width * 0.78, state.height * lighting.sunY, 34, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // 2. Drifting Clouds
+      ctx.fillStyle = lighting.isNight ? 'rgba(148, 163, 184, 0.14)' : 'rgba(255, 255, 255, 0.55)';
+      state.clouds.forEach((c) => {
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, 24 * c.scale, 0, Math.PI * 2);
+        ctx.arc(c.x + 22 * c.scale, c.y - 6 * c.scale, 28 * c.scale, 0, Math.PI * 2);
+        ctx.arc(c.x + 48 * c.scale, c.y, 22 * c.scale, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 3. Procedural Biome Scenery
+      drawProceduralBackdrop(biome, lighting, horizonY);
+
+      // 4. Steel I-Beam Obstacles & Suspended Wrecking Balls
       state.obstacles.forEach((obs) => {
-        const capH = 22;
-        const flangeOver = 7;
+        const capH = 20;
+        const capOverhang = 8;
 
-        if (obs.topHeight > 0) {
-          ctx.fillStyle = light.beamMain;
-          ctx.fillRect(obs.x, 0, obs.width, obs.topHeight);
-          ctx.fillStyle = light.beamHighlight;
-          ctx.fillRect(obs.x + 6, 0, 6, obs.topHeight);
-          ctx.fillStyle = light.beamShadow;
-          ctx.fillRect(obs.x + obs.width - 8, 0, 8, obs.topHeight);
+        const drawBeamSegment = (bx, by, bw, bh, isTop) => {
+          if (bh <= 0) return;
+          ctx.fillStyle = lighting.beamMain;
+          ctx.fillRect(bx, by, bw, bh);
 
-          const capY = Math.max(0, obs.topHeight - capH);
+          ctx.fillStyle = lighting.beamHighlight;
+          ctx.fillRect(bx + 6, by, 7, bh);
+          ctx.fillStyle = lighting.beamShadow;
+          ctx.fillRect(bx + bw - 10, by, 10, bh);
+
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
+          for (let ry = by + 16; ry < by + bh - 12; ry += 26) {
+            ctx.beginPath();
+            ctx.arc(bx + 18, ry, 2.5, 0, Math.PI * 2);
+            ctx.arc(bx + bw - 18, ry, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          const flangeY = isTop ? by + bh - capH : by;
           ctx.fillStyle = '#1e293b';
           ctx.beginPath();
-          ctx.roundRect(obs.x - flangeOver, capY, obs.width + flangeOver * 2, capH, 4);
+          ctx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
           ctx.fill();
-          ctx.fillStyle = '#fbbf24';
-          ctx.fillRect(obs.x - flangeOver + 3, capY + capH - 6, obs.width + flangeOver * 2 - 6, 4);
-        }
 
-        if (obs.bottomY < playH) {
-          const botH = playH - obs.bottomY;
-          ctx.fillStyle = light.beamMain;
-          ctx.fillRect(obs.x, obs.bottomY, obs.width, botH);
-          ctx.fillStyle = light.beamHighlight;
-          ctx.fillRect(obs.x + 6, obs.bottomY, 6, botH);
-          ctx.fillStyle = light.beamShadow;
-          ctx.fillRect(obs.x + obs.width - 8, obs.bottomY, 8, botH);
+          ctx.fillStyle = '#eab308';
+          ctx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
+        };
 
-          ctx.fillStyle = '#1e293b';
-          ctx.beginPath();
-          ctx.roundRect(obs.x - flangeOver, obs.bottomY, obs.width + flangeOver * 2, capH, 4);
-          ctx.fill();
-          ctx.fillStyle = '#fbbf24';
-          ctx.fillRect(obs.x - flangeOver + 3, obs.bottomY + 2, obs.width + flangeOver * 2 - 6, 4);
-        }
+        drawBeamSegment(obs.x, 0, obs.width, obs.topHeight, true);
+        const botY = obs.topHeight + obs.gap;
+        drawBeamSegment(obs.x, botY, obs.width, horizonY - botY, false);
 
         if (obs.hasWreckingBall) {
-          const pivotX = obs.x + obs.width * 0.5;
-          const pivotY = obs.topHeight;
-          const swingX = pivotX + Math.sin(obs.swingPhase) * 14;
-          const swingY = pivotY + obs.ballDrop;
+          const anchorX = obs.x + obs.width * 0.5;
+          const anchorY = obs.topHeight;
+          const ballX = anchorX + Math.sin(obs.ballPhase) * 14;
+          const ballY = anchorY + obs.ballDrop;
 
           ctx.strokeStyle = '#94a3b8';
-          ctx.lineWidth = 2.2;
+          ctx.lineWidth = 3;
           ctx.beginPath();
-          ctx.moveTo(pivotX, pivotY);
-          ctx.lineTo(swingX, swingY);
+          ctx.moveTo(anchorX, anchorY);
+          ctx.lineTo(ballX, ballY);
           ctx.stroke();
 
-          ctx.fillStyle = '#1e293b';
-          ctx.beginPath();
-          ctx.arc(swingX, swingY, obs.ballRadius, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = '#64748b';
-          ctx.beginPath();
-          ctx.arc(swingX - 3, swingY - 3, obs.ballRadius * 0.35, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        // High-Voltage Pulsing Hazard Wire across partial beam gap (Phase 3+)
-        if (obs.hasElectricWire) {
-          const wireY = obs.topHeight + obs.wireOffset;
-          const wireStart = obs.x - 4;
-          const wireEnd = obs.x + obs.width + 4;
-          const activePulse = Math.sin(performance.now() * 0.012 + obs.movePhase) > -0.15;
-
-          ctx.fillStyle = '#475569';
-          ctx.fillRect(wireStart - 3, wireY - 4, 6, 8);
-          ctx.fillRect(wireEnd - 3, wireY - 4, 6, 8);
-
-          if (activePulse) {
-            ctx.save();
-            ctx.strokeStyle = '#38bdf8';
-            ctx.shadowColor = '#38bdf8';
-            ctx.shadowBlur = 10;
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(wireStart, wireY);
-            const midX = (wireStart + wireEnd) * 0.5;
-            ctx.lineTo(midX, wireY + (Math.random() - 0.5) * 6);
-            ctx.lineTo(wireEnd, wireY);
-            ctx.stroke();
-            ctx.restore();
-          } else {
-            ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
-            ctx.setLineDash([4, 4]);
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.moveTo(wireStart, wireY);
-            ctx.lineTo(wireEnd, wireY);
-            ctx.stroke();
-            ctx.setLineDash([]);
-          }
-        }
-      });
-
-      // Patrolling Site Survey Drones (Phase 2+)
-      state.airDrones.forEach((dr) => {
-        ctx.save();
-        ctx.translate(dr.x, dr.y);
-
-        // Warning beacon glow
-        const blink = Math.sin(performance.now() * 0.02 + dr.phase) > 0;
-        ctx.fillStyle = blink ? 'rgba(239, 68, 68, 0.28)' : 'rgba(251, 191, 36, 0.16)';
-        ctx.beginPath();
-        ctx.arc(0, 0, dr.radius + 7, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Rotor arms
-        ctx.strokeStyle = '#cbd5e1';
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.moveTo(-18, -5);
-        ctx.lineTo(18, -5);
-        ctx.stroke();
-
-        // Spinning rotor blades
-        const bladeW = 10 + Math.sin(performance.now() * 0.06) * 4;
-        ctx.fillStyle = '#94a3b8';
-        ctx.fillRect(-18 - bladeW * 0.5, -8, bladeW, 2.2);
-        ctx.fillRect(18 - bladeW * 0.5, -8, bladeW, 2.2);
-
-        // Drone chassis
-        ctx.fillStyle = '#f97316';
-        ctx.beginPath();
-        ctx.roundRect(-12, -4, 24, 10, 4);
-        ctx.fill();
-        ctx.strokeStyle = '#0f172a';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        // Camera eye / strobe
-        ctx.fillStyle = blink ? '#ef4444' : '#38bdf8';
-        ctx.beginPath();
-        ctx.arc(-5, 1, 3, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.restore();
-      });
-
-      // Golden Safety Hardhat Collectibles (transforms into flashing 2X Super-Hardhat when streak >= 3)
-      const isBonusActive = state.hardhatStreak >= 3;
-      const nowMs = performance.now();
-      state.collectibles.forEach((item) => {
-        if (item.collected) return;
-        const bobY = item.y + Math.sin(nowMs * 0.006 + item.bobPhase) * 4;
-        const pulse = 0.5 + 0.5 * Math.sin(nowMs * 0.016 + item.bobPhase);
-
-        ctx.save();
-        ctx.translate(item.x, bobY);
-
-        if (isBonusActive) {
-          // Pulsing emerald-gold 2X aura & orbiting sparkles
-          ctx.scale(1 + pulse * 0.14, 1 + pulse * 0.14);
-          ctx.fillStyle = pulse > 0.5 ? 'rgba(16, 185, 129, 0.34)' : 'rgba(251, 191, 36, 0.38)';
-          ctx.beginPath();
-          ctx.arc(0, 0, item.radius + 11, 0, Math.PI * 2);
-          ctx.fill();
-
-          ctx.strokeStyle = pulse > 0.5 ? '#34d399' : '#fef08a';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.arc(0, 0, item.radius + 6, 0, Math.PI * 2);
-          ctx.stroke();
-
-          // Hardhat dome flashes between bright emerald-gold and radiant white-gold
-          ctx.fillStyle = pulse > 0.5 ? '#34d399' : '#fef08a';
-          ctx.beginPath();
-          ctx.arc(0, 2, item.radius * 0.88, Math.PI, 0);
-          ctx.fill();
-
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(-2.5, -item.radius * 0.84, 5, item.radius * 0.84);
-          ctx.fillStyle = '#059669';
-          ctx.beginPath();
-          ctx.roundRect(-item.radius * 1.1, 1, item.radius * 2.2, 5, 2.5);
-          ctx.fill();
-
-          // Crisp "2X" tag above bonus hardhat
           ctx.fillStyle = '#0f172a';
           ctx.beginPath();
-          ctx.roundRect(-12, -item.radius - 15, 24, 12, 4);
+          ctx.arc(ballX, ballY, obs.ballRadius, 0, Math.PI * 2);
           ctx.fill();
-          ctx.fillStyle = '#34d399';
-          ctx.font = '800 9px "Chakra Petch", sans-serif';
+          ctx.fillStyle = '#475569';
+          ctx.beginPath();
+          ctx.arc(ballX - 4, ballY - 4, obs.ballRadius * 0.35, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        if (obs.isElectricWire) {
+          const wireY = obs.topHeight + obs.wireOffset;
+          const pulse = 0.55 + 0.45 * Math.sin(state.time * 14 + obs.x * 0.05);
+
+          // Insulated end mounts on beam edges
+          ctx.fillStyle = '#0f172a';
+          ctx.fillRect(obs.x - 4, wireY - 5, 8, 10);
+          ctx.fillRect(obs.x + obs.width - 4, wireY - 5, 8, 10);
+
+          // High-voltage glowing arc line
+          ctx.save();
+          ctx.strokeStyle = `rgba(56, 189, 248, ${pulse.toFixed(2)})`;
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 10;
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.moveTo(obs.x, wireY);
+          const midX = obs.x + obs.width * 0.5;
+          const jitter = Math.sin(state.time * 28) * 3.5;
+          ctx.lineTo(midX, wireY + jitter);
+          ctx.lineTo(obs.x + obs.width, wireY);
+          ctx.stroke();
+          ctx.restore();
+        }
+      });
+
+      // 5. Golden Safety Hardhats (Transform into radiant 2X Super Hardhats at 3+ streak!)
+      const isBonusActive = state.streak >= 3;
+      state.collectibles.forEach((hat) => {
+        if (hat.collected) return;
+        const bobY = hat.y + Math.sin(state.time * 4.5 + hat.bobPhase) * 5;
+        const blink = 0.5 + 0.5 * Math.sin(state.time * 11 + hat.bobPhase);
+        ctx.save();
+        ctx.translate(hat.x, bobY);
+
+        if (isBonusActive) {
+          // Outer pulsing emerald-gold aura ring
+          const ringRadius = 25 + blink * 5;
+          ctx.strokeStyle = `rgba(52, 211, 153, ${(0.55 + blink * 0.45).toFixed(2)})`;
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(0, 0, ringRadius, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.fillStyle = `rgba(16, 185, 129, ${(0.18 + blink * 0.16).toFixed(2)})`;
+          ctx.beginPath();
+          ctx.arc(0, 0, 23, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Orbiting sparkles
+          for (let sp = 0; sp < 3; sp++) {
+            const ang = state.time * 4.2 + (sp * Math.PI * 2) / 3;
+            const sx = Math.cos(ang) * 24;
+            const sy = Math.sin(ang) * 24;
+            ctx.fillStyle = sp % 2 === 0 ? '#fef08a' : '#6ee7b7';
+            ctx.beginPath();
+            ctx.arc(sx, sy, 2.6, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          // Super Hardhat Shell (Flashes between radiant gold & emerald-white)
+          ctx.fillStyle = blink > 0.5 ? '#fef08a' : '#34d399';
+          ctx.beginPath();
+          ctx.arc(0, 2, 14, Math.PI, 0);
+          ctx.fill();
+
+          // Center Crest
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(-3, -12, 6, 12);
+
+          // Brim
+          ctx.fillStyle = '#059669';
+          ctx.beginPath();
+          ctx.roundRect(-18, 1, 36, 5.5, 2.5);
+          ctx.fill();
+
+          // Crisp "2X" Badge floating above hat
+          ctx.fillStyle = '#064e3b';
+          ctx.strokeStyle = '#34d399';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.roundRect(-13, -25, 26, 12, 6);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = '#6ee7b7';
+          ctx.font = '800 8px "Chakra Petch", sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText('2X', 0, -item.radius - 6);
+          ctx.textBaseline = 'middle';
+          ctx.fillText('2X', 0, -19);
         } else {
+          // Standard Golden Hardhat
           ctx.fillStyle = 'rgba(251, 191, 36, 0.24)';
           ctx.beginPath();
-          ctx.arc(0, 0, item.radius + 7, 0, Math.PI * 2);
+          ctx.arc(0, 0, 22, 0, Math.PI * 2);
           ctx.fill();
 
           ctx.fillStyle = '#fbbf24';
           ctx.beginPath();
-          ctx.arc(0, 2, item.radius * 0.85, Math.PI, 0);
+          ctx.arc(0, 2, 13, Math.PI, 0);
           ctx.fill();
 
           ctx.fillStyle = '#fef08a';
-          ctx.fillRect(-2, -item.radius * 0.82, 4, item.radius * 0.82);
+          ctx.fillRect(-2.5, -11, 5, 11);
+
           ctx.fillStyle = '#d97706';
           ctx.beginPath();
-          ctx.roundRect(-item.radius * 1.05, 1, item.radius * 2.1, 4.5, 2.2);
+          ctx.roundRect(-16, 1, 32, 5, 2.5);
           ctx.fill();
         }
+
         ctx.restore();
       });
 
-      // Falling Sky Hazards (Boulders & Suspended Crane Slings) with Top Warning Signs
+      // 6. Ground Roadbed & Hazard Curb
+      ctx.fillStyle = biome.groundDirt;
+      ctx.fillRect(0, horizonY, state.width, state.groundHeight);
+
+      ctx.fillStyle = biome.groundTop;
+      ctx.fillRect(0, horizonY, state.width, 16);
+
+      const stripeW = 36;
+      const offset = -(state.groundScroll % (stripeW * 2));
+      for (let sx = offset; sx < state.width + stripeW * 2; sx += stripeW * 2) {
+        ctx.fillStyle = '#eab308';
+        ctx.fillRect(sx, horizonY + 16, stripeW, 10);
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(sx + stripeW, horizonY + 16, stripeW, 10);
+      }
+
+      // 7. Exhaust & Dust Particles
+      state.particles.forEach((p) => {
+        const alpha = Math.max(0, p.life / p.maxLife);
+        ctx.fillStyle = p.color.replace('0.65', (alpha * 0.65).toFixed(2));
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 8. Falling Boulders & Crane Loads (with top warning indicators)
       state.fallingHazards.forEach((hz) => {
         if (hz.warnTimer > 0) {
-          const pulse = 0.55 + Math.sin(nowMs * 0.025) * 0.45;
+          const pulse = 0.55 + 0.45 * Math.sin(state.time * 22);
+          const warnY = Math.max(54, state.height * 0.08);
           ctx.save();
-          ctx.translate(hz.x, 34);
-          ctx.globalAlpha = pulse;
-
-          ctx.fillStyle = '#fbbf24';
+          ctx.translate(hz.x, warnY);
+          ctx.fillStyle = `rgba(239, 68, 68, ${pulse.toFixed(2)})`;
           ctx.beginPath();
           ctx.moveTo(0, -14);
-          ctx.lineTo(14, 10);
-          ctx.lineTo(-14, 10);
+          ctx.lineTo(15, 12);
+          ctx.lineTo(-15, 12);
           ctx.closePath();
           ctx.fill();
 
-          ctx.fillStyle = '#0f172a';
+          ctx.fillStyle = '#ffffff';
           ctx.font = '800 13px "Chakra Petch", sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText('!', 0, 7);
+          ctx.textBaseline = 'middle';
+          ctx.fillText('!', 0, 3);
 
-          ctx.strokeStyle = 'rgba(251, 191, 36, 0.5)';
-          ctx.setLineDash([4, 4]);
-          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = `rgba(251, 191, 36, ${(pulse * 0.65).toFixed(2)})`;
+          ctx.setLineDash([5, 5]);
+          ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.moveTo(0, 14);
+          ctx.moveTo(0, 16);
           ctx.lineTo(0, 56);
           ctx.stroke();
           ctx.restore();
-          return;
-        }
-
-        ctx.save();
-        ctx.translate(hz.x, hz.y);
-        if (hz.type === 'boulder') {
-          ctx.rotate(hz.rotation);
-          ctx.fillStyle = '#57534e';
-          ctx.beginPath();
-          for (let a = 0; a < 7; a++) {
-            const ang = (a / 7) * Math.PI * 2;
-            const r = hz.radius * (a % 2 === 0 ? 1.04 : 0.86);
-            if (a === 0) ctx.moveTo(Math.cos(ang) * r, Math.sin(ang) * r);
-            else ctx.lineTo(Math.cos(ang) * r, Math.sin(ang) * r);
-          }
-          ctx.closePath();
-          ctx.fill();
-          ctx.strokeStyle = '#292524';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-
-          ctx.fillStyle = '#78716c';
-          ctx.beginPath();
-          ctx.arc(-4, -4, hz.radius * 0.32, 0, Math.PI * 2);
-          ctx.fill();
         } else {
-          // Suspended Steel Girder Load
-          ctx.strokeStyle = '#94a3b8';
-          ctx.lineWidth = 1.6;
-          ctx.beginPath();
-          ctx.moveTo(0, -26);
-          ctx.lineTo(-12, -5);
-          ctx.moveTo(0, -26);
-          ctx.lineTo(12, -5);
-          ctx.stroke();
+          ctx.save();
+          ctx.translate(hz.x, hz.y);
+          if (hz.type === 'boulder') {
+            ctx.rotate(hz.rotation);
+            ctx.fillStyle = '#475569';
+            ctx.beginPath();
+            const pts = 8;
+            for (let i = 0; i < pts; i++) {
+              const ang = (i / pts) * Math.PI * 2;
+              const rad = hz.radius * (i % 2 === 0 ? 1.0 : 0.82);
+              const px = Math.cos(ang) * rad;
+              const py = Math.sin(ang) * rad;
+              if (i === 0) ctx.moveTo(px, py);
+              else ctx.lineTo(px, py);
+            }
+            ctx.closePath();
+            ctx.fill();
 
-          ctx.fillStyle = '#dc2626';
-          ctx.beginPath();
-          ctx.roundRect(-20, -6, 40, 12, 3);
-          ctx.fill();
-          ctx.fillStyle = '#fbbf24';
-          ctx.fillRect(-16, -2, 32, 4);
+            ctx.fillStyle = '#64748b';
+            ctx.beginPath();
+            ctx.arc(-hz.radius * 0.25, -hz.radius * 0.25, hz.radius * 0.36, 0, Math.PI * 2);
+            ctx.fill();
+          } else {
+            // Lowered Crane Steel Bundle
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(0, -hz.y - 20);
+            ctx.lineTo(0, -hz.radius * 0.6);
+            ctx.stroke();
+
+            ctx.fillStyle = '#ea580c';
+            ctx.beginPath();
+            ctx.roundRect(-hz.radius * 1.15, -hz.radius * 0.65, hz.radius * 2.3, hz.radius * 1.3, 5);
+            ctx.fill();
+
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillRect(-hz.radius * 1.05, -3, hz.radius * 2.1, 6);
+          }
+          ctx.restore();
         }
-        ctx.restore();
       });
 
-      // Player Heavy Construction Rig
+      // 9. Player Construction Rig
       drawConstructionRig(
         ctx,
-        state.selectedRig,
+        state.rig,
         state.player.x,
         state.player.y,
         state.player.radius,
         state.player.rotation,
-        state.player.thrustAnim,
-        state.player.wheelAngle,
+        state.player.bucketAngle,
+        state.player.wheelSpin,
         1
       );
 
-      // Exhaust & Impact Particles
-      state.particles.forEach((pt) => {
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, pt.life / pt.maxLife);
-        ctx.fillStyle = pt.color;
-        ctx.beginPath();
-        ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      });
-
-      // Floating Score Callouts
+      // 10. Floating Score Popups
       state.floatingTexts.forEach((ft) => {
+        const alpha = Math.max(0, ft.life / ft.maxLife);
         ctx.save();
-        ctx.globalAlpha = Math.max(0, ft.life / ft.maxLife);
-        ctx.font = '700 17px "Chakra Petch", sans-serif';
+        ctx.globalAlpha = alpha;
+        ctx.font = '700 18px "Chakra Petch", sans-serif';
         ctx.textAlign = 'center';
         ctx.fillStyle = '#0f172a';
         ctx.fillText(ft.text, ft.x + 1.5, ft.y + 1.5);
@@ -2429,162 +2593,112 @@
         ctx.fillText(ft.text, ft.x, ft.y);
         ctx.restore();
       });
-
-      // Foreground Ground & Hazard Roadbed (extends fully to bottom edge)
-      ctx.fillStyle = biome.groundDirt;
-      ctx.fillRect(0, playH, viewW, groundHeight + 40);
-
-      ctx.fillStyle = biome.groundTop;
-      ctx.fillRect(0, playH, viewW, 14);
-
-      const stripeW = 28;
-      const offset = -(state.groundScroll % (stripeW * 2));
-      for (let gx = offset; gx < viewW + stripeW * 2; gx += stripeW) {
-        const idx = Math.floor((gx - offset) / stripeW);
-        ctx.fillStyle = idx % 2 === 0 ? '#fbbf24' : '#0f172a';
-        ctx.fillRect(gx, playH + 14, stripeW, 8);
-      }
-
-      if (state.flashAlpha > 0) {
-        ctx.fillStyle = `rgba(255, 255, 255, ${state.flashAlpha})`;
-        ctx.fillRect(0, 0, viewW, viewH);
-      }
-
-      ctx.restore();
     }
 
     // =========================================================================
-    // 7. OBSTACLE GENERATION, PHYSICS & COLLISION DETECTION
+    // 6. SIMULATION PHYSICS & COLLISION DETECTION
     // =========================================================================
-    const DIFFICULTY_TIERS = [
-      { tier: 1, minGates: 0,  label: 'PHASE 1 • STEADY',     speedBonus: 0,   gapShrink: 0,  moveChance: 0.55, moveMult: 0.72, ballChance: 0.22, wireChance: 0.0 },
-      { tier: 2, minGates: 5,  label: 'PHASE 2 • DOUBLE SHIFT', speedBonus: 32, gapShrink: 12, moveChance: 0.80, moveMult: 0.90, ballChance: 0.36, wireChance: 0.18 },
-      { tier: 3, minGates: 11, label: 'PHASE 3 • RUSH HOUR',   speedBonus: 65,  gapShrink: 22, moveChance: 0.92, moveMult: 1.05, ballChance: 0.48, wireChance: 0.32 },
-      { tier: 4, minGates: 18, label: 'PHASE 4 • HEAVY SURGE', speedBonus: 98,  gapShrink: 30, moveChance: 1.00, moveMult: 1.20, ballChance: 0.58, wireChance: 0.44 },
-      { tier: 5, minGates: 26, label: 'PHASE 5 • OVERDRIVE',   speedBonus: 132, gapShrink: 36, moveChance: 1.00, moveMult: 1.35, ballChance: 0.68, wireChance: 0.52 }
-    ];
-
-    function getCurrentTierSpec() {
-      const progress = state.obstaclesPassed + Math.floor(state.score * 0.35);
-      let active = DIFFICULTY_TIERS[0];
-      for (let i = 0; i < DIFFICULTY_TIERS.length; i++) {
-        if (progress >= DIFFICULTY_TIERS[i].minGates) {
-          active = DIFFICULTY_TIERS[i];
-        }
-      }
-      return active;
-    }
-
-    function getCurrentSpeed() {
-      const tier = getCurrentTierSpec();
-      return Math.min(345, 195 + tier.speedBonus + state.obstaclesPassed * 1.4);
-    }
-
-    function spawnBeamPair(initialOffsetX = null) {
-      const playH = viewH - groundHeight;
-      const beamWidth = 64;
-      const speed = getCurrentSpeed();
-      const tier = getCurrentTierSpec();
-
-      const baseGap = Math.round(playH * 0.295) - tier.gapShrink;
-      const gapHeight = Math.max(134, Math.min(212, baseGap));
-      const isStandalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
-      const topSafeMargin = Math.max(108, Math.round(playH * 0.165)) + (isStandalone ? 22 : 0);
-      const bottomSafeMargin = 62;
+    function spawnObstaclePair(customX = null) {
+      const horizonY = state.height - state.groundHeight;
+      const tier = getDifficultyTier();
+      const baseGap = Math.max(146, Math.min(182, horizonY * 0.275));
+      const gapHeight = Math.max(134, Math.round(baseGap * tier.gapScale));
+      const topSafeMargin = state.width < 600
+        ? Math.max(148, horizonY * 0.23)
+        : Math.max(116, horizonY * 0.19);
+      const bottomSafeMargin = 86;
       const minCenter = topSafeMargin + gapHeight * 0.5;
-      const maxCenter = Math.max(minCenter + 12, playH - bottomSafeMargin - gapHeight * 0.5);
+      const maxCenter = Math.max(minCenter + 20, horizonY - bottomSafeMargin - gapHeight * 0.5);
+      const gapCenterY = minCenter + Math.random() * (maxCenter - minCenter);
 
-      let gapCenterY;
-      if (state.lastGapCenterY === null) {
-        gapCenterY = Math.max(minCenter, Math.min(maxCenter, playH * 0.50 + (Math.random() - 0.5) * 60));
-      } else {
-        const maxDelta = Math.min(180, playH * (0.26 + tier.tier * 0.018));
-        gapCenterY = state.lastGapCenterY + (Math.random() * 2 - 1) * maxDelta;
-      }
-      gapCenterY = Math.max(minCenter, Math.min(maxCenter, gapCenterY));
-      state.lastGapCenterY = gapCenterY;
-
-      const maxAmp = Math.min(44, Math.max(0, Math.min(gapCenterY - minCenter, maxCenter - gapCenterY) - 6));
-      const shouldMove = state.obstaclesPassed >= 1 && Math.random() < tier.moveChance;
-      const moveAmp = shouldMove ? Math.max(14, maxAmp * Math.min(1, tier.moveMult)) : 0;
-      const moveSpeed = (1.45 + Math.random() * 0.75) * (0.9 + tier.tier * 0.12);
-      const movePhase = Math.random() * Math.PI * 2;
-
-      const hasWreckingBall = state.obstaclesPassed >= 2 && Math.random() < tier.ballChance;
-      const ballDrop = hasWreckingBall ? Math.min(34, gapHeight * 0.21) : 0;
-      const ballRadius = 12;
-
-      const hasElectricWire = !hasWreckingBall && tier.tier >= 2 && Math.random() < tier.wireChance;
-      const wireOffset = hasElectricWire ? Math.round(gapHeight * 0.22) : 0;
+      const width = 66;
+      const spawnX = customX !== null ? customX : state.width + 40;
+      const isMoving = tier.tier >= 2 && Math.random() < tier.movingChance;
+      const hasWreckingBall = Math.random() < tier.ballChance;
+      const isElectricWire = !hasWreckingBall && tier.tier >= 2 && Math.random() < tier.wireChance;
+      const wireOffset = isElectricWire ? Math.round(gapHeight * 0.24) : 0;
 
       const topHeight = Math.max(topSafeMargin * 0.55, gapCenterY - gapHeight * 0.5);
-      const bottomY = Math.min(playH - 28, gapCenterY + gapHeight * 0.5);
 
-      const spawnX = initialOffsetX !== null ? initialOffsetX : viewW + 40;
-
-      const obs = {
+      state.obstacles.push({
         x: spawnX,
-        width: beamWidth,
-        baseGapCenterY: gapCenterY,
-        gapHeight,
-        moveAmp,
-        moveSpeed,
-        movePhase,
+        width,
         topHeight,
-        bottomY,
+        baseTopHeight: topHeight,
+        gap: gapHeight,
+        passed: false,
+        isMoving,
+        movePhase: Math.random() * Math.PI * 2,
+        moveAmp: isMoving ? Math.min(34, (maxCenter - minCenter) * 0.24) : 0,
+        moveSpeed: 1.9 * tier.movingSpeedMult,
         hasWreckingBall,
-        ballDrop,
-        ballRadius,
-        hasElectricWire,
-        wireOffset,
-        swingPhase: Math.random() * Math.PI * 2,
-        passed: false
-      };
-      state.obstacles.push(obs);
+        ballDrop: 24,
+        ballRadius: 11,
+        ballPhase: Math.random() * Math.PI * 2,
+        isElectricWire,
+        wireOffset
+      });
 
       const safeOffsetY = hasWreckingBall
         ? Math.min(26, gapHeight * 0.17)
-        : hasElectricWire
-          ? Math.round(gapHeight * 0.66) - gapHeight * 0.5
+        : isElectricWire
+          ? Math.round(gapHeight * 0.68) - gapHeight * 0.5
           : (Math.random() - 0.5) * 18;
       state.collectibles.push({
-        obsRef: obs,
-        offsetY: safeOffsetY,
-        x: obs.x + beamWidth * 0.5,
+        x: spawnX + width * 0.5,
         y: gapCenterY + safeOffsetY,
-        radius: 14,
-        bobPhase: Math.random() * Math.PI * 2,
-        collected: false
+        radius: 17,
+        collected: false,
+        missed: false,
+        bobPhase: Math.random() * Math.PI * 2
       });
-
-      const minReactionSec = Math.max(1.26, (viewW < 600 ? 1.54 : 1.62) - (tier.tier - 1) * 0.065);
-      state.spawnDistance = Math.round(speed * minReactionSec);
     }
 
-    function circleRectOverlap(cx, cy, cr, rx, ry, rw, rh) {
-      const closestX = Math.max(rx, Math.min(cx, rx + rw));
-      const closestY = Math.max(ry, Math.min(cy, ry + rh));
-      const dx = cx - closestX;
-      const dy = cy - closestY;
-      return dx * dx + dy * dy < cr * cr;
+    function spawnFallingHazard() {
+      const tier = getDifficultyTier();
+      const isCityOrHarbor = state.biome.id === 'city' || state.biome.id === 'harbor';
+      const type = isCityOrHarbor ? 'crane_load' : 'boulder';
+      const radius = type === 'boulder' ? 20 : 22;
+
+      const minX = state.width * 0.28;
+      const maxX = state.width * 0.88;
+      let dropX = minX + Math.random() * Math.max(40, maxX - minX);
+
+      for (const obs of state.obstacles) {
+        if (Math.abs(dropX - (obs.x + obs.width * 0.5)) < obs.width * 0.9) {
+          dropX = Math.min(maxX, obs.x + obs.width + 65);
+        }
+      }
+
+      const baseVy = (290 + Math.random() * 110) * tier.hazardMult;
+      state.fallingHazards.push({
+        type,
+        x: dropX,
+        y: -radius - 18,
+        vy: baseVy,
+        radius,
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 4.5,
+        warnTimer: Math.max(0.55, 0.85 - (tier.tier - 1) * 0.06)
+      });
     }
 
-    function spawnExhaustSparks(x, y, count = 7, color = '#fbbf24') {
+    function spawnDust(x, y, count = 6, color = 'rgba(255,255,255,0.65)') {
       for (let i = 0; i < count; i++) {
         state.particles.push({
           x,
           y,
-          vx: -60 - Math.random() * 110,
+          vx: -80 - Math.random() * 130,
           vy: (Math.random() - 0.5) * 120,
-          size: 2.2 + Math.random() * 2.8,
-          color,
-          life: 0.28 + Math.random() * 0.22,
-          maxLife: 0.5
+          size: 3 + Math.random() * 5,
+          life: 0.35 + Math.random() * 0.25,
+          maxLife: 0.6,
+          color
         });
       }
     }
 
-    function addFloatingText(x, y, text, color = '#fbbf24') {
+    function spawnFloatingText(x, y, text, color = '#fbbf24') {
       state.floatingTexts.push({
         x,
         y,
@@ -2595,391 +2709,212 @@
       });
     }
 
-    function updateHUD() {
-      const activeName = state.playerNames[state.activePlayerIdx] || `Player ${state.activePlayerIdx + 1}`;
-      document.getElementById('hud-player-tag').textContent = state.playerCount > 1
-        ? `P${state.activePlayerIdx + 1}/${state.playerCount} SHIFT`
-        : 'OPERATOR';
-      document.getElementById('hud-player-name').textContent = activeName;
-      document.getElementById('hud-best').textContent = state.bestScore;
-
-      const bonusLabelEl = document.getElementById('hud-bonus-label');
-      const bonusValEl = document.getElementById('hud-bonus');
-      if (state.hardhatStreak >= 3) {
-        bonusLabelEl.textContent = 'STREAK ACTIVE';
-        bonusLabelEl.style.color = '#fbbf24';
-        bonusValEl.textContent = '2X BONUS!';
-        bonusValEl.style.color = '#fbbf24';
-      } else {
-        bonusLabelEl.textContent = '3-HAT BONUS';
-        bonusLabelEl.style.color = '#94a3b8';
-        bonusValEl.textContent = `${state.hardhatStreak}/3`;
-        bonusValEl.style.color = '#38bdf8';
-      }
-
-      document.getElementById('hud-score').textContent = state.score;
-      document.getElementById('hud-biome-pill').textContent = state.currentBiome.label;
-
-      const tier = getCurrentTierSpec();
-      const tierEl = document.getElementById('hud-tier-pill');
-      if (tierEl) {
-        tierEl.textContent = tier.label;
-        tierEl.style.background = 'rgba(15, 23, 42, 0.92)';
-        if (tier.tier >= 4) {
-          tierEl.style.borderColor = '#f87171';
-          tierEl.style.color = '#fca5a5';
-        } else if (tier.tier >= 2) {
-          tierEl.style.borderColor = '#fbbf24';
-          tierEl.style.color = '#fbbf24';
-        } else {
-          tierEl.style.borderColor = '#38bdf8';
-          tierEl.style.color = '#7dd3fc';
-        }
-      }
-    }
-
-    function popScoreHUD() {
-      const el = document.getElementById('hud-score');
-      el.textContent = state.score;
-      el.classList.remove('pop');
-      void el.offsetWidth;
-      el.classList.add('pop');
-      setTimeout(() => el.classList.remove('pop'), 140);
-    }
-
-    function prepareReadyShift() {
-      const playH = viewH - groundHeight;
-      const prevId = state.currentBiome ? state.currentBiome.id : '';
-      const pool = PROCEDURAL_BIOMES.filter((b) => b.id !== prevId);
-      state.currentBiome = pool[Math.floor(Math.random() * pool.length)] || PROCEDURAL_BIOMES[0];
-
-      state.phase = 'READY';
-      state.score = 0;
-      state.bonusPoints = 0;
-      state.hardhatsCollected = 0;
-      state.hardhatStreak = 0;
-      state.obstacles = [];
-      state.fallingHazards = [];
-      state.airDrones = [];
-      state.collectibles = [];
-      state.particles = [];
-      state.floatingTexts = [];
-      state.spawnDistance = 120;
-      state.lastGapCenterY = null;
-      state.obstaclesPassed = 0;
-      state.difficultyTier = 1;
-      state.hazardTimer = 3.4 + Math.random() * 1.8;
-      state.droneTimer = 6.2;
-      state.shakeTime = 0;
-      state.flashAlpha = 0;
-
-      state.player.y = playH * 0.46;
-      state.player.vy = 0;
-      state.player.rotation = 0;
-      state.player.thrustAnim = 0;
-
-      // Pre-populate initial beam chain across wide landscape viewports (iPad/Desktop)
-      // so the first beam arrives in ~1.8s instead of crossing the entire wide screen
-      const speed = getCurrentSpeed();
-      const firstBeamX = Math.min(viewW + 40, Math.max(viewW * 0.62, state.player.x + speed * 1.85));
-      spawnBeamPair(firstBeamX);
-      while (state.obstacles[state.obstacles.length - 1].x + state.spawnDistance <= viewW + 40) {
-        const prevX = state.obstacles[state.obstacles.length - 1].x;
-        spawnBeamPair(prevX + state.spawnDistance);
-      }
-      const lastBeamX = state.obstacles[state.obstacles.length - 1].x;
-      state.spawnDistance = Math.max(40, Math.round((lastBeamX + state.spawnDistance) - (viewW + 40)));
-
-      document.getElementById('start-modal').classList.add('hidden');
-      document.getElementById('pause-modal').classList.add('hidden');
-      document.getElementById('gameover-modal').classList.add('hidden');
-      document.getElementById('leaderboard-modal').classList.add('hidden');
-      document.getElementById('hud').classList.remove('hidden');
-
-      const activeName = state.playerNames[state.activePlayerIdx] || `Player ${state.activePlayerIdx + 1}`;
-      document.getElementById('ready-hint-text').textContent = state.playerCount > 1
-        ? `${activeName.toUpperCase()} — TAP TO LAUNCH`
-        : 'TAP, CLICK OR PRESS SPACE';
-      document.getElementById('ready-hint').classList.remove('hidden');
-
-      updateHUD();
-    }
-
-    function triggerThrust() {
-      if (state.phase === 'READY') {
-        state.phase = 'PLAYING';
-        document.getElementById('ready-hint').classList.add('hidden');
-      }
-      if (state.phase !== 'PLAYING') return;
-
-      const spec = RIG_SPECS[state.selectedRig] || RIG_SPECS.loader;
-      state.player.vy = spec.flapVel;
-      state.player.thrustAnim = 1;
-      audio.playHydraulicThrust();
-      spawnExhaustSparks(state.player.x - 16, state.player.y + 4, 6, '#fbbf24');
-    }
-
-    function triggerGameOver(reason = 'BEAM IMPACT!') {
-      if (state.phase === 'GAMEOVER') return;
-      state.phase = 'GAMEOVER';
-      state.deathReason = reason;
-      state.shakeTime = 0.28;
-      state.shakeIntensity = 14;
-      state.flashAlpha = 0.55;
+    function triggerGameOver(reason) {
+      if (state.mode === 'gameover') return;
+      state.mode = 'gameover';
       audio.playClangCrash();
-      spawnExhaustSparks(state.player.x, state.player.y, 18, '#f97316');
+      spawnDust(state.player.x, state.player.y, 18, '#fbbf24');
 
-      const prevOverallBest = state.bestScore;
-      state.lastScoredPlayerIdx = state.activePlayerIdx;
-      const currentName = state.playerNames[state.activePlayerIdx] || `Player ${state.activePlayerIdx + 1}`;
-      const modeTag = state.playerCount > 1 ? `${state.playerCount}P Pass & Play` : 'Solo';
-      const placedRank = recordPlayerScore(currentName, state.score, state.selectedRig, modeTag);
-      const isNewBest = state.score > 0 && state.score >= state.bestScore && state.score > prevOverallBest;
+      const currentName = state.playerNames[state.activePlayerIndex] || `Player ${state.activePlayerIndex + 1}`;
+      const previousOverallBest = state.bestScore;
+      const placedRank = recordPlayerScore(currentName, state.score, state.rig, state.playerCount > 1);
+      const isNewBest = state.score > 0 && state.score > previousOverallBest;
 
       const shareBtn = document.getElementById('btn-share-score');
       if (shareBtn) {
-        shareBtn.textContent = '📤 Share Score';
+        shareBtn.innerHTML = '<span>📤</span><span>Share</span>';
         shareBtn.style.borderColor = 'rgba(56,189,248,0.45)';
         shareBtn.style.color = '#7dd3fc';
       }
 
+      const rankInfo = getRankDetails(state.score);
+      document.getElementById('go-reason').textContent = reason;
+      document.getElementById('go-player-title').textContent = state.playerCount > 1
+        ? `${currentName.toUpperCase()} — SHIFT OVER`
+        : 'SHIFT OVER';
+      document.getElementById('go-new-record').classList.toggle('hidden', !isNewBest);
+      document.getElementById('go-medal-icon').textContent = rankInfo.icon;
+      document.getElementById('go-rank-title').textContent = rankInfo.title;
+
+      const placementBadge = document.getElementById('go-placement-badge');
+      const placementText = document.getElementById('go-placement-text');
+      if (placedRank !== null && placedRank <= 10) {
+        placementBadge.classList.remove('hidden');
+        placementText.textContent = `TOP 10: #${placedRank}`;
+      } else {
+        placementBadge.classList.add('hidden');
+      }
+
+      document.getElementById('go-score').textContent = state.score;
+      document.getElementById('go-best').textContent = state.bestScore;
+      document.getElementById('go-hardhats').textContent = state.hardhatsCollected;
+      updateHUD();
+
       renderLeaderboardList('go-leaderboard-list', 4, false, state.lastRunEntryId);
 
-      const nextHintEl = document.getElementById('go-next-up-hint');
-      const retryLabelEl = document.getElementById('btn-retry-label');
+      const nextHint = document.getElementById('go-next-up-hint');
+      const retryLabel = document.getElementById('btn-retry-label');
       if (state.playerCount > 1) {
-        state.activePlayerIdx = (state.activePlayerIdx + 1) % state.playerCount;
-        const nextName = state.playerNames[state.activePlayerIdx] || `Player ${state.activePlayerIdx + 1}`;
-        nextHintEl.textContent = `Next: ${nextName}`;
-        retryLabelEl.textContent = `Next: ${nextName}`;
+        const nextIdx = (state.activePlayerIndex + 1) % state.playerCount;
+        const nextName = state.playerNames[nextIdx] || `Player ${nextIdx + 1}`;
+        nextHint.textContent = `Next: P${nextIdx + 1} ${nextName}`;
+        retryLabel.textContent = `Next: ${nextName}`;
       } else {
-        nextHintEl.textContent = '';
-        retryLabelEl.textContent = 'Retry Shift';
+        nextHint.textContent = 'Solo Shift';
+        retryLabel.textContent = 'Retry Shift';
       }
 
       document.getElementById('ready-hint').classList.add('hidden');
       document.getElementById('gameover-modal').classList.remove('hidden');
     }
 
+    function circleRectOverlap(cx, cy, cr, rx, ry, rw, rh) {
+      const nearestX = Math.max(rx, Math.min(cx, rx + rw));
+      const nearestY = Math.max(ry, Math.min(cy, ry + rh));
+      const dx = cx - nearestX;
+      const dy = cy - nearestY;
+      return dx * dx + dy * dy < cr * cr;
+    }
+
     function updateSimulation(dt) {
-      const playH = viewH - groundHeight;
-      const spec = RIG_SPECS[state.selectedRig] || RIG_SPECS.loader;
+      state.time += dt;
+      const spec = RIG_SPECS[state.rig] || RIG_SPECS.loader;
+      const horizonY = state.height - state.groundHeight;
+      const tier = getDifficultyTier();
+      const activeSpeed = state.mode === 'playing' ? state.scrollSpeed * tier.speedMult : state.scrollSpeed;
 
-      if (state.shakeTime > 0) state.shakeTime = Math.max(0, state.shakeTime - dt);
-      if (state.flashAlpha > 0) state.flashAlpha = Math.max(0, state.flashAlpha - dt * 2.2);
+      // Ambient scenery scroll when not paused/gameover
+      if (state.mode !== 'paused' && state.mode !== 'gameover') {
+        state.bgScrollFar += activeSpeed * 0.14 * dt;
+        state.bgScrollMid += activeSpeed * 0.34 * dt;
+        state.groundScroll += activeSpeed * dt;
+        state.player.wheelSpin += (activeSpeed / 22) * dt;
 
-      for (let i = state.particles.length - 1; i >= 0; i--) {
-        const pt = state.particles[i];
-        pt.x += pt.vx * dt;
-        pt.y += pt.vy * dt;
-        pt.life -= dt;
-        if (pt.life <= 0) state.particles.splice(i, 1);
+        state.clouds.forEach((c) => {
+          c.x -= c.speed * dt;
+          if (c.x < -120) c.x = state.width + 100;
+        });
       }
 
-      for (let i = state.floatingTexts.length - 1; i >= 0; i--) {
-        const ft = state.floatingTexts[i];
-        ft.y -= 34 * dt;
-        ft.life -= dt;
-        if (ft.life <= 0) state.floatingTexts.splice(i, 1);
-      }
-
-      if (state.phase === 'MENU' || state.phase === 'READY') {
-        state.groundScroll += 95 * dt;
-        state.skylineScroll += 95 * dt;
-        state.cloudScroll += 28 * dt;
-        state.player.bobPhase += dt * 4.2;
-        state.player.y = playH * 0.46 + Math.sin(state.player.bobPhase) * 9;
-        state.player.rotation = Math.sin(state.player.bobPhase * 0.8) * 0.06;
-        state.player.wheelAngle += dt * 4;
+      // Gentle hover bobbing in menu or ready states
+      if (state.mode === 'menu' || state.mode === 'ready') {
+        const baseHoverY = horizonY * 0.46;
+        state.player.y = baseHoverY + Math.sin(state.time * 4.2) * 10;
+        state.player.rotation = Math.sin(state.time * 4.2) * 0.06;
+        state.player.bucketAngle = 0.25 + Math.sin(state.time * 3.1) * 0.15;
         return;
       }
 
-      if (state.phase !== 'PLAYING') return;
+      if (state.mode !== 'playing') return;
 
-      const speed = getCurrentSpeed();
-      state.groundScroll += speed * dt;
-      state.skylineScroll += speed * dt;
-      state.cloudScroll += speed * 0.25 * dt;
-
+      // 1. Player Vertical Physics
       state.player.vy = Math.min(spec.maxFall, state.player.vy + spec.gravity * dt);
       state.player.y += state.player.vy * dt;
-      state.player.thrustAnim = Math.max(0, state.player.thrustAnim - dt * 4.5);
-      state.player.wheelAngle += dt * 9;
 
-      const targetRot = Math.max(-0.42, Math.min(0.68, state.player.vy / 640));
-      state.player.rotation += (targetRot - state.player.rotation) * Math.min(1, dt * 14);
+      const targetRot = Math.max(-0.46, Math.min(0.75, state.player.vy / 520));
+      state.player.rotation += (targetRot - state.player.rotation) * Math.min(1, dt * 12);
+      state.player.bucketAngle += (0 - state.player.bucketAngle) * Math.min(1, dt * 7);
 
-      const hitR = state.player.radius - 3.5;
-
-      if (state.player.y - hitR < 4) {
-        state.player.y = hitR + 4;
-        if (state.player.vy < 0) state.player.vy = 0;
+      // 2. Ceiling & Ground Bounds
+      if (state.player.y - state.player.radius < 6) {
+        state.player.y = 6 + state.player.radius;
+        state.player.vy = 0;
       }
-      if (state.player.y + hitR >= playH) {
-        state.player.y = playH - hitR;
+      if (state.player.y + state.player.radius >= horizonY) {
+        state.player.y = horizonY - state.player.radius;
         triggerGameOver('GROUND IMPACT!');
         return;
       }
 
-      state.spawnDistance -= speed * dt;
-      if (state.spawnDistance <= 0) {
-        spawnBeamPair();
+      // 3. Obstacle Spawning & Movement
+      const spacing = state.width < 600 ? 275 : 315;
+      state.spawnTimer += activeSpeed * dt;
+      if (state.spawnTimer >= spacing) {
+        state.spawnTimer = 0;
+        spawnObstaclePair();
       }
 
-      const activeTier = getCurrentTierSpec();
-      if (activeTier.tier > state.difficultyTier) {
-        state.difficultyTier = activeTier.tier;
-        addFloatingText(state.player.x + 35, Math.max(70, state.player.y - 36), `⚡ ${activeTier.label}!`, '#38bdf8');
-        updateHUD();
-      }
-
-      // Patrolling Survey Drones spawn between beams starting in Phase 2
-      if (activeTier.tier >= 2) {
-        state.droneTimer -= dt;
-        if (state.droneTimer <= 0) {
-          state.droneTimer = Math.max(2.6, 5.4 - activeTier.tier * 0.55) + Math.random() * 1.6;
-          const spawnDroneX = viewW + 36;
-          const tooCloseToBeam = state.obstacles.some((o) => Math.abs((o.x + o.width * 0.5) - spawnDroneX) < 110);
-          if (!tooCloseToBeam) {
-            const baseDroneY = playH * (0.24 + Math.random() * 0.52);
-            state.airDrones.push({
-              x: spawnDroneX,
-              baseY: baseDroneY,
-              y: baseDroneY,
-              vxExtra: 45 + activeTier.tier * 14,
-              bobAmp: 22 + activeTier.tier * 6,
-              bobFreq: 2.6 + Math.random() * 1.2,
-              phase: Math.random() * Math.PI * 2,
-              radius: 13
-            });
-          }
-        }
-      }
-
-      for (let i = state.airDrones.length - 1; i >= 0; i--) {
-        const dr = state.airDrones[i];
-        dr.x -= (speed + dr.vxExtra) * dt;
-        dr.phase += dr.bobFreq * dt;
-        dr.y = Math.max(28, Math.min(playH - 28, dr.baseY + Math.sin(dr.phase) * dr.bobAmp));
-
-        const dx = state.player.x - dr.x;
-        const dy = state.player.y - dr.y;
-        if (dx * dx + dy * dy < (hitR + dr.radius - 2) ** 2) {
-          triggerGameOver('SURVEY DRONE COLLISION!');
-          return;
-        }
-        if (dr.x < -50) {
-          state.airDrones.splice(i, 1);
-        }
-      }
-
+      // 3B. Falling Boulders & Crane Loads
       state.hazardTimer -= dt;
-      if (state.hazardTimer <= 0 && state.obstaclesPassed >= 1) {
-        const baseInterval = Math.max(1.85, 4.6 - activeTier.tier * 0.55);
-        state.hazardTimer = baseInterval + Math.random() * 1.6;
-        const dropCount = activeTier.tier >= 4 && Math.random() < 0.45 ? 2 : 1;
-
-        for (let d = 0; d < dropCount; d++) {
-          const dropX = Math.min(
-            viewW - 44,
-            Math.max(state.player.x + 70, state.player.x + speed * (0.58 + d * 0.34))
-          );
-          const nearBeam = state.obstacles.some((o) => Math.abs((o.x + o.width * 0.5) - dropX) < 72);
-          if (!nearBeam) {
-            const isCityOrHarbor = state.currentBiome && (state.currentBiome.id === 'city' || state.currentBiome.id === 'harbor');
-            state.fallingHazards.push({
-              type: isCityOrHarbor && Math.random() < 0.55 ? 'girder' : 'boulder',
-              x: dropX,
-              y: -24,
-              vy: 145 + activeTier.tier * 22,
-              radius: 17,
-              rotation: Math.random() * Math.PI * 2,
-              rotSpeed: (Math.random() < 0.5 ? -1 : 1) * (2.4 + Math.random() * 2.4),
-              warnTimer: Math.max(0.55, 0.78 - (activeTier.tier - 1) * 0.04) + d * 0.25
-            });
-          }
+      if (state.hazardTimer <= 0) {
+        spawnFallingHazard();
+        if (tier.doubleHazardChance > 0 && Math.random() < tier.doubleHazardChance) {
+          setTimeout(() => {
+            if (state.mode === 'playing') spawnFallingHazard();
+          }, 420);
         }
+        state.hazardTimer = tier.hazardIntervalMin + Math.random() * tier.hazardIntervalRange;
       }
 
+      const hitR = state.player.radius * 0.82;
       for (let i = state.fallingHazards.length - 1; i >= 0; i--) {
         const hz = state.fallingHazards[i];
+        hz.x -= activeSpeed * 0.35 * dt;
         if (hz.warnTimer > 0) {
           hz.warnTimer -= dt;
-          hz.x -= speed * 0.35 * dt;
-          continue;
-        }
-        hz.x -= speed * 0.65 * dt;
-        hz.vy += 420 * dt;
-        hz.y += hz.vy * dt;
-        hz.rotation += hz.rotSpeed * dt;
+        } else {
+          hz.y += hz.vy * dt;
+          hz.rotation += hz.rotSpeed * dt;
 
-        if (hz.type === 'boulder') {
           const dx = state.player.x - hz.x;
           const dy = state.player.y - hz.y;
-          if (dx * dx + dy * dy < (hitR + hz.radius - 2) ** 2) {
-            triggerGameOver('FALLING BOULDER!');
+          const minDist = hitR + hz.radius * 0.85;
+          if (dx * dx + dy * dy < minDist * minDist) {
+            triggerGameOver(hz.type === 'boulder' ? 'FALLING BOULDER!' : 'CRANE LOAD IMPACT!');
             return;
           }
-        } else if (circleRectOverlap(state.player.x, state.player.y, hitR, hz.x - 20, hz.y - 6, 40, 12)) {
-          triggerGameOver('FALLING CRANE LOAD!');
-          return;
         }
 
-        if (hz.y + hz.radius >= playH) {
-          spawnExhaustSparks(hz.x, playH - 4, 8, '#a8a29e');
-          state.fallingHazards.splice(i, 1);
-        } else if (hz.x < -60) {
+        if (hz.y - hz.radius > horizonY || hz.x + hz.radius < -60) {
           state.fallingHazards.splice(i, 1);
         }
       }
 
       for (let i = state.obstacles.length - 1; i >= 0; i--) {
         const obs = state.obstacles[i];
-        obs.x -= speed * dt;
+        obs.x -= activeSpeed * dt;
 
-        if (obs.moveAmp > 0) {
+        if (obs.isMoving) {
           obs.movePhase += obs.moveSpeed * dt;
-          const curCenter = obs.baseGapCenterY + Math.sin(obs.movePhase) * obs.moveAmp;
-          obs.topHeight = Math.max(58, curCenter - obs.gapHeight * 0.5);
-          obs.bottomY = Math.min(playH - 28, curCenter + obs.gapHeight * 0.5);
+          const nextTop = obs.baseTopHeight + Math.sin(obs.movePhase) * obs.moveAmp;
+          const minTop = state.width < 600 ? 115 : 88;
+          const maxTop = horizonY - 86 - obs.gap;
+          obs.topHeight = Math.max(minTop, Math.min(maxTop, nextTop));
         }
 
         if (obs.hasWreckingBall) {
-          obs.swingPhase += dt * (3.1 + activeTier.tier * 0.25);
-          const pivotX = obs.x + obs.width * 0.5;
-          const swingX = pivotX + Math.sin(obs.swingPhase) * 14;
-          const swingY = obs.topHeight + obs.ballDrop;
-          const dx = state.player.x - swingX;
-          const dy = state.player.y - swingY;
-          if (dx * dx + dy * dy < (hitR + obs.ballRadius - 2) ** 2) {
-            triggerGameOver('WRECKING BALL!');
-            return;
-          }
+          obs.ballPhase += 3.2 * dt;
         }
 
-        if (obs.hasElectricWire) {
-          const activePulse = Math.sin(performance.now() * 0.012 + obs.movePhase) > -0.15;
-          if (activePulse) {
-            const wireY = obs.topHeight + obs.wireOffset;
-            if (circleRectOverlap(state.player.x, state.player.y, hitR, obs.x - 2, wireY - 3, obs.width + 4, 6)) {
-              triggerGameOver('HIGH VOLTAGE ARC!');
-              return;
-            }
-          }
+        const hitTop = circleRectOverlap(state.player.x, state.player.y, hitR, obs.x, 0, obs.width, obs.topHeight);
+        const botY = obs.topHeight + obs.gap;
+        const hitBot = circleRectOverlap(state.player.x, state.player.y, hitR, obs.x, botY, obs.width, horizonY - botY);
+
+        let hitBall = false;
+        if (obs.hasWreckingBall) {
+          const bx = obs.x + obs.width * 0.5 + Math.sin(obs.ballPhase) * 14;
+          const by = obs.topHeight + obs.ballDrop;
+          const dx = state.player.x - bx;
+          const dy = state.player.y - by;
+          hitBall = dx * dx + dy * dy < (hitR + obs.ballRadius) * (hitR + obs.ballRadius);
         }
 
-        const hitTop = obs.topHeight > 0 && circleRectOverlap(state.player.x, state.player.y, hitR, obs.x + 2, 0, obs.width - 4, obs.topHeight);
-        const hitBot = obs.bottomY < playH && circleRectOverlap(state.player.x, state.player.y, hitR, obs.x + 2, obs.bottomY, obs.width - 4, playH - obs.bottomY);
-        if (hitTop || hitBot) {
-          triggerGameOver('BEAM IMPACT!');
+        let hitWire = false;
+        if (obs.isElectricWire) {
+          const wy = obs.topHeight + obs.wireOffset;
+          hitWire = circleRectOverlap(state.player.x, state.player.y, hitR, obs.x, wy - 4, obs.width, 8);
+        }
+
+        if (hitTop || hitBot || hitBall || hitWire) {
+          triggerGameOver(
+            hitBall ? 'WRECKING BALL!' : hitWire ? 'HIGH-VOLTAGE ARC!' : 'BEAM IMPACT!'
+          );
           return;
         }
 
-        if (!obs.passed && obs.x + obs.width < state.player.x - hitR) {
+        if (!obs.passed && obs.x + obs.width < state.player.x) {
           obs.passed = true;
-          state.obstaclesPassed++;
           audio.playBeamScore();
-          updateHUD();
         }
 
         if (obs.x + obs.width < -60) {
@@ -2987,171 +2922,393 @@
         }
       }
 
+      // 4. Hardhat Collectibles (Points ONLY awarded when catching hardhats!)
       for (let i = state.collectibles.length - 1; i >= 0; i--) {
-        const item = state.collectibles[i];
-        if (item.obsRef) {
-          item.x = item.obsRef.x + item.obsRef.width * 0.5;
-          const gapCenter = (item.obsRef.topHeight + item.obsRef.bottomY) * 0.5;
-          item.y = gapCenter + item.offsetY;
-        } else {
-          item.x -= speed * dt;
-        }
+        const hat = state.collectibles[i];
+        hat.x -= activeSpeed * dt;
 
-        if (!item.collected) {
-          const dx = state.player.x - item.x;
-          const dy = state.player.y - item.y;
-          if (dx * dx + dy * dy < (hitR + item.radius + 4) ** 2) {
-            item.collected = true;
-            state.hardhatsCollected++;
-            state.hardhatStreak++;
-            const pts = state.hardhatStreak >= 3 ? 2 : 1;
-            state.score += pts;
-            state.bonusPoints += pts > 1 ? 1 : 0;
+        if (!hat.collected) {
+          const dx = state.player.x - hat.x;
+          const dy = state.player.y - hat.y;
+          const pickupDist = state.player.radius + hat.radius + 6;
+          if (dx * dx + dy * dy < pickupDist * pickupDist) {
+            hat.collected = true;
+            state.hardhatsCollected += 1;
+            state.streak += 1;
+            const bonusPoints = state.streak >= 3 ? 2 : 1;
+            state.score += bonusPoints;
+
+            const newTier = getDifficultyTier();
+            if (newTier.tier > state.lastTier) {
+              state.lastTier = newTier.tier;
+              spawnFloatingText(state.player.x + 24, state.player.y - 44, `⚡ ${newTier.label}`, newTier.color);
+            }
+
             audio.playHardhatPickup();
-            spawnExhaustSparks(item.x, item.y, 10, '#fbbf24');
-            const callout = state.hardhatStreak === 3
-              ? '+2 • 2X BONUS UNLOCKED!'
-              : pts > 1
-                ? '+2 • 2X BONUS!'
-                : `+1 (${state.hardhatStreak}/3)`;
-            addFloatingText(item.x, item.y - 12, callout, '#fbbf24');
-            popScoreHUD();
-            updateHUD();
-          } else if (item.x < state.player.x - hitR - 22 && !item.missedNotified) {
-            item.missedNotified = true;
-            state.hardhatStreak = 0;
-            addFloatingText(state.player.x, state.player.y - 24, 'MISSED!', '#fb7185');
+            spawnDust(hat.x, hat.y, 10, '#fbbf24');
+            let label = `+1 (${state.streak}/3)`;
+            if (state.streak === 3) label = '+2 • 2X BONUS UNLOCKED!';
+            else if (state.streak > 3) label = '+2 • 2X BONUS!';
+            spawnFloatingText(hat.x, hat.y - 14, label, state.streak >= 3 ? '#34d399' : '#fef08a');
+            updateHUD(true);
+          } else if (!hat.missed && hat.x + hat.radius < state.player.x - state.player.radius - 8) {
+            hat.missed = true;
+            if (state.streak > 0) {
+              spawnFloatingText(state.player.x, state.player.y - 26, 'STREAK RESET!', '#fb7185');
+            }
+            state.streak = 0;
             updateHUD();
           }
         }
 
-        if (item.collected || item.x < -60) {
+        if (hat.x < -60) {
           state.collectibles.splice(i, 1);
         }
+      }
+
+      // 5. Particles & Floating Text
+      for (let i = state.particles.length - 1; i >= 0; i--) {
+        const p = state.particles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.life -= dt;
+        if (p.life <= 0) state.particles.splice(i, 1);
+      }
+
+      for (let i = state.floatingTexts.length - 1; i >= 0; i--) {
+        const ft = state.floatingTexts[i];
+        ft.y -= 42 * dt;
+        ft.life -= dt;
+        if (ft.life <= 0) state.floatingTexts.splice(i, 1);
       }
     }
 
     // =========================================================================
-    // 8. UI CONTROLS, ROSTER SETUP & MAIN ANIMATION LOOP
+    // 7. INPUT CONTROLS & HUD SYNC
     // =========================================================================
+    function handleFlapAction() {
+      if (state.mode === 'ready') {
+        state.mode = 'playing';
+        document.getElementById('ready-hint').classList.add('hidden');
+      }
+      if (state.mode !== 'playing') return;
+
+      const spec = RIG_SPECS[state.rig] || RIG_SPECS.loader;
+      state.player.vy = spec.flapVel;
+      state.player.bucketAngle = 0.72;
+      audio.playHydraulicThrust();
+      spawnDust(state.player.x - 16, state.player.y + 6, 5, 'rgba(255,255,255,0.65)');
+    }
+
+    function updateHUD(popScore = false) {
+      const scoreEl = document.getElementById('hud-score');
+      scoreEl.textContent = state.score;
+      document.getElementById('hud-best').textContent = Math.max(state.bestScore, state.score);
+
+      const bonusLabel = document.getElementById('hud-bonus-label');
+      const bonusVal = document.getElementById('hud-bonus');
+      if (state.streak >= 3) {
+        bonusLabel.textContent = 'STREAK ACTIVE';
+        bonusLabel.style.color = '#fbbf24';
+        bonusVal.textContent = '2X BONUS!';
+        bonusVal.style.color = '#fbbf24';
+      } else {
+        bonusLabel.textContent = '3-HAT BONUS';
+        bonusLabel.style.color = '#94a3b8';
+        bonusVal.textContent = `${state.streak}/3`;
+        bonusVal.style.color = '#38bdf8';
+      }
+
+      const tier = getDifficultyTier();
+      const tierPill = document.getElementById('hud-tier-pill');
+      if (tierPill) {
+        tierPill.textContent = tier.label;
+        tierPill.style.color = tier.color;
+        tierPill.style.borderColor = `${tier.color}88`;
+      }
+
+      const activeName = state.playerNames[state.activePlayerIndex] || `Player ${state.activePlayerIndex + 1}`;
+      document.getElementById('hud-player-tag').textContent = state.playerCount > 1
+        ? `P${state.activePlayerIndex + 1} / ${state.playerCount}`
+        : 'OPERATOR';
+      document.getElementById('hud-player-name').textContent = activeName;
+      document.getElementById('ready-hint-text').textContent = state.playerCount > 1
+        ? `${activeName.toUpperCase()}: TAP OR SPACE`
+        : 'TAP, CLICK OR PRESS SPACE';
+
+      if (popScore) {
+        scoreEl.classList.remove('pop');
+        void scoreEl.offsetWidth;
+        scoreEl.classList.add('pop');
+        setTimeout(() => scoreEl.classList.remove('pop'), 150);
+      }
+    }
+
+    function updateRecordDisplay() {
+      const topEntry = state.leaderboard[0];
+      const topScore = topEntry ? topEntry.score : 0;
+      state.bestScore = topScore;
+      document.getElementById('menu-best-score').textContent = topScore;
+      document.getElementById('menu-best-holder').textContent = topEntry
+        ? `${topEntry.name}`
+        : 'No shifts yet';
+    }
+
+    function renderLeaderboardList(containerId, limit = 10, detailed = false, highlightId = null) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const entries = state.leaderboard.slice(0, limit);
+      if (entries.length === 0) {
+        container.innerHTML = '<div style="font-size:0.78rem; color:#94a3b8; text-align:center; padding:0.75rem 0;">No scores recorded yet — complete a shift to set the first record!</div>';
+        return;
+      }
+      const medals = ['🏆', '🥈', '🥉'];
+      container.innerHTML = entries
+        .map((entry, idx) => {
+          const rankIcon = idx < 3
+            ? `<span style="font-size:0.95rem;">${medals[idx]}</span>`
+            : `<span style="font-family:'Chakra Petch',sans-serif; font-weight:700; color:#fbbf24; font-size:0.8rem;">#${idx + 1}</span>`;
+          const rigName = (RIG_SPECS[entry.rig] && RIG_SPECS[entry.rig].name) || 'Heavy Rig';
+          const modeTag = entry.shared ? 'Shared' : entry.isMultiplayer ? 'Pass & Play' : 'Solo';
+          const rankInfo = getRankDetails(entry.score);
+          const isCurrentRun = highlightId && entry.id === highlightId;
+          const rowHighlightStyle = isCurrentRun
+            ? 'background:rgba(56,189,248,0.18); border:1px solid rgba(56,189,248,0.45); border-radius:8px; padding:0.32rem 0.45rem; margin:2px -4px;'
+            : '';
+          const youBadge = isCurrentRun
+            ? '<span style="background:#38bdf8; color:#0f172a; font-size:0.56rem; font-weight:800; padding:1px 5px; border-radius:999px; margin-left:4px; vertical-align:middle;">THIS SHIFT</span>'
+            : '';
+
+          if (detailed) {
+            return `
+              <div class="lb-row" style="padding:0.42rem 0; ${rowHighlightStyle}">
+                <div style="display:flex; align-items:center; gap:0.55rem; min-width:0;">
+                  <span style="min-width:24px; text-align:center;">${rankIcon}</span>
+                  <div style="min-width:0;">
+                    <div style="color:#f8fafc; font-weight:700; font-size:0.86rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${entry.name}${youBadge}</div>
+                    <div style="color:#38bdf8; font-size:0.65rem; font-weight:700;">${rankInfo.icon} ${rankInfo.title} • <span style="color:#94a3b8; font-weight:600;">${rigName} (${modeTag})</span></div>
+                  </div>
+                </div>
+                <span class="font-display" style="color:#fbbf24; font-weight:700; font-size:1.05rem; margin-left:0.5rem;">${entry.score}</span>
+              </div>
+            `;
+          }
+          return `
+            <div class="lb-row" style="${rowHighlightStyle}">
+              <div style="min-width:0; padding-right:0.5rem;">
+                <div style="color:#f8fafc; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${rankIcon} ${entry.name}${youBadge}</div>
+                <div style="color:#38bdf8; font-size:0.62rem; font-weight:700; padding-left:1.35rem;">${rankInfo.icon} ${rankInfo.title}</div>
+              </div>
+              <span class="font-display" style="color:#fbbf24; font-weight:700; flex-shrink:0;">${entry.score}</span>
+            </div>
+          `;
+        })
+        .join('');
+    }
+
+    function openTop10Leaderboard() {
+      renderLeaderboardList('top10-leaderboard-list', 10, true, state.lastRunEntryId);
+      document.getElementById('leaderboard-modal').classList.remove('hidden');
+    }
+
+    function closeTop10Leaderboard() {
+      document.getElementById('leaderboard-modal').classList.add('hidden');
+    }
+
     function renderRosterInputs() {
       const container = document.getElementById('roster-inputs');
       const summary = document.getElementById('mode-summary-label');
-      if (!container) return;
-
+      const startLabel = document.getElementById('btn-start-label');
+      container.classList.toggle('two-col', state.playerCount > 1);
       summary.textContent = state.playerCount === 1
         ? 'Solo Shift'
-        : `${state.playerCount} Players (Pass & Play)`;
+        : `${state.playerCount} Players • Pass & Play`;
 
-      container.classList.toggle('two-col', state.playerCount > 1);
       container.innerHTML = '';
-
       for (let i = 0; i < state.playerCount; i++) {
         const row = document.createElement('div');
         row.className = 'player-input-row';
         row.innerHTML = `
           <span class="player-tag">P${i + 1}</span>
-          <input type="text" class="player-name-input" maxlength="16" value="${state.playerNames[i]}" placeholder="Player ${i + 1}" data-pidx="${i}" />
+          <input type="text" class="player-name-input" maxlength="14" value="${state.playerNames[i]}" placeholder="Player ${i + 1}" aria-label="Player ${i + 1} name" />
         `;
         const input = row.querySelector('input');
         input.addEventListener('input', (e) => {
-          const idx = Number(e.target.dataset.pidx);
-          state.playerNames[idx] = e.target.value.trim() || `Player ${idx + 1}`;
-          saveRosterData();
-          updateStartButtonLabel();
+          const val = e.target.value.trim();
+          state.playerNames[i] = val || `Player ${i + 1}`;
+          saveRosterToStorage();
+          if (i === 0) {
+            startLabel.textContent = state.playerCount > 1
+              ? `Start: ${state.playerNames[0]}`
+              : 'Start Shift';
+          }
         });
         container.appendChild(row);
       }
-      updateStartButtonLabel();
-    }
 
-    function updateStartButtonLabel() {
-      const firstPlayer = state.playerNames[0] || 'Player 1';
-      document.getElementById('btn-start-label').textContent = state.playerCount > 1
-        ? `Start (${firstPlayer})`
+      startLabel.textContent = state.playerCount > 1
+        ? `Start: ${state.playerNames[0]}`
         : 'Start Shift';
     }
 
-    function refreshMenuRecordDisplay() {
-      document.getElementById('menu-best-score').textContent = state.bestScore;
-      document.getElementById('menu-best-holder').textContent = state.bestScore > 0 ? state.bestHolder : '—';
-    }
+    function prepareReadyShift(resetTour = false, advanceTurn = false) {
+      if (resetTour) {
+        state.activePlayerIndex = 0;
+      } else if (advanceTurn && state.playerCount > 1) {
+        state.activePlayerIndex = (state.activePlayerIndex + 1) % state.playerCount;
+      }
 
-    function openGarageMenu() {
-      state.phase = 'MENU';
-      state.activePlayerIdx = 0;
-      refreshMenuRecordDisplay();
-      renderGaragePreviews();
-      document.getElementById('hud').classList.add('hidden');
-      document.getElementById('ready-hint').classList.add('hidden');
+      rollNewProceduralBiome(true);
+      state.mode = 'ready';
+      state.score = 0;
+      state.hardhatsCollected = 0;
+      state.streak = 0;
+      state.lastTier = 1;
+      state.obstacles = [];
+      state.collectibles = [];
+      state.fallingHazards = [];
+      state.particles = [];
+      state.floatingTexts = [];
+      state.spawnTimer = 0;
+      state.hazardTimer = 2.6;
+
+      // Pre-populate opening obstacles so iPad & desktop landscape players don't fly over empty sky
+      const spacing = state.width < 600 ? 275 : 315;
+      const firstSpawnX = Math.max(state.player.x + 410, Math.min(state.width + 40, state.player.x + 460));
+      spawnObstaclePair(firstSpawnX);
+      if (firstSpawnX + spacing <= state.width + 180) {
+        spawnObstaclePair(firstSpawnX + spacing);
+      }
+
+      state.player.y = Math.round((state.height - state.groundHeight) * 0.46);
+      state.player.vy = 0;
+      state.player.rotation = 0;
+      state.player.bucketAngle = 0.25;
+
+      updateHUD();
+      document.getElementById('start-modal').classList.add('hidden');
       document.getElementById('pause-modal').classList.add('hidden');
       document.getElementById('gameover-modal').classList.add('hidden');
-      document.getElementById('leaderboard-modal').classList.add('hidden');
-      document.getElementById('start-modal').classList.remove('hidden');
+      document.getElementById('hud').classList.remove('hidden');
+      document.getElementById('ready-hint').classList.remove('hidden');
     }
 
     function togglePauseState() {
-      if (state.phase === 'PLAYING') {
-        state.phase = 'PAUSED';
+      if (state.mode === 'playing') {
+        state.mode = 'paused';
         document.getElementById('pause-modal').classList.remove('hidden');
-      } else if (state.phase === 'PAUSED') {
-        state.phase = 'PLAYING';
+      } else if (state.mode === 'paused') {
+        state.mode = 'playing';
         document.getElementById('pause-modal').classList.add('hidden');
       }
     }
 
+    function returnToGarage() {
+      state.mode = 'menu';
+      state.obstacles = [];
+      state.collectibles = [];
+      state.fallingHazards = [];
+      state.particles = [];
+      state.floatingTexts = [];
+      updateRecordDisplay();
+      document.getElementById('hud').classList.add('hidden');
+      document.getElementById('ready-hint').classList.add('hidden');
+      document.getElementById('pause-modal').classList.add('hidden');
+      document.getElementById('gameover-modal').classList.add('hidden');
+      document.getElementById('start-modal').classList.remove('hidden');
+    }
+
+    // Canvas Tap / Pointer Controls
+    canvas.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      handleFlapAction();
+    });
+
+    // Keyboard Controls (Space, Up Arrow, W, P / Esc)
+    window.addEventListener('keydown', (e) => {
+      if (document.activeElement && document.activeElement.tagName === 'INPUT') {
+        if (e.code === 'Enter') document.activeElement.blur();
+        return;
+      }
+      if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+        e.preventDefault();
+        if (state.mode === 'ready' || state.mode === 'playing') {
+          handleFlapAction();
+        } else if (state.mode === 'gameover') {
+          audio.playClick();
+          prepareReadyShift(false, true);
+        }
+      } else if (e.code === 'Escape' || e.code === 'KeyP') {
+        if (state.mode === 'playing' || state.mode === 'paused') {
+          audio.playClick();
+          togglePauseState();
+        }
+      }
+    });
+
+    // Player Count Selector (1P Solo - 4P Local Pass & Play)
     document.querySelectorAll('#player-count-selector .mode-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         audio.playClick();
         document.querySelectorAll('#player-count-selector .mode-btn').forEach((b) => b.classList.remove('selected'));
         btn.classList.add('selected');
         state.playerCount = Number(btn.dataset.count) || 1;
-        state.activePlayerIdx = 0;
-        saveRosterData();
+        saveRosterToStorage();
         renderRosterInputs();
       });
     });
 
+    // Rig Selector Buttons
     document.querySelectorAll('#rig-selector .rig-card').forEach((card) => {
       card.addEventListener('click', () => {
         audio.playClick();
         document.querySelectorAll('#rig-selector .rig-card').forEach((c) => c.classList.remove('selected'));
         card.classList.add('selected');
-        state.selectedRig = card.dataset.rig;
+        state.rig = card.dataset.rig;
       });
     });
 
+    // Day / Night Shift Selector Buttons
     document.querySelectorAll('#shift-selector .shift-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         audio.playClick();
         document.querySelectorAll('#shift-selector .shift-btn').forEach((b) => b.classList.remove('selected'));
         btn.classList.add('selected');
-        state.selectedShift = btn.dataset.shift;
+        state.shift = btn.dataset.shift;
       });
     });
 
+    // Menu, Pause & Game Over Action Buttons
     document.getElementById('btn-start-shift').addEventListener('click', () => {
+      audio.init();
       audio.playClick();
-      state.activePlayerIdx = 0;
-      prepareReadyShift();
+      prepareReadyShift(true, false);
     });
 
     document.getElementById('btn-retry-shift').addEventListener('click', () => {
       audio.playClick();
-      prepareReadyShift();
+      prepareReadyShift(false, true);
     });
 
     document.getElementById('btn-go-garage').addEventListener('click', () => {
       audio.playClick();
-      openGarageMenu();
+      returnToGarage();
     });
 
     document.getElementById('btn-share-score').addEventListener('click', async () => {
       audio.playClick();
       const shareBtn = document.getElementById('btn-share-score');
-      const shareUrl = buildShareScoreUrl();
-      const playerName = state.playerNames[state.lastScoredPlayerIdx ?? state.activePlayerIdx] || 'Player 1';
-      const shareText = `🚧 ${playerName} scored ${state.score} pts in Heavy Flap! Open this link to add my score to your leaderboard and try to beat it:`;
+      const currentName = state.playerNames[state.activePlayerIndex] || `Player ${state.activePlayerIndex + 1}`;
+      const rankInfo = getRankDetails(state.score);
+      const token = encodeChallengePayload({
+        n: currentName,
+        s: state.score,
+        r: state.rig,
+        t: Date.now()
+      });
+      const baseUrl = window.location.href.split('?')[0].split('#')[0];
+      const shareUrl = `${baseUrl}?challenge=${token}`;
+      const shareText = `🚜 ${currentName} scored ${state.score} pts (${rankInfo.title}) in Heavy Flap! Open this link to add my score to your Top 10 & try to beat me:`;
 
       if (navigator.share) {
         try {
@@ -3160,7 +3317,7 @@
             text: shareText,
             url: shareUrl
           });
-          shareBtn.textContent = '✅ Shared!';
+          shareBtn.innerHTML = '<span>✅</span><span>Shared!</span>';
           shareBtn.style.borderColor = '#34d399';
           shareBtn.style.color = '#6ee7b7';
           return;
@@ -3179,13 +3336,19 @@
       ta.select();
       try {
         document.execCommand('copy');
-        shareBtn.textContent = '✅ Link Copied!';
+        shareBtn.innerHTML = '<span>✅</span><span>Copied!</span>';
         shareBtn.style.borderColor = '#34d399';
         shareBtn.style.color = '#6ee7b7';
       } catch (e) {
-        shareBtn.textContent = '⚠️ Copy Failed';
+        shareBtn.innerHTML = '<span>⚠️</span><span>Failed</span>';
       }
       document.body.removeChild(ta);
+    });
+
+    document.getElementById('btn-pause').addEventListener('click', (e) => {
+      e.stopPropagation();
+      audio.playClick();
+      togglePauseState();
     });
 
     document.getElementById('btn-resume-shift').addEventListener('click', () => {
@@ -3195,29 +3358,42 @@
 
     document.getElementById('btn-pause-garage').addEventListener('click', () => {
       audio.playClick();
-      openGarageMenu();
+      returnToGarage();
     });
 
-    document.getElementById('btn-sound').addEventListener('click', (e) => {
+    document.getElementById('btn-open-leaderboard').addEventListener('click', () => {
+      audio.playClick();
+      openTop10Leaderboard();
+    });
+
+    document.getElementById('btn-hud-leaderboard').addEventListener('click', (e) => {
       e.stopPropagation();
-      const on = audio.toggle();
-      const btn = document.getElementById('btn-sound');
-      const iconOn = document.getElementById('icon-sound-on');
-      const iconOff = document.getElementById('icon-sound-off');
-      const label = document.getElementById('sound-label');
-      if (on) {
-        btn.classList.add('sound-active');
-        btn.classList.remove('sound-muted');
-        iconOn.classList.remove('hidden');
-        iconOff.classList.add('hidden');
-        label.textContent = 'SFX ON';
+      audio.playClick();
+      if (state.mode === 'playing') {
+        togglePauseState();
+      }
+      openTop10Leaderboard();
+    });
+
+    document.getElementById('btn-go-top10').addEventListener('click', () => {
+      audio.playClick();
+      openTop10Leaderboard();
+    });
+
+    document.getElementById('btn-close-leaderboard').addEventListener('click', () => {
+      audio.playClick();
+      closeTop10Leaderboard();
+    });
+
+    document.getElementById('btn-close-leaderboard-bottom').addEventListener('click', () => {
+      audio.playClick();
+      closeTop10Leaderboard();
+    });
+
+    document.getElementById('leaderboard-modal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
         audio.playClick();
-      } else {
-        btn.classList.remove('sound-active');
-        btn.classList.add('sound-muted');
-        iconOn.classList.add('hidden');
-        iconOff.classList.remove('hidden');
-        label.textContent = 'MUTED';
+        closeTop10Leaderboard();
       }
     });
 
@@ -3226,89 +3402,56 @@
       checkAndApplyLatestBuild(true);
     });
 
-    document.getElementById('btn-open-leaderboard').addEventListener('click', openTop10Leaderboard);
-    document.getElementById('btn-go-top10').addEventListener('click', openTop10Leaderboard);
-    document.getElementById('btn-hud-leaderboard').addEventListener('click', (e) => {
+    document.getElementById('btn-sound').addEventListener('click', (e) => {
       e.stopPropagation();
-      openTop10Leaderboard();
-    });
-    document.getElementById('btn-close-leaderboard').addEventListener('click', closeTop10Leaderboard);
-    document.getElementById('btn-close-leaderboard-bottom').addEventListener('click', closeTop10Leaderboard);
-    document.getElementById('leaderboard-modal').addEventListener('click', (e) => {
-      if (e.target.id === 'leaderboard-modal') closeTop10Leaderboard();
-    });
-
-    canvas.addEventListener('pointerdown', (e) => {
-      if (e.button !== undefined && e.button !== 0) return;
-      if (state.phase === 'READY' || state.phase === 'PLAYING') {
-        e.preventDefault();
-        triggerThrust();
-      }
-    }, { passive: false });
-
-    window.addEventListener('keydown', (e) => {
-      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
-
-      if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
-        if (state.phase === 'READY' || state.phase === 'PLAYING') {
-          e.preventDefault();
-          triggerThrust();
-        }
-      } else if (e.code === 'KeyP' || e.code === 'Escape') {
-        if (state.phase === 'PLAYING' || state.phase === 'PAUSED') {
-          e.preventDefault();
-          togglePauseState();
-        }
-      }
+      const on = audio.toggle();
+      if (on) audio.playClick();
+      const btn = document.getElementById('btn-sound');
+      const label = document.getElementById('sound-label');
+      btn.classList.toggle('sound-active', on);
+      btn.classList.toggle('sound-muted', !on);
+      if (label) label.textContent = on ? 'SFX ON' : 'MUTED';
+      document.getElementById('icon-sound-on').classList.toggle('hidden', !on);
+      document.getElementById('icon-sound-off').classList.toggle('hidden', on);
     });
 
-    window.addEventListener('resize', resizeCanvas);
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', resizeCanvas);
-    }
+    // =========================================================================
+    // 8. MAIN ANIMATION LOOP
+    // =========================================================================
+    let lastTimestamp = performance.now();
 
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
-        checkAndApplyLatestBuild(false);
-      }
-    });
-
-    let lastTimestamp = 0;
     function gameLoop(timestamp) {
-      if (!lastTimestamp) lastTimestamp = timestamp;
       const dt = Math.min(0.05, Math.max(0.001, (timestamp - lastTimestamp) / 1000));
       lastTimestamp = timestamp;
 
       updateSimulation(dt);
       drawScene();
+
       requestAnimationFrame(gameLoop);
     }
 
-    window.addEventListener('load', () => {
-      const verBadge = document.getElementById('app-version-badge');
-      const syncBtnText = document.getElementById('sync-status-text');
-      if (verBadge) verBadge.textContent = APP_VERSION;
-      if (syncBtnText) syncBtnText.textContent = `↻ Get Latest (${APP_VERSION})`;
-
-      const importedChallenge = importSharedChallengeFromUrl();
-
-      document.querySelectorAll('#player-count-selector .mode-btn').forEach((b) => {
-        b.classList.toggle('selected', Number(b.dataset.count) === state.playerCount);
-      });
-
-      generateHomeScreenAppIcon();
-      initScenery();
-      resizeCanvas();
-      renderRosterInputs();
-      renderGaragePreviews();
-      refreshMenuRecordDisplay();
-      checkAndApplyLatestBuild(false);
-      if (importedChallenge) {
-        renderLeaderboardList('top10-leaderboard-list', 10, true, state.lastRunEntryId);
-        document.getElementById('leaderboard-modal').classList.remove('hidden');
-      }
-      requestAnimationFrame(gameLoop);
+    // Boot Sequence
+    document.getElementById('app-version-badge').textContent = APP_VERSION;
+    setSyncButtonFeedback(`↻ Get Latest (${APP_VERSION})`, 'default');
+    document.querySelectorAll('#player-count-selector .mode-btn').forEach((b) => {
+      b.classList.toggle('selected', Number(b.dataset.count) === state.playerCount);
     });
+    const importedChallenge = importSharedChallengeFromUrl();
+    updateRecordDisplay();
+    rollNewProceduralBiome(false);
+    renderRosterInputs();
+    renderRigPreviews();
+    generateHomeScreenAppIcon();
+    if (importedChallenge) {
+      openTop10Leaderboard();
+    }
+    checkAndApplyLatestBuild(false);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        checkAndApplyLatestBuild(false);
+      }
+    });
+    requestAnimationFrame(gameLoop);
   </script>
 </body>
 </html>
