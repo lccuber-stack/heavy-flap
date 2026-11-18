@@ -841,7 +841,10 @@
           <button type="button" class="btn-secondary" id="btn-go-garage" style="flex:1;">
             Garage
           </button>
-          <button type="button" class="btn-launch" id="btn-retry-shift" style="flex:2; margin-top:0;">
+          <button type="button" class="btn-secondary" id="btn-share-score" style="flex:1.25; border-color:rgba(56,189,248,0.45); color:#7dd3fc;">
+            📤 Share Score
+          </button>
+          <button type="button" class="btn-launch" id="btn-retry-shift" style="flex:1.65; margin-top:0;">
             <span id="btn-retry-label">Retry Shift</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
@@ -1309,7 +1312,7 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v2.6';
+    const APP_VERSION = 'v2.7';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
 
@@ -1444,6 +1447,60 @@
       return rankIndex >= 0 ? rankIndex + 1 : null;
     }
 
+    function buildShareScoreUrl() {
+      const cleanUrl = window.location.href.split('?')[0].split('#')[0];
+      const currentName = (state.playerNames[state.lastScoredPlayerIdx ?? state.activePlayerIdx] || 'Player 1').trim().slice(0, 18);
+      const rigName = (RIG_SPECS[state.selectedRig] && RIG_SPECS[state.selectedRig].name) || 'Wheel Loader';
+      const payload = {
+        n: currentName,
+        s: state.score,
+        r: rigName,
+        t: Date.now()
+      };
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+      return `${cleanUrl}?challenge=${encodeURIComponent(encoded)}`;
+    }
+
+    function importSharedChallengeFromUrl() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const raw = params.get('challenge');
+        if (!raw) return null;
+        const decoded = JSON.parse(decodeURIComponent(escape(atob(raw))));
+        if (!decoded || typeof decoded.n !== 'string' || typeof decoded.s !== 'number' || decoded.s <= 0) {
+          return null;
+        }
+        const sharedName = decoded.n.trim().slice(0, 18) || 'Challenger';
+        const sharedScore = Math.min(9999, Math.max(1, Math.round(decoded.s)));
+        const sharedRig = typeof decoded.r === 'string' ? decoded.r.slice(0, 24) : 'Wheel Loader';
+        const challengeId = `shared_${decoded.t || sharedName}_${sharedScore}`;
+
+        let records = loadLeaderboardData();
+        const alreadyImported = records.some((r) => r.id === challengeId);
+        if (!alreadyImported) {
+          records.push({
+            id: challengeId,
+            name: sharedName,
+            score: sharedScore,
+            rig: sharedRig,
+            mode: 'Shared Link'
+          });
+          records = saveLeaderboardData(records);
+          state.leaderboard = records;
+          state.bestScore = records.length ? records[0].score : 0;
+          state.bestHolder = records.length && records[0].score > 0 ? records[0].name : '—';
+          state.lastRunEntryId = challengeId;
+        }
+
+        // Clean URL parameter so refreshing doesn't re-trigger
+        const cleanUrl = window.location.href.split('?')[0].split('#')[0];
+        window.history.replaceState({}, document.title, cleanUrl);
+        return { name: sharedName, score: sharedScore, rig: sharedRig };
+      } catch (e) {
+        return null;
+      }
+    }
+
     let initialSignature = null;
 
     function setSyncButtonFeedback(text, tone = 'default') {
@@ -1559,6 +1616,7 @@
       playerCount: initialRoster.playerCount,
       playerNames: initialRoster.playerNames,
       activePlayerIdx: 0,
+      lastScoredPlayerIdx: 0,
       score: 0,
       bonusPoints: 0,
       hardhatsCollected: 0,
@@ -1681,6 +1739,11 @@
       targetCtx.rotate(rotation);
       targetCtx.scale(scale, scale);
 
+      // Subtle dark contrast halo so yellow/orange machines stand out clearly against bright/orange skies
+      targetCtx.shadowColor = 'rgba(15, 23, 42, 0.55)';
+      targetCtx.shadowBlur = 7;
+      targetCtx.shadowOffsetY = 2;
+
       if (thrustAnim > 0.05) {
         targetCtx.save();
         const flameLen = (12 + thrustAnim * 18);
@@ -1704,7 +1767,7 @@
         targetCtx.roundRect(-21, -7, 22, 16, 4);
         targetCtx.fill();
         targetCtx.strokeStyle = '#0f172a';
-        targetCtx.lineWidth = 1.6;
+        targetCtx.lineWidth = 1.8;
         targetCtx.stroke();
 
         targetCtx.fillStyle = '#0f172a';
@@ -1729,9 +1792,17 @@
         targetCtx.save();
         targetCtx.translate(6, -3);
         targetCtx.rotate(armLift);
-        targetCtx.strokeStyle = spec.secondaryColor;
-        targetCtx.lineWidth = 4;
         targetCtx.lineCap = 'round';
+        // Dark steel outline behind loader lift arm for high contrast on all skies
+        targetCtx.strokeStyle = '#0f172a';
+        targetCtx.lineWidth = 6.5;
+        targetCtx.beginPath();
+        targetCtx.moveTo(0, 0);
+        targetCtx.lineTo(13, 4);
+        targetCtx.stroke();
+
+        targetCtx.strokeStyle = spec.secondaryColor;
+        targetCtx.lineWidth = 3.6;
         targetCtx.beginPath();
         targetCtx.moveTo(0, 0);
         targetCtx.lineTo(13, 4);
@@ -1745,8 +1816,8 @@
         targetCtx.lineTo(10, 10);
         targetCtx.closePath();
         targetCtx.fill();
-        targetCtx.strokeStyle = '#94a3b8';
-        targetCtx.lineWidth = 1.2;
+        targetCtx.strokeStyle = '#0f172a';
+        targetCtx.lineWidth = 1.5;
         targetCtx.stroke();
         targetCtx.restore();
 
@@ -1771,8 +1842,8 @@
         targetCtx.beginPath();
         targetCtx.roundRect(-18, 7, 32, 9, 4.5);
         targetCtx.fill();
-        targetCtx.strokeStyle = '#64748b';
-        targetCtx.lineWidth = 1.4;
+        targetCtx.strokeStyle = '#0f172a';
+        targetCtx.lineWidth = 1.6;
         targetCtx.stroke();
 
         targetCtx.fillStyle = '#eab308';
@@ -1787,7 +1858,7 @@
         targetCtx.roundRect(-19, -6, 24, 13, 4);
         targetCtx.fill();
         targetCtx.strokeStyle = '#0f172a';
-        targetCtx.lineWidth = 1.6;
+        targetCtx.lineWidth = 1.8;
         targetCtx.stroke();
 
         targetCtx.fillStyle = spec.cabColor;
@@ -1801,19 +1872,42 @@
         targetCtx.save();
         targetCtx.translate(4, -4);
         targetCtx.rotate(boomAngle);
-        targetCtx.strokeStyle = spec.primaryColor;
-        targetCtx.lineWidth = 4.5;
         targetCtx.lineCap = 'round';
+        targetCtx.lineJoin = 'round';
+
+        // Bold dark outline around excavator boom & stick so it pops against orange canyon skies
+        targetCtx.strokeStyle = '#0f172a';
+        targetCtx.lineWidth = 7.4;
         targetCtx.beginPath();
         targetCtx.moveTo(0, 0);
         targetCtx.lineTo(13, -7);
         targetCtx.lineTo(20, 5);
         targetCtx.stroke();
 
-        targetCtx.fillStyle = '#334155';
+        // Inner golden-yellow boom core
+        targetCtx.strokeStyle = '#fbbf24';
+        targetCtx.lineWidth = 4.2;
         targetCtx.beginPath();
-        targetCtx.arc(20, 8, 5.5, 0.2, Math.PI * 1.15);
+        targetCtx.moveTo(0, 0);
+        targetCtx.lineTo(13, -7);
+        targetCtx.lineTo(20, 5);
+        targetCtx.stroke();
+
+        // Hydraulic cylinder accent along top of boom
+        targetCtx.strokeStyle = '#cbd5e1';
+        targetCtx.lineWidth = 1.6;
+        targetCtx.beginPath();
+        targetCtx.moveTo(3, -3);
+        targetCtx.lineTo(12, -8.5);
+        targetCtx.stroke();
+
+        targetCtx.fillStyle = '#1e293b';
+        targetCtx.beginPath();
+        targetCtx.arc(20, 8, 5.8, 0.2, Math.PI * 1.15);
         targetCtx.fill();
+        targetCtx.strokeStyle = '#0f172a';
+        targetCtx.lineWidth = 1.4;
+        targetCtx.stroke();
         targetCtx.restore();
       } else {
         targetCtx.save();
@@ -1828,7 +1922,7 @@
         targetCtx.closePath();
         targetCtx.fill();
         targetCtx.strokeStyle = '#0f172a';
-        targetCtx.lineWidth = 1.5;
+        targetCtx.lineWidth = 1.8;
         targetCtx.stroke();
         targetCtx.restore();
 
@@ -1840,7 +1934,7 @@
         targetCtx.roundRect(5, -6, 15, 12, 3);
         targetCtx.fill();
         targetCtx.strokeStyle = '#0f172a';
-        targetCtx.lineWidth = 1.5;
+        targetCtx.lineWidth = 1.8;
         targetCtx.stroke();
 
         targetCtx.fillStyle = spec.cabColor;
@@ -2636,32 +2730,17 @@
       spawnExhaustSparks(state.player.x, state.player.y, 18, '#f97316');
 
       const prevOverallBest = state.bestScore;
+      state.lastScoredPlayerIdx = state.activePlayerIdx;
       const currentName = state.playerNames[state.activePlayerIdx] || `Player ${state.activePlayerIdx + 1}`;
       const modeTag = state.playerCount > 1 ? `${state.playerCount}P Pass & Play` : 'Solo';
       const placedRank = recordPlayerScore(currentName, state.score, state.selectedRig, modeTag);
       const isNewBest = state.score > 0 && state.score >= state.bestScore && state.score > prevOverallBest;
 
-      document.getElementById('go-reason').textContent = reason;
-      document.getElementById('go-player-title').textContent = `${currentName.toUpperCase()} — SHIFT OVER`;
-      document.getElementById('go-score').textContent = state.score;
-      document.getElementById('go-best').textContent = state.bestScore;
-      document.getElementById('go-hardhats').textContent = state.hardhatsCollected;
-
-      const newRecEl = document.getElementById('go-new-record');
-      if (isNewBest) newRecEl.classList.remove('hidden');
-      else newRecEl.classList.add('hidden');
-
-      const rankDetails = getRankDetails(state.score);
-      document.getElementById('go-rank-title').textContent = rankDetails.title;
-      document.getElementById('go-medal-icon').textContent = rankDetails.icon;
-
-      const placementTextEl = document.getElementById('go-placement-text');
-      if (placedRank !== null && state.score > 0) {
-        placementTextEl.textContent = `TOP 10: #${placedRank}`;
-        placementTextEl.style.color = placedRank === 1 ? '#fbbf24' : '#7dd3fc';
-      } else {
-        placementTextEl.textContent = 'UNRANKED (0 PTS)';
-        placementTextEl.style.color = '#94a3b8';
+      const shareBtn = document.getElementById('btn-share-score');
+      if (shareBtn) {
+        shareBtn.textContent = '📤 Share Score';
+        shareBtn.style.borderColor = 'rgba(56,189,248,0.45)';
+        shareBtn.style.color = '#7dd3fc';
       }
 
       renderLeaderboardList('go-leaderboard-list', 4, false, state.lastRunEntryId);
@@ -3067,10 +3146,46 @@
       openGarageMenu();
     });
 
-    document.getElementById('btn-pause').addEventListener('click', (e) => {
-      e.stopPropagation();
+    document.getElementById('btn-share-score').addEventListener('click', async () => {
       audio.playClick();
-      togglePauseState();
+      const shareBtn = document.getElementById('btn-share-score');
+      const shareUrl = buildShareScoreUrl();
+      const playerName = state.playerNames[state.lastScoredPlayerIdx ?? state.activePlayerIdx] || 'Player 1';
+      const shareText = `🚧 ${playerName} scored ${state.score} pts in Heavy Flap! Open this link to add my score to your leaderboard and try to beat it:`;
+
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: 'Heavy Flap High Score Challenge',
+            text: shareText,
+            url: shareUrl
+          });
+          shareBtn.textContent = '✅ Shared!';
+          shareBtn.style.borderColor = '#34d399';
+          shareBtn.style.color = '#6ee7b7';
+          return;
+        } catch (e) {
+          if (e && e.name === 'AbortError') return;
+        }
+      }
+
+      // Fallback clipboard copy for desktop / non-WebShare browsers
+      const fullMessage = `${shareText} ${shareUrl}`;
+      const ta = document.createElement('textarea');
+      ta.value = fullMessage;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        shareBtn.textContent = '✅ Link Copied!';
+        shareBtn.style.borderColor = '#34d399';
+        shareBtn.style.color = '#6ee7b7';
+      } catch (e) {
+        shareBtn.textContent = '⚠️ Copy Failed';
+      }
+      document.body.removeChild(ta);
     });
 
     document.getElementById('btn-resume-shift').addEventListener('click', () => {
@@ -3175,6 +3290,8 @@
       if (verBadge) verBadge.textContent = APP_VERSION;
       if (syncBtnText) syncBtnText.textContent = `↻ Get Latest (${APP_VERSION})`;
 
+      const importedChallenge = importSharedChallengeFromUrl();
+
       document.querySelectorAll('#player-count-selector .mode-btn').forEach((b) => {
         b.classList.toggle('selected', Number(b.dataset.count) === state.playerCount);
       });
@@ -3186,6 +3303,10 @@
       renderGaragePreviews();
       refreshMenuRecordDisplay();
       checkAndApplyLatestBuild(false);
+      if (importedChallenge) {
+        renderLeaderboardList('top10-leaderboard-list', 10, true, state.lastRunEntryId);
+        document.getElementById('leaderboard-modal').classList.remove('hidden');
+      }
       requestAnimationFrame(gameLoop);
     });
   </script>
