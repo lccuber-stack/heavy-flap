@@ -350,9 +350,9 @@
     }
 
     .rig-preview {
-      width: 48px;
-      height: 36px;
-      margin-bottom: 0.2rem;
+      width: 78px;
+      height: 54px;
+      margin-bottom: 0.25rem;
     }
 
     /* Day/Night Shift Toggle */
@@ -601,8 +601,8 @@
         padding: 0.72rem 0.88rem 0.82rem 0.88rem;
       }
       .rig-preview {
-        width: 42px;
-        height: 30px;
+        width: 68px;
+        height: 46px;
       }
       .btn-launch {
         margin-top: 0.65rem;
@@ -643,19 +643,19 @@
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
             <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
           </svg>
+      <!-- Audio Button (Right-aligned) -->
+      <div style="display:flex; align-items:center; justify-content:flex-end; flex-shrink:0;">
+        <button type="button" class="icon-btn sound-active" id="btn-sound" aria-label="Toggle Sound" title="Toggle Construction Audio">
+          <svg id="icon-sound-on" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
           <svg id="icon-sound-off" class="hidden" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
             <line x1="23" y1="9" x2="17" y2="15"></line>
             <line x1="17" y1="9" x2="23" y2="15"></line>
           </svg>
           <span id="sound-label">SFX ON</span>
-        </button>
-
-        <button type="button" class="icon-btn" id="btn-pause" aria-label="Pause Game" title="Pause / Change Rig">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="6" y="4" width="4" height="16" rx="1"></rect>
-            <rect x="14" y="4" width="4" height="16" rx="1"></rect>
-          </svg>
         </button>
       </div>
     </div>
@@ -690,11 +690,11 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.66rem; font-weight:800; letter-spacing:0.12em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v2.4</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v3.0</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.6rem, 6.8vw, 2.1rem); font-weight:700; line-height:1.05; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <button type="button" id="btn-sync-latest" style="margin-top:4px; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.38); color:#e0f2fe; border-radius:999px; padding:0.2rem 0.65rem; font-size:0.65rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.28rem;">
-              <span id="sync-status-text">↻ Get Latest (v2.4)</span>
+              <span id="sync-status-text">↻ Get Latest (v3.0)</span>
             </button>
           </div>
           <button type="button" class="record-btn" id="btn-open-leaderboard" title="View Top 10 High Scores">
@@ -728,20 +728,20 @@
           <label style="font-size:0.66rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8; display:block;">SELECT HEAVY MACHINE</label>
           <div class="rig-grid" id="rig-selector">
             <button type="button" class="rig-card selected" data-rig="loader">
-              <canvas class="rig-preview" id="preview-loader" width="112" height="88"></canvas>
-              <div class="font-display" style="font-size:0.78rem; font-weight:700; color:#fff; line-height:1.15;">Wheel Loader</div>
+              <canvas class="rig-preview" id="preview-loader" width="156" height="108"></canvas>
+              <div class="font-display" style="font-size:0.8rem; font-weight:700; color:#fff; line-height:1.15;">Wheel Loader</div>
               <div style="font-size:0.6rem; color:#94a3b8; margin-top:1px;">Balanced</div>
             </button>
 
             <button type="button" class="rig-card" data-rig="excavator">
-              <canvas class="rig-preview" id="preview-excavator" width="112" height="88"></canvas>
-              <div class="font-display" style="font-size:0.78rem; font-weight:700; color:#fff; line-height:1.15;">Excavator</div>
+              <canvas class="rig-preview" id="preview-excavator" width="156" height="108"></canvas>
+              <div class="font-display" style="font-size:0.8rem; font-weight:700; color:#fff; line-height:1.15;">Excavator</div>
               <div style="font-size:0.6rem; color:#94a3b8; margin-top:1px;">Snappy Lift</div>
             </button>
 
             <button type="button" class="rig-card" data-rig="hauler">
-              <canvas class="rig-preview" id="preview-hauler" width="112" height="88"></canvas>
-              <div class="font-display" style="font-size:0.78rem; font-weight:700; color:#fff; line-height:1.15;">Artic Hauler</div>
+              <canvas class="rig-preview" id="preview-hauler" width="156" height="108"></canvas>
+              <div class="font-display" style="font-size:0.8rem; font-weight:700; color:#fff; line-height:1.15;">Artic Hauler</div>
               <div style="font-size:0.6rem; color:#94a3b8; margin-top:1px;">Smooth Glide</div>
             </button>
           </div>
@@ -1312,7 +1312,7 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v2.8';
+    const APP_VERSION = 'v3.0';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const MAX_LEADERBOARD_ENTRIES = 10;
@@ -2003,12 +2003,12 @@
         context.closePath();
         context.fill();
 
-        context.fillStyle = spec.primaryColor;
+        context.fillStyle = '#facc15';
         context.beginPath();
-        context.moveTo(-r * 0.83, -r * 0.63);
-        context.lineTo(r * 0.11, -r * 0.63);
-        context.lineTo(r * 0.02, r * 0.02);
-        context.lineTo(-r * 0.72, r * 0.02);
+        context.moveTo(-r * 0.82, -r * 0.62);
+        context.lineTo(r * 0.11, -r * 0.62);
+        context.lineTo(r * 0.02, r * 0.01);
+        context.lineTo(-r * 0.71, r * 0.01);
         context.closePath();
         context.fill();
 
@@ -2034,7 +2034,7 @@
         context.beginPath();
         context.roundRect(r * 0.3, -r * 0.76, r * 0.38, r * 0.38, 3);
         context.fill();
-        context.fillStyle = spec.primaryColor;
+        context.fillStyle = '#facc15';
         context.beginPath();
         context.roundRect(r * 0.2, -r * 0.28, r * 0.6, r * 0.36, 4);
         context.fill();
@@ -2064,7 +2064,7 @@
         if (!pCanvas) return;
         const pCtx = pCanvas.getContext('2d');
         pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
-        drawConstructionRig(pCtx, rigKey, 54, 48, 22, -0.05, 0.2, 0.4, 1);
+        drawConstructionRig(pCtx, rigKey, 76, 58, 32, -0.04, 0.2, 0.4, 1);
       });
     }
 
@@ -2391,52 +2391,59 @@
         ctx.translate(hat.x, bobY);
 
         if (isBonusActive) {
-          // Outer pulsing emerald-gold aura ring
-          const ringRadius = 25 + blink * 5;
-          ctx.strokeStyle = `rgba(52, 211, 153, ${(0.55 + blink * 0.45).toFixed(2)})`;
-          ctx.lineWidth = 2.5;
+          // Dark high-contrast circular badge backing matching standard hardhat for crisp visibility on all skies
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
+          ctx.beginPath();
+          ctx.arc(0, 0, 22, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Pulsing emerald-gold ring
+          const ringRadius = 22 + blink * 3.5;
+          ctx.strokeStyle = blink > 0.5 ? '#34d399' : '#fbbf24';
+          ctx.lineWidth = 2.4;
           ctx.beginPath();
           ctx.arc(0, 0, ringRadius, 0, Math.PI * 2);
           ctx.stroke();
-
-          ctx.fillStyle = `rgba(16, 185, 129, ${(0.18 + blink * 0.16).toFixed(2)})`;
-          ctx.beginPath();
-          ctx.arc(0, 0, 23, 0, Math.PI * 2);
-          ctx.fill();
 
           // Orbiting sparkles
           for (let sp = 0; sp < 3; sp++) {
             const ang = state.time * 4.2 + (sp * Math.PI * 2) / 3;
             const sx = Math.cos(ang) * 24;
             const sy = Math.sin(ang) * 24;
-            ctx.fillStyle = sp % 2 === 0 ? '#fef08a' : '#6ee7b7';
+            ctx.fillStyle = sp % 2 === 0 ? '#fef08a' : '#34d399';
             ctx.beginPath();
-            ctx.arc(sx, sy, 2.6, 0, Math.PI * 2);
+            ctx.arc(sx, sy, 2.4, 0, Math.PI * 2);
             ctx.fill();
           }
 
-          // Super Hardhat Shell (Flashes between radiant gold & emerald-white)
-          ctx.fillStyle = blink > 0.5 ? '#fef08a' : '#34d399';
+          // Super Hardhat Shell with dark steel outline (matches standard hat geometry & contrast)
+          ctx.fillStyle = blink > 0.5 ? '#fde047' : '#34d399';
+          ctx.strokeStyle = '#0f172a';
+          ctx.lineWidth = 2.2;
           ctx.beginPath();
-          ctx.arc(0, 2, 14, Math.PI, 0);
+          ctx.arc(0, 2, 13, Math.PI, 0);
           ctx.fill();
+          ctx.stroke();
 
           // Center Crest
           ctx.fillStyle = '#ffffff';
-          ctx.fillRect(-3, -12, 6, 12);
+          ctx.fillRect(-2.5, -11, 5, 11);
 
-          // Brim
-          ctx.fillStyle = '#059669';
+          // Brim with dark steel outline
+          ctx.fillStyle = '#10b981';
+          ctx.strokeStyle = '#0f172a';
+          ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.roundRect(-18, 1, 36, 5.5, 2.5);
+          ctx.roundRect(-16, 1, 32, 5.5, 2.5);
           ctx.fill();
+          ctx.stroke();
 
           // Crisp "2X" Badge floating above hat
           ctx.fillStyle = '#064e3b';
           ctx.strokeStyle = '#34d399';
-          ctx.lineWidth = 1.5;
+          ctx.lineWidth = 1.6;
           ctx.beginPath();
-          ctx.roundRect(-13, -25, 26, 12, 6);
+          ctx.roundRect(-13, -27, 26, 12, 6);
           ctx.fill();
           ctx.stroke();
 
@@ -2444,26 +2451,38 @@
           ctx.font = '800 8px "Chakra Petch", sans-serif';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText('2X', 0, -19);
+          ctx.fillText('2X', 0, -21);
         } else {
-          // Standard Golden Hardhat
-          ctx.fillStyle = 'rgba(251, 191, 36, 0.24)';
+          // Standard Golden Hardhat with high-contrast dark backing & rim so it pops against orange canyon skies
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.58)';
           ctx.beginPath();
-          ctx.arc(0, 0, 22, 0, Math.PI * 2);
+          ctx.arc(0, 0, 21, 0, Math.PI * 2);
           ctx.fill();
 
-          ctx.fillStyle = '#fbbf24';
+          ctx.strokeStyle = 'rgba(254, 240, 138, 0.8)';
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.arc(0, 0, 21, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.fillStyle = '#facc15';
+          ctx.strokeStyle = '#0f172a';
+          ctx.lineWidth = 2.2;
           ctx.beginPath();
           ctx.arc(0, 2, 13, Math.PI, 0);
           ctx.fill();
+          ctx.stroke();
 
-          ctx.fillStyle = '#fef08a';
+          ctx.fillStyle = '#ffffff';
           ctx.fillRect(-2.5, -11, 5, 11);
 
-          ctx.fillStyle = '#d97706';
+          ctx.fillStyle = '#eab308';
+          ctx.strokeStyle = '#0f172a';
+          ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.roundRect(-16, 1, 32, 5, 2.5);
+          ctx.roundRect(-16, 1, 32, 5.5, 2.5);
           ctx.fill();
+          ctx.stroke();
         }
 
         ctx.restore();
@@ -3343,12 +3362,6 @@
         shareBtn.innerHTML = '<span>⚠️</span><span>Failed</span>';
       }
       document.body.removeChild(ta);
-    });
-
-    document.getElementById('btn-pause').addEventListener('click', (e) => {
-      e.stopPropagation();
-      audio.playClick();
-      togglePauseState();
     });
 
     document.getElementById('btn-resume-shift').addEventListener('click', () => {
