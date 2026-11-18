@@ -51,7 +51,8 @@
     html, body {
       width: 100%;
       height: 100%;
-      min-height: 100dvh;
+      min-height: 100vh;
+      min-height: 100lvh;
       overflow: hidden;
       background: #0f172a;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -67,12 +68,14 @@
       display: none !important;
     }
 
-    /* Full-bleed Canvas across iPhone Safari & Standalone Home Screen */
+    /* Full-bleed Canvas extending under iPhone home indicator safe area */
     #game-canvas {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
       width: 100vw;
-      height: 100dvh;
+      height: calc(100vh + var(--safe-bottom));
+      height: calc(100lvh + var(--safe-bottom));
       display: block;
       z-index: 1;
       touch-action: none;
@@ -617,8 +620,8 @@
         </button>
         <div style="width:1px; height:22px; background:rgba(255,255,255,0.14); flex-shrink:0;"></div>
         <div>
-          <div class="hud-stat-label">STREAK</div>
-          <div class="hud-stat-val" style="color:#38bdf8;" id="hud-bonus">0x</div>
+          <div class="hud-stat-label" id="hud-bonus-label">3-HAT BONUS</div>
+          <div class="hud-stat-val" style="color:#38bdf8; white-space:nowrap;" id="hud-bonus">0/3</div>
         </div>
       </div>
 
@@ -649,7 +652,10 @@
     <!-- Giant Center Score -->
     <div class="score-center">
       <div id="hud-score">0</div>
-      <div id="hud-biome-pill" style="margin-top:3px; display:inline-block; background:rgba(15,23,42,0.76); border:1px solid rgba(255,255,255,0.14); border-radius:999px; padding:2px 9px; font-size:0.62rem; font-weight:700; letter-spacing:0.06em; color:#cbd5e1; white-space:nowrap;">🌲 DEEP PINE FOREST</div>
+      <div style="margin-top:3px; display:flex; align-items:center; justify-content:center; gap:5px; flex-wrap:wrap;">
+        <div id="hud-biome-pill" style="display:inline-block; background:rgba(15,23,42,0.76); border:1px solid rgba(255,255,255,0.14); border-radius:999px; padding:2px 9px; font-size:0.62rem; font-weight:700; letter-spacing:0.06em; color:#cbd5e1; white-space:nowrap;">🌲 DEEP PINE FOREST</div>
+        <div id="hud-tier-pill" style="display:inline-block; background:rgba(245,158,11,0.18); border:1px solid rgba(251,191,36,0.42); border-radius:999px; padding:2px 8px; font-size:0.62rem; font-weight:800; letter-spacing:0.05em; color:#fbbf24; white-space:nowrap;">PHASE 1 • STEADY</div>
+      </div>
     </div>
 
     <!-- Tap to Thrust Cue -->
@@ -671,10 +677,13 @@
       <div class="card-body">
         <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:0.5rem;">
           <div style="min-width:0;">
-            <div style="font-size:0.66rem; font-weight:800; letter-spacing:0.12em; color:#fbbf24;">EARTHMOVER ARCADE</div>
+            <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+              <span style="font-size:0.66rem; font-weight:800; letter-spacing:0.12em; color:#fbbf24;">EARTHMOVER ARCADE</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v2.4</span>
+            </div>
             <h1 class="font-display" style="font-size:clamp(1.6rem, 6.8vw, 2.1rem); font-weight:700; line-height:1.05; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
-            <button type="button" id="btn-sync-latest" style="margin-top:4px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.16); color:#cbd5e1; border-radius:999px; padding:0.18rem 0.58rem; font-size:0.64rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.25rem;">
-              <span id="sync-status-text">↻ Sync Latest</span>
+            <button type="button" id="btn-sync-latest" style="margin-top:4px; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.38); color:#e0f2fe; border-radius:999px; padding:0.2rem 0.65rem; font-size:0.65rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.28rem;">
+              <span id="sync-status-text">↻ Get Latest (v2.4)</span>
             </button>
           </div>
           <button type="button" class="record-btn" id="btn-open-leaderboard" title="View Top 10 High Scores">
@@ -1279,7 +1288,15 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
+    const APP_VERSION = 'v2.4';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
+
+    function getRankDetails(score) {
+      if (score >= 30) return { title: 'LEGENDARY SITE MASTER', icon: '👑' };
+      if (score >= 18) return { title: 'MASTER EARTHMOVER', icon: '🏆' };
+      if (score >= 8)  return { title: 'SENIOR FOREMAN', icon: '⭐' };
+      return { title: 'APPRENTICE OPERATOR', icon: '🦺' };
+    }
 
     function loadLeaderboardData() {
       let records = [];
@@ -1340,10 +1357,14 @@
 
     let initialSignature = null;
     async function checkAndApplyLatestBuild(manual = false) {
+      const statusEl = document.getElementById('sync-status-text');
+      if (manual && statusEl) {
+        statusEl.textContent = '↻ Checking GitHub...';
+      }
+
       if (window.location.protocol === 'file:' || window.location.protocol === 'about:' || window.location.protocol === 'blob:') {
-        if (manual) {
-          const el = document.getElementById('sync-status-text');
-          if (el) el.textContent = '✓ Local Preview';
+        if (manual && statusEl) {
+          statusEl.textContent = `✓ Latest (${APP_VERSION})`;
         }
         return;
       }
@@ -1357,19 +1378,14 @@
         if (initialSignature === null) {
           initialSignature = sig;
           if (manual) {
-            const el = document.getElementById('sync-status-text');
-            if (el) el.textContent = '✓ Up to date';
+            window.location.replace(`${cleanUrl}?v=${Date.now()}`);
           }
-        } else if (sig !== initialSignature) {
+        } else if (sig !== initialSignature || manual) {
           window.location.replace(`${cleanUrl}?v=${Date.now()}`);
-        } else if (manual) {
-          const el = document.getElementById('sync-status-text');
-          if (el) el.textContent = '✓ Up to date';
         }
       } catch (e) {
-        if (manual) {
-          const el = document.getElementById('sync-status-text');
-          if (el) el.textContent = '✓ Offline Ready';
+        if (manual && statusEl) {
+          statusEl.textContent = `✓ Offline (${APP_VERSION})`;
         }
       }
     }
@@ -1384,16 +1400,15 @@
       }
       container.innerHTML = list.map((entry, idx) => {
         const medal = idx === 0 ? '🏆' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
-        const meta = detailed && (entry.rig || entry.mode)
-          ? `<div style="font-size:0.64rem; color:#94a3b8; margin-top:1px;">${entry.rig || 'Heavy Rig'}${entry.mode ? ` • ${entry.mode}` : ''}</div>`
-          : '';
+        const rankInfo = getRankDetails(entry.score);
+        const rankSubtitle = `<div style="font-size:0.62rem; font-weight:700; color:#38bdf8; margin-top:1px;">${rankInfo.icon} ${rankInfo.title}${detailed && entry.rig ? ` • ${entry.rig}` : ''}${detailed && entry.mode ? ` (${entry.mode})` : ''}</div>`;
         return `
-          <div class="lb-row" style="${detailed ? 'padding:0.42rem 0;' : ''}">
-            <div>
-              <div style="color:#e2e8f0; font-weight:600;"><strong style="color:#fbbf24; margin-right:6px;">${medal}</strong>${entry.name}</div>
-              ${meta}
+          <div class="lb-row" style="${detailed ? 'padding:0.42rem 0;' : 'padding:0.3rem 0;'}">
+            <div style="min-width:0; padding-right:0.5rem;">
+              <div style="color:#e2e8f0; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><strong style="color:#fbbf24; margin-right:6px;">${medal}</strong>${entry.name}</div>
+              ${rankSubtitle}
             </div>
-            <span class="font-display" style="font-weight:700; font-size:${detailed ? '1.05rem' : '0.86rem'}; color:#fbbf24;">${entry.score}</span>
+            <span class="font-display" style="font-weight:700; font-size:${detailed ? '1.05rem' : '0.88rem'}; color:#fbbf24; flex-shrink:0;">${entry.score}</span>
           </div>
         `;
       }).join('');
@@ -1442,7 +1457,9 @@
       spawnDistance: 120,
       lastGapCenterY: null,
       obstaclesPassed: 0,
+      difficultyTier: 1,
       hazardTimer: 4.5,
+      droneTimer: 7.0,
       deathReason: 'BEAM IMPACT!',
       player: {
         x: 100,
@@ -1456,6 +1473,7 @@
       },
       obstacles: [],
       fallingHazards: [],
+      airDrones: [],
       collectibles: [],
       particles: [],
       floatingTexts: []
@@ -1515,17 +1533,16 @@
 
     function resizeCanvas() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const vv = window.visualViewport;
-      viewW = Math.round(vv ? vv.width : window.innerWidth);
-      viewH = Math.round(vv ? vv.height : window.innerHeight);
+      const rect = canvas.getBoundingClientRect();
+      const safeBottomPx = Math.max(0, Math.round(rect.height - window.innerHeight));
+      viewW = Math.max(320, Math.round(rect.width || window.innerWidth));
+      viewH = Math.max(480, Math.round(rect.height || (window.innerHeight + safeBottomPx)));
 
       canvas.width = Math.round(viewW * dpr);
       canvas.height = Math.round(viewH * dpr);
-      canvas.style.width = `${viewW}px`;
-      canvas.style.height = `${viewH}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      groundHeight = Math.max(64, Math.min(90, Math.round(viewH * 0.11)));
+      groundHeight = Math.max(64, Math.min(90, Math.round((viewH - safeBottomPx) * 0.11))) + safeBottomPx;
 
       state.player.x = viewW < 600
         ? Math.max(74, Math.round(viewW * 0.25))
@@ -1939,38 +1956,160 @@
           ctx.arc(swingX - 3, swingY - 3, obs.ballRadius * 0.35, 0, Math.PI * 2);
           ctx.fill();
         }
+
+        // High-Voltage Pulsing Hazard Wire across partial beam gap (Phase 3+)
+        if (obs.hasElectricWire) {
+          const wireY = obs.topHeight + obs.wireOffset;
+          const wireStart = obs.x - 4;
+          const wireEnd = obs.x + obs.width + 4;
+          const activePulse = Math.sin(performance.now() * 0.012 + obs.movePhase) > -0.15;
+
+          ctx.fillStyle = '#475569';
+          ctx.fillRect(wireStart - 3, wireY - 4, 6, 8);
+          ctx.fillRect(wireEnd - 3, wireY - 4, 6, 8);
+
+          if (activePulse) {
+            ctx.save();
+            ctx.strokeStyle = '#38bdf8';
+            ctx.shadowColor = '#38bdf8';
+            ctx.shadowBlur = 10;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(wireStart, wireY);
+            const midX = (wireStart + wireEnd) * 0.5;
+            ctx.lineTo(midX, wireY + (Math.random() - 0.5) * 6);
+            ctx.lineTo(wireEnd, wireY);
+            ctx.stroke();
+            ctx.restore();
+          } else {
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
+            ctx.setLineDash([4, 4]);
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(wireStart, wireY);
+            ctx.lineTo(wireEnd, wireY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        }
       });
 
-      // Golden Safety Hardhat Collectibles
+      // Patrolling Site Survey Drones (Phase 2+)
+      state.airDrones.forEach((dr) => {
+        ctx.save();
+        ctx.translate(dr.x, dr.y);
+
+        // Warning beacon glow
+        const blink = Math.sin(performance.now() * 0.02 + dr.phase) > 0;
+        ctx.fillStyle = blink ? 'rgba(239, 68, 68, 0.28)' : 'rgba(251, 191, 36, 0.16)';
+        ctx.beginPath();
+        ctx.arc(0, 0, dr.radius + 7, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Rotor arms
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(-18, -5);
+        ctx.lineTo(18, -5);
+        ctx.stroke();
+
+        // Spinning rotor blades
+        const bladeW = 10 + Math.sin(performance.now() * 0.06) * 4;
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillRect(-18 - bladeW * 0.5, -8, bladeW, 2.2);
+        ctx.fillRect(18 - bladeW * 0.5, -8, bladeW, 2.2);
+
+        // Drone chassis
+        ctx.fillStyle = '#f97316';
+        ctx.beginPath();
+        ctx.roundRect(-12, -4, 24, 10, 4);
+        ctx.fill();
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Camera eye / strobe
+        ctx.fillStyle = blink ? '#ef4444' : '#38bdf8';
+        ctx.beginPath();
+        ctx.arc(-5, 1, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      });
+
+      // Golden Safety Hardhat Collectibles (transforms into flashing 2X Super-Hardhat when streak >= 3)
+      const isBonusActive = state.hardhatStreak >= 3;
+      const nowMs = performance.now();
       state.collectibles.forEach((item) => {
         if (item.collected) return;
-        const bobY = item.y + Math.sin(performance.now() * 0.006 + item.bobPhase) * 4;
+        const bobY = item.y + Math.sin(nowMs * 0.006 + item.bobPhase) * 4;
+        const pulse = 0.5 + 0.5 * Math.sin(nowMs * 0.016 + item.bobPhase);
+
         ctx.save();
         ctx.translate(item.x, bobY);
 
-        ctx.fillStyle = 'rgba(251, 191, 36, 0.24)';
-        ctx.beginPath();
-        ctx.arc(0, 0, item.radius + 7, 0, Math.PI * 2);
-        ctx.fill();
+        if (isBonusActive) {
+          // Pulsing emerald-gold 2X aura & orbiting sparkles
+          ctx.scale(1 + pulse * 0.14, 1 + pulse * 0.14);
+          ctx.fillStyle = pulse > 0.5 ? 'rgba(16, 185, 129, 0.34)' : 'rgba(251, 191, 36, 0.38)';
+          ctx.beginPath();
+          ctx.arc(0, 0, item.radius + 11, 0, Math.PI * 2);
+          ctx.fill();
 
-        ctx.fillStyle = '#fbbf24';
-        ctx.beginPath();
-        ctx.arc(0, 2, item.radius * 0.85, Math.PI, 0);
-        ctx.fill();
+          ctx.strokeStyle = pulse > 0.5 ? '#34d399' : '#fef08a';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(0, 0, item.radius + 6, 0, Math.PI * 2);
+          ctx.stroke();
 
-        ctx.fillStyle = '#fef08a';
-        ctx.fillRect(-2, -item.radius * 0.82, 4, item.radius * 0.82);
-        ctx.fillStyle = '#d97706';
-        ctx.beginPath();
-        ctx.roundRect(-item.radius * 1.05, 1, item.radius * 2.1, 4.5, 2.2);
-        ctx.fill();
+          // Hardhat dome flashes between bright emerald-gold and radiant white-gold
+          ctx.fillStyle = pulse > 0.5 ? '#34d399' : '#fef08a';
+          ctx.beginPath();
+          ctx.arc(0, 2, item.radius * 0.88, Math.PI, 0);
+          ctx.fill();
+
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(-2.5, -item.radius * 0.84, 5, item.radius * 0.84);
+          ctx.fillStyle = '#059669';
+          ctx.beginPath();
+          ctx.roundRect(-item.radius * 1.1, 1, item.radius * 2.2, 5, 2.5);
+          ctx.fill();
+
+          // Crisp "2X" tag above bonus hardhat
+          ctx.fillStyle = '#0f172a';
+          ctx.beginPath();
+          ctx.roundRect(-12, -item.radius - 15, 24, 12, 4);
+          ctx.fill();
+          ctx.fillStyle = '#34d399';
+          ctx.font = '800 9px "Chakra Petch", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('2X', 0, -item.radius - 6);
+        } else {
+          ctx.fillStyle = 'rgba(251, 191, 36, 0.24)';
+          ctx.beginPath();
+          ctx.arc(0, 0, item.radius + 7, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#fbbf24';
+          ctx.beginPath();
+          ctx.arc(0, 2, item.radius * 0.85, Math.PI, 0);
+          ctx.fill();
+
+          ctx.fillStyle = '#fef08a';
+          ctx.fillRect(-2, -item.radius * 0.82, 4, item.radius * 0.82);
+          ctx.fillStyle = '#d97706';
+          ctx.beginPath();
+          ctx.roundRect(-item.radius * 1.05, 1, item.radius * 2.1, 4.5, 2.2);
+          ctx.fill();
+        }
         ctx.restore();
       });
 
       // Falling Sky Hazards (Boulders & Suspended Crane Slings) with Top Warning Signs
       state.fallingHazards.forEach((hz) => {
         if (hz.warnTimer > 0) {
-          const pulse = 0.55 + Math.sin(performance.now() * 0.025) * 0.45;
+          const pulse = 0.55 + Math.sin(nowMs * 0.025) * 0.45;
           ctx.save();
           ctx.translate(hz.x, 34);
           ctx.globalAlpha = pulse;
@@ -1978,25 +2117,22 @@
           ctx.fillStyle = '#fbbf24';
           ctx.beginPath();
           ctx.moveTo(0, -14);
-          ctx.lineTo(15, 12);
-          ctx.lineTo(-15, 12);
+          ctx.lineTo(14, 10);
+          ctx.lineTo(-14, 10);
           ctx.closePath();
           ctx.fill();
-          ctx.strokeStyle = '#0f172a';
-          ctx.lineWidth = 2;
-          ctx.stroke();
 
           ctx.fillStyle = '#0f172a';
-          ctx.font = '800 14px "Chakra Petch", sans-serif';
+          ctx.font = '800 13px "Chakra Petch", sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText('!', 0, 8);
+          ctx.fillText('!', 0, 7);
 
-          ctx.strokeStyle = 'rgba(251, 191, 36, 0.32)';
-          ctx.setLineDash([5, 6]);
+          ctx.strokeStyle = 'rgba(251, 191, 36, 0.5)';
+          ctx.setLineDash([4, 4]);
           ctx.lineWidth = 1.5;
           ctx.beginPath();
-          ctx.moveTo(0, 16);
-          ctx.lineTo(0, playH * 0.45);
+          ctx.moveTo(0, 14);
+          ctx.lineTo(0, 56);
           ctx.stroke();
           ctx.restore();
           return;
@@ -2008,14 +2144,11 @@
           ctx.rotate(hz.rotation);
           ctx.fillStyle = '#57534e';
           ctx.beginPath();
-          const pts = 8;
-          for (let p = 0; p < pts; p++) {
-            const ang = (p / pts) * Math.PI * 2;
-            const rad = hz.radius * (p % 2 === 0 ? 1.04 : 0.86);
-            const px = Math.cos(ang) * rad;
-            const py = Math.sin(ang) * rad;
-            if (p === 0) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
+          for (let a = 0; a < 7; a++) {
+            const ang = (a / 7) * Math.PI * 2;
+            const r = hz.radius * (a % 2 === 0 ? 1.04 : 0.86);
+            if (a === 0) ctx.moveTo(Math.cos(ang) * r, Math.sin(ang) * r);
+            else ctx.lineTo(Math.cos(ang) * r, Math.sin(ang) * r);
           }
           ctx.closePath();
           ctx.fill();
@@ -2025,22 +2158,25 @@
 
           ctx.fillStyle = '#78716c';
           ctx.beginPath();
-          ctx.arc(-hz.radius * 0.25, -hz.radius * 0.25, hz.radius * 0.35, 0, Math.PI * 2);
+          ctx.arc(-4, -4, hz.radius * 0.32, 0, Math.PI * 2);
           ctx.fill();
         } else {
+          // Suspended Steel Girder Load
           ctx.strokeStyle = '#94a3b8';
-          ctx.lineWidth = 2;
+          ctx.lineWidth = 1.6;
           ctx.beginPath();
-          ctx.moveTo(0, -hz.y);
-          ctx.lineTo(0, -6);
+          ctx.moveTo(0, -26);
+          ctx.lineTo(-12, -5);
+          ctx.moveTo(0, -26);
+          ctx.lineTo(12, -5);
           ctx.stroke();
 
-          ctx.fillStyle = '#ef4444';
+          ctx.fillStyle = '#dc2626';
           ctx.beginPath();
-          ctx.roundRect(-22, -7, 44, 14, 4);
+          ctx.roundRect(-20, -6, 40, 12, 3);
           ctx.fill();
           ctx.fillStyle = '#fbbf24';
-          ctx.fillRect(-18, -3, 36, 4);
+          ctx.fillRect(-16, -2, 32, 4);
         }
         ctx.restore();
       });
@@ -2082,9 +2218,9 @@
         ctx.restore();
       });
 
-      // Foreground Ground & Hazard Roadbed
+      // Foreground Ground & Hazard Roadbed (extends fully to bottom edge)
       ctx.fillStyle = biome.groundDirt;
-      ctx.fillRect(0, playH, viewW, groundHeight);
+      ctx.fillRect(0, playH, viewW, groundHeight + 40);
 
       ctx.fillStyle = biome.groundTop;
       ctx.fillRect(0, playH, viewW, 14);
@@ -2108,17 +2244,39 @@
     // =========================================================================
     // 7. OBSTACLE GENERATION, PHYSICS & COLLISION DETECTION
     // =========================================================================
-    function getCurrentSpeed() {
-      return Math.min(285, 195 + state.obstaclesPassed * 2.4);
+    const DIFFICULTY_TIERS = [
+      { tier: 1, minGates: 0,  label: 'PHASE 1 • STEADY',     speedBonus: 0,   gapShrink: 0,  moveChance: 0.55, moveMult: 0.72, ballChance: 0.22, wireChance: 0.0 },
+      { tier: 2, minGates: 5,  label: 'PHASE 2 • DOUBLE SHIFT', speedBonus: 32, gapShrink: 12, moveChance: 0.80, moveMult: 0.90, ballChance: 0.36, wireChance: 0.18 },
+      { tier: 3, minGates: 11, label: 'PHASE 3 • RUSH HOUR',   speedBonus: 65,  gapShrink: 22, moveChance: 0.92, moveMult: 1.05, ballChance: 0.48, wireChance: 0.32 },
+      { tier: 4, minGates: 18, label: 'PHASE 4 • HEAVY SURGE', speedBonus: 98,  gapShrink: 30, moveChance: 1.00, moveMult: 1.20, ballChance: 0.58, wireChance: 0.44 },
+      { tier: 5, minGates: 26, label: 'PHASE 5 • OVERDRIVE',   speedBonus: 132, gapShrink: 36, moveChance: 1.00, moveMult: 1.35, ballChance: 0.68, wireChance: 0.52 }
+    ];
+
+    function getCurrentTierSpec() {
+      const progress = state.obstaclesPassed + Math.floor(state.score * 0.35);
+      let active = DIFFICULTY_TIERS[0];
+      for (let i = 0; i < DIFFICULTY_TIERS.length; i++) {
+        if (progress >= DIFFICULTY_TIERS[i].minGates) {
+          active = DIFFICULTY_TIERS[i];
+        }
+      }
+      return active;
     }
 
-    function spawnBeamPair() {
+    function getCurrentSpeed() {
+      const tier = getCurrentTierSpec();
+      return Math.min(345, 195 + tier.speedBonus + state.obstaclesPassed * 1.4);
+    }
+
+    function spawnBeamPair(initialOffsetX = null) {
       const playH = viewH - groundHeight;
       const beamWidth = 64;
       const speed = getCurrentSpeed();
+      const tier = getCurrentTierSpec();
 
-      const gapHeight = Math.max(158, Math.min(212, Math.round(playH * 0.285 - Math.min(26, state.obstaclesPassed * 0.75))));
-      const margin = 58;
+      const baseGap = Math.round(playH * 0.295) - tier.gapShrink;
+      const gapHeight = Math.max(134, Math.min(212, baseGap));
+      const margin = 54;
       const minCenter = margin + gapHeight * 0.5;
       const maxCenter = playH - margin - gapHeight * 0.5;
 
@@ -2126,26 +2284,32 @@
       if (state.lastGapCenterY === null) {
         gapCenterY = playH * 0.46 + (Math.random() - 0.5) * 70;
       } else {
-        const maxDelta = Math.min(165, playH * 0.28);
+        const maxDelta = Math.min(185, playH * (0.27 + tier.tier * 0.018));
         gapCenterY = state.lastGapCenterY + (Math.random() * 2 - 1) * maxDelta;
       }
       gapCenterY = Math.max(minCenter, Math.min(maxCenter, gapCenterY));
       state.lastGapCenterY = gapCenterY;
 
-      const maxAmp = Math.min(34, Math.max(0, Math.min(gapCenterY - minCenter, maxCenter - gapCenterY) - 6));
-      const moveAmp = state.obstaclesPassed >= 1 ? Math.max(12, maxAmp * 0.78) : 0;
-      const moveSpeed = 1.45 + Math.random() * 0.75;
+      const maxAmp = Math.min(46, Math.max(0, Math.min(gapCenterY - minCenter, maxCenter - gapCenterY) - 6));
+      const shouldMove = state.obstaclesPassed >= 1 && Math.random() < tier.moveChance;
+      const moveAmp = shouldMove ? Math.max(14, maxAmp * Math.min(1, tier.moveMult)) : 0;
+      const moveSpeed = (1.45 + Math.random() * 0.75) * (0.9 + tier.tier * 0.12);
       const movePhase = Math.random() * Math.PI * 2;
 
-      const hasWreckingBall = state.obstaclesPassed >= 3 && Math.random() < 0.32;
-      const ballDrop = hasWreckingBall ? Math.min(32, gapHeight * 0.2) : 0;
+      const hasWreckingBall = state.obstaclesPassed >= 2 && Math.random() < tier.ballChance;
+      const ballDrop = hasWreckingBall ? Math.min(34, gapHeight * 0.21) : 0;
       const ballRadius = 12;
+
+      const hasElectricWire = !hasWreckingBall && tier.tier >= 2 && Math.random() < tier.wireChance;
+      const wireOffset = hasElectricWire ? Math.round(gapHeight * 0.22) : 0;
 
       const topHeight = Math.max(24, gapCenterY - gapHeight * 0.5);
       const bottomY = Math.min(playH - 24, gapCenterY + gapHeight * 0.5);
 
+      const spawnX = initialOffsetX !== null ? initialOffsetX : viewW + 40;
+
       const obs = {
-        x: viewW + 40,
+        x: spawnX,
         width: beamWidth,
         baseGapCenterY: gapCenterY,
         gapHeight,
@@ -2157,12 +2321,18 @@
         hasWreckingBall,
         ballDrop,
         ballRadius,
+        hasElectricWire,
+        wireOffset,
         swingPhase: Math.random() * Math.PI * 2,
         passed: false
       };
       state.obstacles.push(obs);
 
-      const safeOffsetY = hasWreckingBall ? Math.min(26, gapHeight * 0.16) : (Math.random() - 0.5) * 18;
+      const safeOffsetY = hasWreckingBall
+        ? Math.min(26, gapHeight * 0.17)
+        : hasElectricWire
+          ? Math.round(gapHeight * 0.66) - gapHeight * 0.5
+          : (Math.random() - 0.5) * 18;
       state.collectibles.push({
         obsRef: obs,
         offsetY: safeOffsetY,
@@ -2173,7 +2343,7 @@
         collected: false
       });
 
-      const minReactionSec = viewW < 600 ? 1.54 : 1.62;
+      const minReactionSec = Math.max(1.26, (viewW < 600 ? 1.54 : 1.62) - (tier.tier - 1) * 0.065);
       state.spawnDistance = Math.round(speed * minReactionSec);
     }
 
@@ -2218,9 +2388,42 @@
         : 'OPERATOR';
       document.getElementById('hud-player-name').textContent = activeName;
       document.getElementById('hud-best').textContent = state.bestScore;
-      document.getElementById('hud-bonus').textContent = `${state.hardhatStreak}x`;
+
+      const bonusLabelEl = document.getElementById('hud-bonus-label');
+      const bonusValEl = document.getElementById('hud-bonus');
+      if (state.hardhatStreak >= 3) {
+        bonusLabelEl.textContent = 'STREAK ACTIVE';
+        bonusLabelEl.style.color = '#fbbf24';
+        bonusValEl.textContent = '2X BONUS!';
+        bonusValEl.style.color = '#fbbf24';
+      } else {
+        bonusLabelEl.textContent = '3-HAT BONUS';
+        bonusLabelEl.style.color = '#94a3b8';
+        bonusValEl.textContent = `${state.hardhatStreak}/3`;
+        bonusValEl.style.color = '#38bdf8';
+      }
+
       document.getElementById('hud-score').textContent = state.score;
       document.getElementById('hud-biome-pill').textContent = state.currentBiome.label;
+
+      const tier = getCurrentTierSpec();
+      const tierEl = document.getElementById('hud-tier-pill');
+      if (tierEl) {
+        tierEl.textContent = tier.label;
+        if (tier.tier >= 4) {
+          tierEl.style.background = 'rgba(239, 68, 68, 0.24)';
+          tierEl.style.borderColor = 'rgba(248, 113, 113, 0.55)';
+          tierEl.style.color = '#fca5a5';
+        } else if (tier.tier >= 2) {
+          tierEl.style.background = 'rgba(245, 158, 11, 0.22)';
+          tierEl.style.borderColor = 'rgba(251, 191, 36, 0.5)';
+          tierEl.style.color = '#fbbf24';
+        } else {
+          tierEl.style.background = 'rgba(56, 189, 248, 0.16)';
+          tierEl.style.borderColor = 'rgba(56, 189, 248, 0.38)';
+          tierEl.style.color = '#7dd3fc';
+        }
+      }
     }
 
     function popScoreHUD() {
@@ -2245,13 +2448,16 @@
       state.hardhatStreak = 0;
       state.obstacles = [];
       state.fallingHazards = [];
+      state.airDrones = [];
       state.collectibles = [];
       state.particles = [];
       state.floatingTexts = [];
       state.spawnDistance = 120;
       state.lastGapCenterY = null;
       state.obstaclesPassed = 0;
-      state.hazardTimer = 3.6 + Math.random() * 2.2;
+      state.difficultyTier = 1;
+      state.hazardTimer = 3.4 + Math.random() * 1.8;
+      state.droneTimer = 6.2;
       state.shakeTime = 0;
       state.flashAlpha = 0;
 
@@ -2259,6 +2465,18 @@
       state.player.vy = 0;
       state.player.rotation = 0;
       state.player.thrustAnim = 0;
+
+      // Pre-populate initial beam chain across wide landscape viewports (iPad/Desktop)
+      // so the first beam arrives in ~1.8s instead of crossing the entire wide screen
+      const speed = getCurrentSpeed();
+      const firstBeamX = Math.min(viewW + 40, Math.max(viewW * 0.62, state.player.x + speed * 1.85));
+      spawnBeamPair(firstBeamX);
+      while (state.obstacles[state.obstacles.length - 1].x + state.spawnDistance <= viewW + 40) {
+        const prevX = state.obstacles[state.obstacles.length - 1].x;
+        spawnBeamPair(prevX + state.spawnDistance);
+      }
+      const lastBeamX = state.obstacles[state.obstacles.length - 1].x;
+      state.spawnDistance = Math.max(40, Math.round((lastBeamX + state.spawnDistance) - (viewW + 40)));
 
       document.getElementById('start-modal').classList.add('hidden');
       document.getElementById('pause-modal').classList.add('hidden');
@@ -2315,13 +2533,9 @@
       if (isNewBest) newRecEl.classList.remove('hidden');
       else newRecEl.classList.add('hidden');
 
-      let rank = 'APPRENTICE OPERATOR';
-      let medal = '🦺';
-      if (state.score >= 30) { rank = 'LEGENDARY SITE MASTER'; medal = '👑'; }
-      else if (state.score >= 18) { rank = 'MASTER EARTHMOVER'; medal = '🏆'; }
-      else if (state.score >= 8) { rank = 'SENIOR FOREMAN'; medal = '⭐'; }
-      document.getElementById('go-rank-title').textContent = rank;
-      document.getElementById('go-medal-icon').textContent = medal;
+      const rankDetails = getRankDetails(state.score);
+      document.getElementById('go-rank-title').textContent = rankDetails.title;
+      document.getElementById('go-medal-icon').textContent = rankDetails.icon;
 
       renderLeaderboardList('go-leaderboard-list', 5, false);
 
@@ -2404,23 +2618,78 @@
         spawnBeamPair();
       }
 
+      const activeTier = getCurrentTierSpec();
+      if (activeTier.tier > state.difficultyTier) {
+        state.difficultyTier = activeTier.tier;
+        addFloatingText(state.player.x + 35, Math.max(70, state.player.y - 36), `⚡ ${activeTier.label}!`, '#38bdf8');
+        updateHUD();
+      }
+
+      // Patrolling Survey Drones spawn between beams starting in Phase 2
+      if (activeTier.tier >= 2) {
+        state.droneTimer -= dt;
+        if (state.droneTimer <= 0) {
+          state.droneTimer = Math.max(2.6, 5.4 - activeTier.tier * 0.55) + Math.random() * 1.6;
+          const spawnDroneX = viewW + 36;
+          const tooCloseToBeam = state.obstacles.some((o) => Math.abs((o.x + o.width * 0.5) - spawnDroneX) < 110);
+          if (!tooCloseToBeam) {
+            const baseDroneY = playH * (0.24 + Math.random() * 0.52);
+            state.airDrones.push({
+              x: spawnDroneX,
+              baseY: baseDroneY,
+              y: baseDroneY,
+              vxExtra: 45 + activeTier.tier * 14,
+              bobAmp: 22 + activeTier.tier * 6,
+              bobFreq: 2.6 + Math.random() * 1.2,
+              phase: Math.random() * Math.PI * 2,
+              radius: 13
+            });
+          }
+        }
+      }
+
+      for (let i = state.airDrones.length - 1; i >= 0; i--) {
+        const dr = state.airDrones[i];
+        dr.x -= (speed + dr.vxExtra) * dt;
+        dr.phase += dr.bobFreq * dt;
+        dr.y = Math.max(28, Math.min(playH - 28, dr.baseY + Math.sin(dr.phase) * dr.bobAmp));
+
+        const dx = state.player.x - dr.x;
+        const dy = state.player.y - dr.y;
+        if (dx * dx + dy * dy < (hitR + dr.radius - 2) ** 2) {
+          triggerGameOver('SURVEY DRONE COLLISION!');
+          return;
+        }
+        if (dr.x < -50) {
+          state.airDrones.splice(i, 1);
+        }
+      }
+
       state.hazardTimer -= dt;
-      if (state.hazardTimer <= 0 && state.obstaclesPassed >= 2) {
-        state.hazardTimer = Math.max(3.2, 5.8 - Math.min(2.2, state.obstaclesPassed * 0.08)) + Math.random() * 2.4;
-        const dropX = Math.min(viewW - 44, Math.max(state.player.x + 75, state.player.x + speed * 0.62));
-        const nearBeam = state.obstacles.some((o) => Math.abs((o.x + o.width * 0.5) - dropX) < 75);
-        if (!nearBeam) {
-          const isCityOrHarbor = state.currentBiome && (state.currentBiome.id === 'city' || state.currentBiome.id === 'harbor');
-          state.fallingHazards.push({
-            type: isCityOrHarbor && Math.random() < 0.55 ? 'girder' : 'boulder',
-            x: dropX,
-            y: -24,
-            vy: 140,
-            radius: 17,
-            rotation: Math.random() * Math.PI * 2,
-            rotSpeed: (Math.random() < 0.5 ? -1 : 1) * (2.4 + Math.random() * 2.2),
-            warnTimer: 0.78
-          });
+      if (state.hazardTimer <= 0 && state.obstaclesPassed >= 1) {
+        const baseInterval = Math.max(1.85, 4.6 - activeTier.tier * 0.55);
+        state.hazardTimer = baseInterval + Math.random() * 1.6;
+        const dropCount = activeTier.tier >= 4 && Math.random() < 0.45 ? 2 : 1;
+
+        for (let d = 0; d < dropCount; d++) {
+          const dropX = Math.min(
+            viewW - 44,
+            Math.max(state.player.x + 70, state.player.x + speed * (0.58 + d * 0.34))
+          );
+          const nearBeam = state.obstacles.some((o) => Math.abs((o.x + o.width * 0.5) - dropX) < 72);
+          if (!nearBeam) {
+            const isCityOrHarbor = state.currentBiome && (state.currentBiome.id === 'city' || state.currentBiome.id === 'harbor');
+            state.fallingHazards.push({
+              type: isCityOrHarbor && Math.random() < 0.55 ? 'girder' : 'boulder',
+              x: dropX,
+              y: -24,
+              vy: 145 + activeTier.tier * 22,
+              radius: 17,
+              rotation: Math.random() * Math.PI * 2,
+              rotSpeed: (Math.random() < 0.5 ? -1 : 1) * (2.4 + Math.random() * 2.4),
+              warnTimer: Math.max(0.55, 0.78 - (activeTier.tier - 1) * 0.04) + d * 0.25
+            });
+          }
         }
       }
 
@@ -2468,7 +2737,7 @@
         }
 
         if (obs.hasWreckingBall) {
-          obs.swingPhase += dt * 3.1;
+          obs.swingPhase += dt * (3.1 + activeTier.tier * 0.25);
           const pivotX = obs.x + obs.width * 0.5;
           const swingX = pivotX + Math.sin(obs.swingPhase) * 14;
           const swingY = obs.topHeight + obs.ballDrop;
@@ -2477,6 +2746,17 @@
           if (dx * dx + dy * dy < (hitR + obs.ballRadius - 2) ** 2) {
             triggerGameOver('WRECKING BALL!');
             return;
+          }
+        }
+
+        if (obs.hasElectricWire) {
+          const activePulse = Math.sin(performance.now() * 0.012 + obs.movePhase) > -0.15;
+          if (activePulse) {
+            const wireY = obs.topHeight + obs.wireOffset;
+            if (circleRectOverlap(state.player.x, state.player.y, hitR, obs.x - 2, wireY - 3, obs.width + 4, 6)) {
+              triggerGameOver('HIGH VOLTAGE ARC!');
+              return;
+            }
           }
         }
 
@@ -2491,6 +2771,7 @@
           obs.passed = true;
           state.obstaclesPassed++;
           audio.playBeamScore();
+          updateHUD();
         }
 
         if (obs.x + obs.width < -60) {
@@ -2520,7 +2801,12 @@
             state.bonusPoints += pts > 1 ? 1 : 0;
             audio.playHardhatPickup();
             spawnExhaustSparks(item.x, item.y, 10, '#fbbf24');
-            addFloatingText(item.x, item.y - 12, pts > 1 ? `+${pts} STREAK!` : '+1 HARDHAT', '#fbbf24');
+            const callout = state.hardhatStreak === 3
+              ? '+2 • 2X BONUS UNLOCKED!'
+              : pts > 1
+                ? '+2 • 2X BONUS!'
+                : `+1 (${state.hardhatStreak}/3)`;
+            addFloatingText(item.x, item.y - 12, callout, '#fbbf24');
             popScoreHUD();
             updateHUD();
           } else if (item.x < state.player.x - hitR - 22 && !item.missedNotified) {
@@ -2752,6 +3038,11 @@
     }
 
     window.addEventListener('load', () => {
+      const verBadge = document.getElementById('app-version-badge');
+      const syncBtnText = document.getElementById('sync-status-text');
+      if (verBadge) verBadge.textContent = APP_VERSION;
+      if (syncBtnText) syncBtnText.textContent = `↻ Get Latest (${APP_VERSION})`;
+
       generateHomeScreenAppIcon();
       initScenery();
       resizeCanvas();
