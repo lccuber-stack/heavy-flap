@@ -1309,14 +1309,72 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v2.5';
+    const APP_VERSION = 'v2.6';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
+    const ROSTER_COOKIE = 'heavy_flap_roster_v1';
 
     function getRankDetails(score) {
-      if (score >= 30) return { title: 'LEGENDARY SITE MASTER', icon: '👑' };
-      if (score >= 18) return { title: 'MASTER EARTHMOVER', icon: '🏆' };
-      if (score >= 8)  return { title: 'SENIOR FOREMAN', icon: '⭐' };
+      if (score >= 100) return { title: 'LEGENDARY SITE MASTER', icon: '👑' };
+      if (score >= 75)  return { title: 'CHIEF INFRASTRUCTURE TITAN', icon: '💎' };
+      if (score >= 55)  return { title: 'GRAND EARTHMOVING DIRECTOR', icon: '🏛️' };
+      if (score >= 40)  return { title: 'MASTER EARTHMOVER', icon: '🏆' };
+      if (score >= 26)  return { title: 'HEAVY FLEET COMMANDER', icon: '🎖️' };
+      if (score >= 15)  return { title: 'SENIOR SITE FOREMAN', icon: '⭐' };
+      if (score >= 6)   return { title: 'CERTIFIED RIG OPERATOR', icon: '🚧' };
       return { title: 'APPRENTICE OPERATOR', icon: '🦺' };
+    }
+
+    function loadSavedRoster() {
+      const fallback = {
+        playerCount: 1,
+        playerNames: ['Player 1', 'Player 2', 'Player 3', 'Player 4']
+      };
+      try {
+        const match = document.cookie.match(new RegExp('(?:^|; )' + ROSTER_COOKIE + '=([^;]*)'));
+        if (match) {
+          const parsed = JSON.parse(decodeURIComponent(match[1]));
+          if (parsed && Array.isArray(parsed.playerNames)) {
+            return {
+              playerCount: Math.min(4, Math.max(1, Number(parsed.playerCount) || 1)),
+              playerNames: [0, 1, 2, 3].map((i) => {
+                const n = typeof parsed.playerNames[i] === 'string' ? parsed.playerNames[i].trim().slice(0, 18) : '';
+                return n || `Player ${i + 1}`;
+              })
+            };
+          }
+        }
+      } catch (e) {}
+      try {
+        if (window.name && window.name.includes('HEAVY_ROSTER:')) {
+          const raw = window.name.split('HEAVY_ROSTER:')[1].split('|')[0];
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.playerNames)) {
+            return {
+              playerCount: Math.min(4, Math.max(1, Number(parsed.playerCount) || 1)),
+              playerNames: [0, 1, 2, 3].map((i) => {
+                const n = typeof parsed.playerNames[i] === 'string' ? parsed.playerNames[i].trim().slice(0, 18) : '';
+                return n || `Player ${i + 1}`;
+              })
+            };
+          }
+        }
+      } catch (e) {}
+      return fallback;
+    }
+
+    function saveRosterData() {
+      const payload = {
+        playerCount: state.playerCount,
+        playerNames: state.playerNames.map((n, i) => (n || `Player ${i + 1}`).trim().slice(0, 18) || `Player ${i + 1}`)
+      };
+      try {
+        const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
+        document.cookie = `${ROSTER_COOKIE}=${encodeURIComponent(JSON.stringify(payload))}; expires=${expires}; path=/; SameSite=Lax`;
+      } catch (e) {}
+      try {
+        const lbPart = state.leaderboard ? `HEAVY_LB:${JSON.stringify(state.leaderboard)}` : '';
+        window.name = `${lbPart}|HEAVY_ROSTER:${JSON.stringify(payload)}`;
+      } catch (e) {}
     }
 
     function loadLeaderboardData() {
@@ -1329,8 +1387,9 @@
         }
       } catch (e) {}
       try {
-        if (!records.length && window.name && window.name.startsWith('HEAVY_LB:')) {
-          const parsed = JSON.parse(window.name.slice(9));
+        if (!records.length && window.name && window.name.includes('HEAVY_LB:')) {
+          const raw = window.name.split('HEAVY_LB:')[1].split('|')[0];
+          const parsed = JSON.parse(raw);
           if (Array.isArray(parsed)) records = parsed;
         }
       } catch (e) {}
@@ -1350,7 +1409,11 @@
         document.cookie = `${LEADERBOARD_COOKIE}=${encodeURIComponent(JSON.stringify(clean))}; expires=${expires}; path=/; SameSite=Lax`;
       } catch (e) {}
       try {
-        window.name = `HEAVY_LB:${JSON.stringify(clean)}`;
+        const rosterPayload = {
+          playerCount: state.playerCount,
+          playerNames: state.playerNames
+        };
+        window.name = `HEAVY_LB:${JSON.stringify(clean)}|HEAVY_ROSTER:${JSON.stringify(rosterPayload)}`;
       } catch (e) {}
       return clean;
     }
@@ -1486,14 +1549,15 @@
     }
 
     const initialLeaderboard = loadLeaderboardData();
+    const initialRoster = loadSavedRoster();
 
     const state = {
       phase: 'MENU', // MENU, READY, PLAYING, PAUSED, GAMEOVER
       selectedRig: 'loader',
       selectedShift: 'day',
       currentBiome: PROCEDURAL_BIOMES[0],
-      playerCount: 1,
-      playerNames: ['Player 1', 'Player 2', 'Player 3', 'Player 4'],
+      playerCount: initialRoster.playerCount,
+      playerNames: initialRoster.playerNames,
       activePlayerIdx: 0,
       score: 0,
       bonusPoints: 0,
@@ -2330,21 +2394,23 @@
 
       const baseGap = Math.round(playH * 0.295) - tier.gapShrink;
       const gapHeight = Math.max(134, Math.min(212, baseGap));
-      const margin = 54;
-      const minCenter = margin + gapHeight * 0.5;
-      const maxCenter = playH - margin - gapHeight * 0.5;
+      const isStandalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+      const topSafeMargin = Math.max(108, Math.round(playH * 0.165)) + (isStandalone ? 22 : 0);
+      const bottomSafeMargin = 62;
+      const minCenter = topSafeMargin + gapHeight * 0.5;
+      const maxCenter = Math.max(minCenter + 12, playH - bottomSafeMargin - gapHeight * 0.5);
 
       let gapCenterY;
       if (state.lastGapCenterY === null) {
-        gapCenterY = playH * 0.46 + (Math.random() - 0.5) * 70;
+        gapCenterY = Math.max(minCenter, Math.min(maxCenter, playH * 0.50 + (Math.random() - 0.5) * 60));
       } else {
-        const maxDelta = Math.min(185, playH * (0.27 + tier.tier * 0.018));
+        const maxDelta = Math.min(180, playH * (0.26 + tier.tier * 0.018));
         gapCenterY = state.lastGapCenterY + (Math.random() * 2 - 1) * maxDelta;
       }
       gapCenterY = Math.max(minCenter, Math.min(maxCenter, gapCenterY));
       state.lastGapCenterY = gapCenterY;
 
-      const maxAmp = Math.min(46, Math.max(0, Math.min(gapCenterY - minCenter, maxCenter - gapCenterY) - 6));
+      const maxAmp = Math.min(44, Math.max(0, Math.min(gapCenterY - minCenter, maxCenter - gapCenterY) - 6));
       const shouldMove = state.obstaclesPassed >= 1 && Math.random() < tier.moveChance;
       const moveAmp = shouldMove ? Math.max(14, maxAmp * Math.min(1, tier.moveMult)) : 0;
       const moveSpeed = (1.45 + Math.random() * 0.75) * (0.9 + tier.tier * 0.12);
@@ -2357,8 +2423,8 @@
       const hasElectricWire = !hasWreckingBall && tier.tier >= 2 && Math.random() < tier.wireChance;
       const wireOffset = hasElectricWire ? Math.round(gapHeight * 0.22) : 0;
 
-      const topHeight = Math.max(24, gapCenterY - gapHeight * 0.5);
-      const bottomY = Math.min(playH - 24, gapCenterY + gapHeight * 0.5);
+      const topHeight = Math.max(topSafeMargin * 0.55, gapCenterY - gapHeight * 0.5);
+      const bottomY = Math.min(playH - 28, gapCenterY + gapHeight * 0.5);
 
       const spawnX = initialOffsetX !== null ? initialOffsetX : viewW + 40;
 
@@ -2795,8 +2861,8 @@
         if (obs.moveAmp > 0) {
           obs.movePhase += obs.moveSpeed * dt;
           const curCenter = obs.baseGapCenterY + Math.sin(obs.movePhase) * obs.moveAmp;
-          obs.topHeight = Math.max(24, curCenter - obs.gapHeight * 0.5);
-          obs.bottomY = Math.min(playH - 24, curCenter + obs.gapHeight * 0.5);
+          obs.topHeight = Math.max(58, curCenter - obs.gapHeight * 0.5);
+          obs.bottomY = Math.min(playH - 28, curCenter + obs.gapHeight * 0.5);
         }
 
         if (obs.hasWreckingBall) {
@@ -2912,6 +2978,7 @@
         input.addEventListener('input', (e) => {
           const idx = Number(e.target.dataset.pidx);
           state.playerNames[idx] = e.target.value.trim() || `Player ${idx + 1}`;
+          saveRosterData();
           updateStartButtonLabel();
         });
         container.appendChild(row);
@@ -2961,6 +3028,7 @@
         btn.classList.add('selected');
         state.playerCount = Number(btn.dataset.count) || 1;
         state.activePlayerIdx = 0;
+        saveRosterData();
         renderRosterInputs();
       });
     });
@@ -3106,6 +3174,10 @@
       const syncBtnText = document.getElementById('sync-status-text');
       if (verBadge) verBadge.textContent = APP_VERSION;
       if (syncBtnText) syncBtnText.textContent = `↻ Get Latest (${APP_VERSION})`;
+
+      document.querySelectorAll('#player-count-selector .mode-btn').forEach((b) => {
+        b.classList.toggle('selected', Number(b.dataset.count) === state.playerCount);
+      });
 
       generateHomeScreenAppIcon();
       initScenery();
