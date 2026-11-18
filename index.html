@@ -636,14 +636,7 @@
         </div>
       </div>
 
-      <!-- Audio & Pause/Garage Buttons -->
-      <div style="display:flex; gap:0.35rem; flex-shrink:0;">
-        <button type="button" class="icon-btn sound-active" id="btn-sound" aria-label="Toggle Sound" title="Toggle Construction Audio">
-          <svg id="icon-sound-on" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-          </svg>
-      <!-- Audio Button (Right-aligned) -->
+      <!-- Single Audio Button (Right-aligned) -->
       <div style="display:flex; align-items:center; justify-content:flex-end; flex-shrink:0;">
         <button type="button" class="icon-btn sound-active" id="btn-sound" aria-label="Toggle Sound" title="Toggle Construction Audio">
           <svg id="icon-sound-on" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
@@ -689,18 +682,18 @@
         <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:0.5rem;">
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
-              <span style="font-size:0.66rem; font-weight:800; letter-spacing:0.12em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v3.0</span>
-            </div>
-            <h1 class="font-display" style="font-size:clamp(1.6rem, 6.8vw, 2.1rem); font-weight:700; line-height:1.05; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
-            <button type="button" id="btn-sync-latest" style="margin-top:4px; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.38); color:#e0f2fe; border-radius:999px; padding:0.2rem 0.65rem; font-size:0.65rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.28rem;">
-              <span id="sync-status-text">↻ Get Latest (v3.0)</span>
-            </button>
+            <span style="font-size:0.66rem; font-weight:800; letter-spacing:0.12em; color:#fbbf24;">EARTHMOVER ARCADE</span>
+            <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v3.2</span>
+          </div>
+          <h1 class="font-display" style="font-size:clamp(1.6rem, 6.8vw, 2.1rem); font-weight:700; line-height:1.05; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
+          <button type="button" id="btn-sync-latest" style="margin-top:4px; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.38); color:#e0f2fe; border-radius:999px; padding:0.2rem 0.65rem; font-size:0.65rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.28rem;">
+            <span id="sync-status-text">↻ Get Latest (v3.2)</span>
+          </button>
           </div>
           <button type="button" class="record-btn" id="btn-open-leaderboard" title="View Top 10 High Scores">
-            <div style="font-size:0.58rem; font-weight:700; color:#94a3b8; white-space:nowrap;">TOP 10 RECORD ▾</div>
-            <div class="font-display" style="font-size:1.2rem; font-weight:700; color:#fbbf24; line-height:1.1;" id="menu-best-score">0</div>
-            <div style="font-size:0.62rem; font-weight:700; color:#cbd5e1; max-width:95px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" id="menu-best-holder">—</div>
+            <div style="font-size:0.58rem; font-weight:800; letter-spacing:0.06em; color:#94a3b8; white-space:nowrap;">TOP 10 RECORD ▾</div>
+            <div class="font-display" style="font-size:1.35rem; font-weight:700; color:#fbbf24; line-height:1.05;" id="menu-best-score">0</div>
+            <div style="font-size:0.62rem; font-weight:700; color:#cbd5e1; max-width:96px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" id="menu-best-holder">No shifts yet</div>
           </button>
         </div>
 
@@ -1312,7 +1305,7 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v3.0';
+    const APP_VERSION = 'v3.2';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const MAX_LEADERBOARD_ENTRIES = 10;
@@ -2845,12 +2838,15 @@
         return;
       }
 
-      // 3. Obstacle Spawning & Movement
+      // 3. Obstacle Spawning & Movement (Exact uniform spacing on all screen sizes)
       const spacing = state.width < 600 ? 275 : 315;
-      state.spawnTimer += activeSpeed * dt;
-      if (state.spawnTimer >= spacing) {
-        state.spawnTimer = 0;
-        spawnObstaclePair();
+      if (state.obstacles.length === 0) {
+        spawnObstaclePair(state.width + 40);
+      } else {
+        const lastObs = state.obstacles[state.obstacles.length - 1];
+        if (lastObs.x + spacing <= state.width + 80) {
+          spawnObstaclePair(lastObs.x + spacing);
+        }
       }
 
       // 3B. Falling Boulders & Crane Loads
@@ -3193,17 +3189,13 @@
       state.spawnTimer = 0;
       state.hazardTimer = 2.6;
 
-      // Pre-populate opening obstacles so iPad & desktop landscape players don't fly over empty sky
+      // Pre-populate opening obstacles with exact uniform spacing across all devices
       const spacing = state.width < 600 ? 275 : 315;
-      const firstSpawnX = Math.max(state.player.x + 410, Math.min(state.width + 40, state.player.x + 460));
+      const firstSpawnX = Math.max(state.player.x + 360, Math.min(state.width + 40, state.player.x + 430));
       spawnObstaclePair(firstSpawnX);
-      let lastSpawnX = firstSpawnX;
-      if (firstSpawnX + spacing <= state.width + 180) {
-        lastSpawnX = firstSpawnX + spacing;
-        spawnObstaclePair(lastSpawnX);
+      if (firstSpawnX + spacing <= state.width + 80) {
+        spawnObstaclePair(firstSpawnX + spacing);
       }
-      // Align spawnTimer so the next obstacle arrives at the exact same spacing on all screen widths
-      state.spawnTimer = Math.max(0, (state.width + 40) - lastSpawnX);
 
       state.player.y = Math.round((state.height - state.groundHeight) * 0.46);
       state.player.vy = 0;
@@ -3263,11 +3255,6 @@
         } else if (state.mode === 'gameover') {
           audio.playClick();
           prepareReadyShift(false, true);
-        }
-      } else if (e.code === 'Escape' || e.code === 'KeyP') {
-        if (state.mode === 'playing' || state.mode === 'paused') {
-          audio.playClick();
-          togglePauseState();
         }
       }
     });
