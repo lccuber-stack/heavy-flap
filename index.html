@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="Crane Flap" />
-  <meta name="application-name" content="Crane Flap" />
+  <meta name="apple-mobile-web-app-title" content="Heavy Flap" />
+  <meta name="application-name" content="Heavy Flap" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#0f172a" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>Crane Flap</title>
+  <title>Heavy Flap</title>
   <link id="apple-touch-icon" rel="apple-touch-icon" sizes="512x512" href="" />
   <link id="app-favicon" rel="icon" type="image/png" sizes="512x512" href="" />
   <link id="app-manifest" rel="manifest" href="" />
@@ -335,10 +335,10 @@
       margin-bottom: 0.35rem;
     }
 
-    /* Shift Shift-Shift/Time Toggle */
+    /* Day/Night Shift Toggle */
     .shift-selector {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 0.45rem;
       background: rgba(15, 23, 42, 0.65);
       padding: 0.32rem;
@@ -448,6 +448,134 @@
       margin-left: 0.4rem;
       vertical-align: middle;
     }
+
+    /* Local Multiplayer Roster & Leaderboard */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.35rem;
+      background: rgba(15, 23, 42, 0.65);
+      padding: 0.3rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 0.4rem;
+    }
+
+    .mode-btn {
+      padding: 0.42rem 0.25rem;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .mode-btn.selected {
+      background: rgba(56, 189, 248, 0.22);
+      color: #ffffff;
+      border-color: rgba(56, 189, 248, 0.55);
+    }
+
+    .roster-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.4rem;
+      margin-top: 0.55rem;
+    }
+
+    @media (min-width: 440px) {
+      .roster-list.two-col {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .player-input-row {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 11px;
+      padding: 0.35rem 0.55rem;
+    }
+
+    .player-tag {
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 0.72rem;
+      color: #fbbf24;
+      min-width: 22px;
+    }
+
+    .player-name-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.82rem;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .leaderboard-box {
+      margin-top: 0.85rem;
+      background: rgba(15, 23, 42, 0.68);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+    }
+
+    .lb-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.28rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.8rem;
+    }
+
+    .lb-row:last-child {
+      border-bottom: none;
+    }
+
+    .record-btn {
+      background: rgba(251, 191, 36, 0.14);
+      border: 1px solid rgba(251, 191, 36, 0.38);
+      border-radius: 14px;
+      padding: 0.45rem 0.75rem;
+      text-align: right;
+      cursor: pointer;
+      color: inherit;
+      transition: transform 0.14s ease, background 0.14s ease, border-color 0.14s ease;
+    }
+
+    .record-btn:hover {
+      background: rgba(251, 191, 36, 0.24);
+      border-color: #fbbf24;
+      transform: translateY(-1px);
+    }
+
+    .record-btn:active {
+      transform: scale(0.96);
+    }
+
+    .hud-best-btn {
+      background: transparent;
+      border: none;
+      padding: 0;
+      text-align: left;
+      cursor: pointer;
+      color: inherit;
+      pointer-events: auto;
+    }
   </style>
 </head>
 <body>
@@ -457,16 +585,21 @@
   <!-- Live In-Game HUD -->
   <div id="hud" class="hidden">
     <div class="hud-top">
-      <!-- Best & Hardhats Collected -->
+      <!-- Active Operator, Best & Streak -->
       <div class="hud-badge">
-        <div>
-          <div style="font-size:0.65rem; font-weight:700; color:#94a3b8; letter-spacing:0.06em;">BEST SHIFT</div>
-          <div class="font-display" style="font-size:1.15rem; font-weight:700; color:#fbbf24;" id="hud-best">0</div>
+        <div id="hud-player-wrap">
+          <div style="font-size:0.62rem; font-weight:700; color:#38bdf8; letter-spacing:0.06em;" id="hud-player-tag">OPERATOR</div>
+          <div class="font-display" style="font-size:0.98rem; font-weight:700; color:#ffffff; max-width:92px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" id="hud-player-name">Player 1</div>
         </div>
         <div style="width:1px; height:24px; background:rgba(255,255,255,0.14);"></div>
+        <button type="button" class="hud-best-btn" id="btn-hud-leaderboard" title="View Top 10 Leaderboard">
+          <div style="font-size:0.62rem; font-weight:700; color:#94a3b8; letter-spacing:0.06em;">OVERALL BEST ▾</div>
+          <div class="font-display" style="font-size:1.05rem; font-weight:700; color:#fbbf24;" id="hud-best">0</div>
+        </button>
+        <div style="width:1px; height:24px; background:rgba(255,255,255,0.14);"></div>
         <div>
-          <div style="font-size:0.65rem; font-weight:700; color:#94a3b8; letter-spacing:0.06em;">STREAK</div>
-          <div class="font-display" style="font-size:1.15rem; font-weight:700; color:#38bdf8;" id="hud-bonus">0x</div>
+          <div style="font-size:0.62rem; font-weight:700; color:#94a3b8; letter-spacing:0.06em;">STREAK</div>
+          <div class="font-display" style="font-size:1.05rem; font-weight:700; color:#38bdf8;" id="hud-bonus">0x</div>
         </div>
       </div>
 
@@ -497,6 +630,7 @@
     <!-- Giant Center Score -->
     <div class="score-center">
       <div id="hud-score">0</div>
+      <div id="hud-biome-pill" style="margin-top:4px; display:inline-block; background:rgba(15,23,42,0.72); border:1px solid rgba(255,255,255,0.14); border-radius:999px; padding:2px 10px; font-size:0.66rem; font-weight:700; letter-spacing:0.07em; color:#cbd5e1;">🌲 DEEP PINE FOREST</div>
     </div>
 
     <!-- Tap to Thrust Cue -->
@@ -518,58 +652,73 @@
       <div class="card-body">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:0.5rem;">
           <div>
-            <div style="font-size:0.72rem; font-weight:800; letter-spacing:0.14em; color:#fbbf24;">HEAVY DUTY ARCADE</div>
-            <h1 class="font-display" style="font-size:2.15rem; font-weight:700; line-height:1.05; letter-spacing:-0.01em; margin-top:2px;">CRANE FLAP</h1>
+            <div style="font-size:0.72rem; font-weight:800; letter-spacing:0.14em; color:#fbbf24;">EARTHMOVER ARCADE</div>
+            <h1 class="font-display" style="font-size:2.15rem; font-weight:700; line-height:1.05; letter-spacing:-0.01em; margin-top:2px;">HEAVY FLAP</h1>
             <button type="button" id="btn-sync-latest" style="margin-top:6px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.16); color:#cbd5e1; border-radius:999px; padding:0.22rem 0.65rem; font-size:0.68rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.3rem;">
               <span id="sync-status-text">↻ Sync Latest</span>
             </button>
           </div>
-          <div style="background:rgba(251,191,36,0.14); border:1px solid rgba(251,191,36,0.35); border-radius:14px; padding:0.45rem 0.75rem; text-align:right;">
-            <div style="font-size:0.65rem; font-weight:700; color:#94a3b8;">HIGH SCORE</div>
+          <button type="button" class="record-btn" id="btn-open-leaderboard" title="View Top 10 High Scores">
+            <div style="font-size:0.62rem; font-weight:700; color:#94a3b8;">OVERALL RECORD ▾</div>
             <div class="font-display" style="font-size:1.25rem; font-weight:700; color:#fbbf24;" id="menu-best-score">0</div>
-          </div>
+            <div style="font-size:0.64rem; font-weight:700; color:#cbd5e1;" id="menu-best-holder">—</div>
+          </button>
         </div>
 
-        <p style="font-size:0.86rem; color:#cbd5e1; margin-top:0.6rem; line-height:1.45;">
-          Pilot your Swedish-engineered Volvo heavy machinery through suspended steel I-beams and Nordic quarry cranes. Collect golden hardhats to score—missing a hardhat breaks your streak!
+        <p style="font-size:0.84rem; color:#cbd5e1; margin-top:0.55rem; line-height:1.42;">
+          Pilot heavy construction rigs across procedurally generated landscapes—from deep pine forests and alpine peaks to bustling city skylines and harbors. Watch out for falling boulders and grab every golden hardhat!
         </p>
 
+        <!-- Single / Local Multiplayer Roster -->
+        <div style="margin-top:0.85rem;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <label style="font-size:0.7rem; font-weight:800; letter-spacing:0.08em; color:#94a3b8;">PLAYERS (LOCAL PASS & PLAY)</label>
+            <span style="font-size:0.68rem; font-weight:700; color:#38bdf8;" id="mode-summary-label">Solo Shift</span>
+          </div>
+          <div class="mode-grid" id="player-count-selector">
+            <button type="button" class="mode-btn selected" data-count="1">1P Solo</button>
+            <button type="button" class="mode-btn" data-count="2">2P</button>
+            <button type="button" class="mode-btn" data-count="3">3P</button>
+            <button type="button" class="mode-btn" data-count="4">4P</button>
+          </div>
+          <div class="roster-list" id="roster-inputs"></div>
+        </div>
+
         <!-- Choose Heavy Equipment Rig -->
-        <div style="margin-top:1.1rem;">
-          <label style="font-size:0.72rem; font-weight:800; letter-spacing:0.08em; color:#94a3b8; display:block;">SELECT VOLVO FLEET MACHINE</label>
+        <div style="margin-top:0.85rem;">
+          <label style="font-size:0.7rem; font-weight:800; letter-spacing:0.08em; color:#94a3b8; display:block;">SELECT HEAVY MACHINE</label>
           <div class="rig-grid" id="rig-selector">
             <button type="button" class="rig-card selected" data-rig="loader">
               <canvas class="rig-preview" id="preview-loader" width="112" height="88"></canvas>
               <div class="font-display" style="font-size:0.84rem; font-weight:700; color:#fff;">Wheel Loader</div>
-              <div style="font-size:0.66rem; color:#94a3b8; margin-top:2px;">L180H • Balanced</div>
+              <div style="font-size:0.66rem; color:#94a3b8; margin-top:2px;">Heavy • Balanced</div>
             </button>
 
             <button type="button" class="rig-card" data-rig="excavator">
               <canvas class="rig-preview" id="preview-excavator" width="112" height="88"></canvas>
               <div class="font-display" style="font-size:0.84rem; font-weight:700; color:#fff;">Excavator</div>
-              <div style="font-size:0.66rem; color:#94a3b8; margin-top:2px;">EC380E • Snappy</div>
+              <div style="font-size:0.66rem; color:#94a3b8; margin-top:2px;">Crawler • Snappy</div>
             </button>
 
             <button type="button" class="rig-card" data-rig="hauler">
               <canvas class="rig-preview" id="preview-hauler" width="112" height="88"></canvas>
               <div class="font-display" style="font-size:0.84rem; font-weight:700; color:#fff;">Artic Hauler</div>
-              <div style="font-size:0.66rem; color:#94a3b8; margin-top:2px;">A40G • Smooth</div>
+              <div style="font-size:0.66rem; color:#94a3b8; margin-top:2px;">6x6 Dump • Smooth</div>
             </button>
           </div>
         </div>
 
-        <!-- Shift Lighting / Atmosphere Selector -->
-        <div style="margin-top:1rem;">
-          <label style="font-size:0.72rem; font-weight:800; letter-spacing:0.08em; color:#94a3b8; display:block;">QUARRY & SITE ENVIRONMENT</label>
+        <!-- Day / Night Shift Selector -->
+        <div style="margin-top:0.85rem;">
+          <label style="font-size:0.7rem; font-weight:800; letter-spacing:0.08em; color:#94a3b8; display:block;">WORK SHIFT LIGHTING</label>
           <div class="shift-selector" id="shift-selector">
-            <button type="button" class="shift-btn selected" data-shift="quarry">🏔️ Nordic Quarry</button>
-            <button type="button" class="shift-btn" data-shift="timber">🌲 Forest Road</button>
-            <button type="button" class="shift-btn" data-shift="night">🌙 Night Blast</button>
+            <button type="button" class="shift-btn selected" data-shift="day">☀️ Day Shift</button>
+            <button type="button" class="shift-btn" data-shift="night">🌙 Night Shift</button>
           </div>
         </div>
 
         <button type="button" class="btn-launch" id="btn-start-shift">
-          <span>Start Shift</span>
+          <span id="btn-start-label">Start Shift</span>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="5 3 19 12 5 21 5 3"></polygon>
           </svg>
@@ -605,43 +754,83 @@
       <div class="hazard-bar"></div>
       <div class="card-body" style="text-align:center;">
         <div style="font-size:0.74rem; font-weight:800; letter-spacing:0.14em; color:#fb7185;" id="go-reason">BEAM IMPACT!</div>
-        <h2 class="font-display" style="font-size:2rem; font-weight:700; margin-top:0.15rem;">
-          SHIFT OVER <span id="go-new-record" class="new-record-tag hidden">NEW BEST!</span>
+        <h2 class="font-display" style="font-size:1.85rem; font-weight:700; margin-top:0.15rem;">
+          <span id="go-player-title">SHIFT OVER</span> <span id="go-new-record" class="new-record-tag hidden">NEW BEST!</span>
         </h2>
 
         <!-- Safety Rank Badge -->
-        <div style="margin-top:0.6rem; display:inline-flex; align-items:center; gap:0.45rem; background:rgba(251,191,36,0.14); border:1px solid rgba(251,191,36,0.35); border-radius:999px; padding:0.35rem 0.9rem;">
+        <div style="margin-top:0.5rem; display:inline-flex; align-items:center; gap:0.45rem; background:rgba(251,191,36,0.14); border:1px solid rgba(251,191,36,0.35); border-radius:999px; padding:0.3rem 0.85rem;">
           <span style="font-size:0.95rem;" id="go-medal-icon">🦺</span>
-          <span class="font-display" style="font-size:0.85rem; font-weight:700; color:#fbbf24;" id="go-rank-title">APPRENTICE OPERATOR</span>
+          <span class="font-display" style="font-size:0.82rem; font-weight:700; color:#fbbf24;" id="go-rank-title">APPRENTICE OPERATOR</span>
         </div>
 
         <div class="stat-grid">
           <div class="stat-box">
-            <div style="font-size:0.66rem; font-weight:700; color:#94a3b8;">TOTAL SCORE</div>
-            <div class="font-display" style="font-size:1.65rem; font-weight:700; color:#ffffff; margin-top:2px;" id="go-score">0</div>
+            <div style="font-size:0.64rem; font-weight:700; color:#94a3b8;">SHIFT SCORE</div>
+            <div class="font-display" style="font-size:1.55rem; font-weight:700; color:#ffffff; margin-top:2px;" id="go-score">0</div>
           </div>
           <div class="stat-box">
-            <div style="font-size:0.66rem; font-weight:700; color:#94a3b8;">BEST SHIFT</div>
-            <div class="font-display" style="font-size:1.65rem; font-weight:700; color:#fbbf24; margin-top:2px;" id="go-best">0</div>
+            <div style="font-size:0.64rem; font-weight:700; color:#94a3b8;">OVERALL BEST</div>
+            <div class="font-display" style="font-size:1.55rem; font-weight:700; color:#fbbf24; margin-top:2px;" id="go-best">0</div>
           </div>
           <div class="stat-box">
-            <div style="font-size:0.66rem; font-weight:700; color:#94a3b8;">HARDHATS</div>
-            <div class="font-display" style="font-size:1.65rem; font-weight:700; color:#38bdf8; margin-top:2px;" id="go-hardhats">0</div>
+            <div style="font-size:0.64rem; font-weight:700; color:#94a3b8;">HARDHATS</div>
+            <div class="font-display" style="font-size:1.55rem; font-weight:700; color:#38bdf8; margin-top:2px;" id="go-hardhats">0</div>
           </div>
         </div>
 
-        <div style="display:flex; gap:0.65rem; margin-top:1.25rem;">
+        <!-- Device Overall Leaderboard -->
+        <div class="leaderboard-box">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+            <span style="font-size:0.66rem; font-weight:800; letter-spacing:0.08em; color:#94a3b8;">DEVICE OVERALL HIGH SCORES</span>
+            <span style="font-size:0.66rem; font-weight:700; color:#38bdf8;" id="go-next-up-hint"></span>
+          </div>
+          <div id="go-leaderboard-list"></div>
+        </div>
+
+        <div style="display:flex; gap:0.65rem; margin-top:1.1rem;">
           <button type="button" class="btn-secondary" id="btn-go-garage" style="flex:1;">
             Garage
           </button>
           <button type="button" class="btn-launch" id="btn-retry-shift" style="flex:2; margin-top:0;">
-            <span>Retry Shift</span>
+            <span id="btn-retry-label">Retry Shift</span>
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
               <path d="M3 3v5h5"></path>
             </svg>
           </button>
         </div>
+      </div>
+      <div class="hazard-bar"></div>
+    </div>
+  </div>
+
+  <!-- Top 10 Overall Leaderboard Modal -->
+  <div id="leaderboard-modal" class="modal-backdrop hidden" style="z-index: 40;">
+    <div class="industrial-card" style="max-width:420px;">
+      <div class="hazard-bar"></div>
+      <div class="card-body">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:0.5rem;">
+          <div>
+            <div style="font-size:0.7rem; font-weight:800; letter-spacing:0.14em; color:#fbbf24;">SOLO &amp; MULTIPLAYER</div>
+            <h2 class="font-display" style="font-size:1.65rem; font-weight:700; line-height:1.1; margin-top:2px;">TOP 10 HIGH SCORES</h2>
+          </div>
+          <button type="button" class="icon-btn" id="btn-close-leaderboard" aria-label="Close High Score List" style="height:38px; min-width:38px; padding:0 0.6rem;">
+            ✕
+          </button>
+        </div>
+
+        <p style="font-size:0.8rem; color:#94a3b8; margin-top:0.35rem;">
+          All-time best shifts recorded on this device across both Solo and Pass &amp; Play shifts.
+        </p>
+
+        <div class="leaderboard-box" style="margin-top:0.8rem; max-height:330px; overflow-y:auto;">
+          <div id="top10-leaderboard-list"></div>
+        </div>
+
+        <button type="button" class="btn-launch" id="btn-close-leaderboard-bottom" style="margin-top:1rem; padding:0.8rem 1rem; font-size:1rem;">
+          Close Leaderboard
+        </button>
       </div>
       <div class="hazard-bar"></div>
     </div>
@@ -783,7 +972,7 @@
     const audio = new ConstructionAudio();
 
     // =========================================================================
-    // 1B. CUSTOM HOME SCREEN APP ICON & WEB MANIFEST GENERATOR ("Crane Flap")
+    // 1B. CUSTOM HOME SCREEN APP ICON & WEB MANIFEST GENERATOR ("Heavy Flap")
     // =========================================================================
     function generateHomeScreenAppIcon() {
       try {
@@ -809,7 +998,7 @@
         ic.fillStyle = glow;
         ic.fillRect(0, 0, size, size);
 
-        // Blueprint Grid Lines (Subtle Engineering Detail)
+        // Blueprint Grid Lines
         ic.strokeStyle = 'rgba(255, 255, 255, 0.06)';
         ic.lineWidth = 2;
         for (let g = 64; g < size; g += 64) {
@@ -899,7 +1088,7 @@
         ic.fill();
         ic.restore();
 
-        // Hero Volvo Wheel Loader Soaring Center-Stage
+        // Hero Wheel Loader Soaring Center-Stage
         ic.save();
         ic.translate(226, 276);
         ic.scale(5.2, 5.2);
@@ -912,10 +1101,9 @@
         if (touchLink) touchLink.href = dataUrl;
         if (favLink) favLink.href = dataUrl;
 
-        // Dynamic Web App Manifest so iOS/Android/Desktop use "Crane Flap" & custom icon
         const manifest = {
-          name: 'Crane Flap',
-          short_name: 'Crane Flap',
+          name: 'Heavy Flap',
+          short_name: 'Heavy Flap',
           start_url: window.location.href.split('?')[0].split('#')[0],
           display: 'standalone',
           background_color: '#0f172a',
@@ -936,11 +1124,11 @@
     }
 
     // =========================================================================
-    // 2. VOLVO RIG CONFIGURATIONS & NORDIC SITE ATMOSPHERE THEMES
+    // 2. HEAVY RIG CONFIGURATIONS, DAY/NIGHT SHIFTS & PROCEDURAL BIOMES
     // =========================================================================
     const RIG_SPECS = {
       loader: {
-        name: 'Volvo L180H Loader',
+        name: 'Wheel Loader',
         gravity: 1360,
         flapVel: -442,
         maxFall: 615,
@@ -949,7 +1137,7 @@
         cabColor: '#1e293b'
       },
       excavator: {
-        name: 'Volvo EC380E Excavator',
+        name: 'Crawler Excavator',
         gravity: 1470,
         flapVel: -465,
         maxFall: 645,
@@ -958,7 +1146,7 @@
         cabColor: '#0f172a'
       },
       hauler: {
-        name: 'Volvo A40G Hauler',
+        name: 'Articulated Hauler',
         gravity: 1265,
         flapVel: -424,
         maxFall: 580,
@@ -968,85 +1156,152 @@
       }
     };
 
-    const SHIFT_THEMES = {
-      quarry: {
-        skyTop: '#0284c7',
-        skyBottom: '#bae6fd',
+    const PROCEDURAL_BIOMES = [
+      {
+        id: 'forest',
+        label: '🌲 DEEP PINE FOREST',
+        daySkyTop: '#0284c7',
+        daySkyBottom: '#bae6fd',
+        dayFar: '#1e40af',
+        dayMid: '#15803d',
+        nightFar: '#0f172a',
+        nightMid: '#064e3b',
+        groundTop: '#365314',
+        groundDirt: '#451a03'
+      },
+      {
+        id: 'alpine',
+        label: '🏔️ ALPINE PEAKS',
+        daySkyTop: '#0369a1',
+        daySkyBottom: '#e0f2fe',
+        dayFar: '#475569',
+        dayMid: '#334155',
+        nightFar: '#0f172a',
+        nightMid: '#1e293b',
+        groundTop: '#475569',
+        groundDirt: '#1e293b'
+      },
+      {
+        id: 'city',
+        label: '🏙️ METRO SKYLINE',
+        daySkyTop: '#2563eb',
+        daySkyBottom: '#fed7aa',
+        dayFar: '#334155',
+        dayMid: '#1e293b',
+        nightFar: '#090d16',
+        nightMid: '#1e293b',
+        groundTop: '#334155',
+        groundDirt: '#0f172a'
+      },
+      {
+        id: 'harbor',
+        label: '⚓ COASTAL HARBOR',
+        daySkyTop: '#0891b2',
+        daySkyBottom: '#cffafe',
+        dayFar: '#1d4ed8',
+        dayMid: '#0f766e',
+        nightFar: '#082f49',
+        nightMid: '#115e59',
+        groundTop: '#1e3a8a',
+        groundDirt: '#0f172a'
+      },
+      {
+        id: 'canyon',
+        label: '🏜️ RED ROCK CANYON',
+        daySkyTop: '#d97706',
+        daySkyBottom: '#fef3c7',
+        dayFar: '#b45309',
+        dayMid: '#9a3412',
+        nightFar: '#27130c',
+        nightMid: '#431407',
+        groundTop: '#9a3412',
+        groundDirt: '#451a03'
+      }
+    ];
+
+    const SHIFT_LIGHTING = {
+      day: {
         sunColor: '#fef9c3',
-        sunY: 0.19,
-        farRidge: '#64748b',
-        midRidge: '#475569',
-        isForest: false,
-        craneColor: '#eab308',
+        sunY: 0.21,
         beamMain: '#334155',
         beamHighlight: '#94a3b8',
         beamShadow: '#0f172a',
-        groundTop: '#334155',
-        groundDirt: '#57534e',
-        windowLit: false
-      },
-      timber: {
-        skyTop: '#0369a1',
-        skyBottom: '#fde68a',
-        sunColor: '#fef08a',
-        sunY: 0.28,
-        farRidge: '#1e3a8a',
-        midRidge: '#14532d',
-        isForest: true,
-        craneColor: '#f59e0b',
-        beamMain: '#3f3f46',
-        beamHighlight: '#71717a',
-        beamShadow: '#18181b',
-        groundTop: '#365314',
-        groundDirt: '#451a03',
-        windowLit: false
+        craneColor: '#eab308',
+        isNight: false
       },
       night: {
         skyTop: '#020617',
         skyBottom: '#1e293b',
         sunColor: '#f8fafc',
-        sunY: 0.18,
-        farRidge: '#0f172a',
-        midRidge: '#1e293b',
-        isForest: false,
-        craneColor: '#facc15',
+        sunY: 0.17,
         beamMain: '#475569',
         beamHighlight: '#cbd5e1',
         beamShadow: '#1e293b',
-        groundTop: '#1e293b',
-        groundDirt: '#090d16',
-        windowLit: true
+        craneColor: '#facc15',
+        isNight: true
       }
     };
 
     // =========================================================================
-    // 3. GAME STATE & PERSISTENT HIGH SCORE + AUTO-UPDATE FROM GITHUB PAGES
+    // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const HIGH_SCORE_COOKIE = 'crane_flap_best_v1';
+    const LEADERBOARD_COOKIE = 'crane_flap_lb_v2';
 
-    function loadSavedHighScore() {
-      let best = 0;
+    function loadLeaderboardData() {
+      let records = [];
       try {
-        const match = document.cookie.match(new RegExp('(?:^|; )' + HIGH_SCORE_COOKIE + '=([^;]*)'));
-        if (match) best = Math.max(best, parseInt(decodeURIComponent(match[1]), 10) || 0);
-      } catch (e) {}
-      try {
-        if (window.name && window.name.startsWith('CRANE_BEST:')) {
-          best = Math.max(best, parseInt(window.name.split(':')[1], 10) || 0);
+        const match = document.cookie.match(new RegExp('(?:^|; )' + LEADERBOARD_COOKIE + '=([^;]*)'));
+        if (match) {
+          const parsed = JSON.parse(decodeURIComponent(match[1]));
+          if (Array.isArray(parsed)) records = parsed;
         }
       } catch (e) {}
-      return best;
+      try {
+        if (!records.length && window.name && window.name.startsWith('CRANE_LB:')) {
+          const parsed = JSON.parse(window.name.slice(9));
+          if (Array.isArray(parsed)) records = parsed;
+        }
+      } catch (e) {}
+      return records
+        .filter((r) => r && typeof r.name === 'string' && typeof r.score === 'number')
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 10);
     }
 
-    function persistHighScore(score) {
-      const val = Math.max(0, Math.floor(score));
+    function saveLeaderboardData(records) {
+      const clean = records
+        .filter((r) => r && typeof r.name === 'string' && typeof r.score === 'number')
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 10);
       try {
         const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
-        document.cookie = `${HIGH_SCORE_COOKIE}=${encodeURIComponent(val)}; expires=${expires}; path=/; SameSite=Lax`;
+        document.cookie = `${LEADERBOARD_COOKIE}=${encodeURIComponent(JSON.stringify(clean))}; expires=${expires}; path=/; SameSite=Lax`;
       } catch (e) {}
       try {
-        window.name = `CRANE_BEST:${val}`;
+        window.name = `CRANE_LB:${JSON.stringify(clean)}`;
       } catch (e) {}
+      return clean;
+    }
+
+    function recordPlayerScore(playerName, score, rigKey = 'loader', modeLabel = 'Solo') {
+      const trimmed = (playerName || 'Player 1').trim().slice(0, 18) || 'Player 1';
+      const rigName = (RIG_SPECS[rigKey] && RIG_SPECS[rigKey].name) || 'Wheel Loader';
+      let records = loadLeaderboardData();
+      const existing = records.find((r) => r.name.toLowerCase() === trimmed.toLowerCase());
+      if (existing) {
+        if (score >= existing.score) {
+          existing.score = score;
+          existing.name = trimmed;
+          existing.rig = rigName;
+          existing.mode = modeLabel;
+        }
+      } else if (score > 0 || records.length === 0) {
+        records.push({ name: trimmed, score, rig: rigName, mode: modeLabel });
+      }
+      records = saveLeaderboardData(records);
+      state.leaderboard = records;
+      state.bestScore = records.length ? records[0].score : 0;
+      state.bestHolder = records.length && records[0].score > 0 ? records[0].name : '—';
     }
 
     let initialSignature = null;
@@ -1059,284 +1314,275 @@
         return;
       }
 
-      const statusEl = document.getElementById('sync-status-text');
-      if (manual && statusEl) statusEl.textContent = '↻ Checking...';
-
       try {
-        const baseUrl = window.location.href.split('?')[0].split('#')[0];
-        const res = await fetch(`${baseUrl}?cb=${Date.now()}`, {
-          cache: 'no-store',
-          headers: { 'Cache-Control': 'no-cache' }
-        });
+        const cleanUrl = window.location.href.split('?')[0].split('#')[0];
+        const res = await fetch(`${cleanUrl}?cb=${Date.now()}`, { cache: 'no-store' });
         if (!res.ok) return;
-        const htmlText = await res.text();
-        if (!htmlText || htmlText.length < 1000) return;
-
-        // Compute lightweight content fingerprint
-        let hash = 0;
-        for (let i = 0; i < htmlText.length; i++) {
-          hash = ((hash << 5) - hash + htmlText.charCodeAt(i)) | 0;
-        }
-        const sig = `${htmlText.length}_${hash}`;
-
+        const html = await res.text();
+        const sig = `${html.length}:${html.slice(0, 120)}:${html.slice(-120)}`;
         if (initialSignature === null) {
           initialSignature = sig;
-          if (manual && statusEl) statusEl.textContent = '✓ Up to Date';
-          return;
+          if (manual) {
+            const el = document.getElementById('sync-status-text');
+            if (el) el.textContent = '✓ Up to date';
+          }
+        } else if (sig !== initialSignature) {
+          window.location.replace(`${cleanUrl}?v=${Date.now()}`);
+        } else if (manual) {
+          const el = document.getElementById('sync-status-text');
+          if (el) el.textContent = '✓ Up to date';
         }
-
-        if (sig !== initialSignature) {
-          if (statusEl) statusEl.textContent = '↻ Updating...';
-          // Preserve high score before reloading with cache-busting query
-          persistHighScore(state.bestScore);
-          const nextUrl = `${baseUrl}?v=${Date.now()}`;
-          window.location.replace(nextUrl);
-        } else if (manual && statusEl) {
-          statusEl.textContent = '✓ Latest Version';
+      } catch (e) {
+        if (manual) {
+          const el = document.getElementById('sync-status-text');
+          if (el) el.textContent = '✓ Offline Ready';
         }
-      } catch (err) {
-        if (manual && statusEl) statusEl.textContent = '↻ Sync Latest';
       }
     }
 
-    let savedBestScore = loadSavedHighScore();
+    function renderLeaderboardList(containerId, limit = 5, detailed = false) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const list = state.leaderboard.slice(0, limit);
+      if (!list.length) {
+        container.innerHTML = `<div style="font-size:0.78rem; color:#94a3b8; padding:0.4rem 0;">No shifts recorded yet — grab golden hardhats in Solo or Multiplayer to claim #1!</div>`;
+        return;
+      }
+      container.innerHTML = list.map((entry, idx) => {
+        const medal = idx === 0 ? '🏆' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
+        const meta = detailed && (entry.rig || entry.mode)
+          ? `<div style="font-size:0.66rem; color:#94a3b8; margin-top:1px;">${entry.rig || 'Heavy Rig'}${entry.mode ? ` • ${entry.mode}` : ''}</div>`
+          : '';
+        return `
+          <div class="lb-row" style="${detailed ? 'padding:0.45rem 0;' : ''}">
+            <div>
+              <div style="color:#e2e8f0; font-weight:600;"><strong style="color:#fbbf24; margin-right:6px;">${medal}</strong>${entry.name}</div>
+              ${meta}
+            </div>
+            <span class="font-display" style="font-weight:700; font-size:${detailed ? '1.05rem' : '0.88rem'}; color:#fbbf24;">${entry.score}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openTop10Leaderboard() {
+      audio.playClick();
+      if (state.phase === 'PLAYING') {
+        state.phase = 'PAUSED';
+      }
+      renderLeaderboardList('top10-leaderboard-list', 10, true);
+      document.getElementById('leaderboard-modal').classList.remove('hidden');
+    }
+
+    function closeTop10Leaderboard() {
+      audio.playClick();
+      document.getElementById('leaderboard-modal').classList.add('hidden');
+      if (state.phase === 'PAUSED' && document.getElementById('pause-modal').classList.contains('hidden')) {
+        state.phase = 'PLAYING';
+      }
+    }
+
+    const initialLeaderboard = loadLeaderboardData();
 
     const state = {
       phase: 'MENU', // MENU, READY, PLAYING, PAUSED, GAMEOVER
       selectedRig: 'loader',
-      selectedShift: 'quarry',
+      selectedShift: 'day',
+      currentBiome: PROCEDURAL_BIOMES[0],
+      playerCount: 1,
+      playerNames: ['Player 1', 'Player 2', 'Player 3', 'Player 4'],
+      activePlayerIdx: 0,
       score: 0,
       bonusPoints: 0,
       hardhatsCollected: 0,
       hardhatStreak: 0,
-      bestScore: savedBestScore,
+      leaderboard: initialLeaderboard,
+      bestScore: initialLeaderboard.length ? initialLeaderboard[0].score : 0,
+      bestHolder: initialLeaderboard.length && initialLeaderboard[0].score > 0 ? initialLeaderboard[0].name : '—',
       shakeTime: 0,
       shakeIntensity: 0,
       flashAlpha: 0,
       groundScroll: 0,
       skylineScroll: 0,
       cloudScroll: 0,
-      spawnDistance: 0,
+      spawnDistance: 120,
       lastGapCenterY: null,
       obstaclesPassed: 0,
+      hazardTimer: 4.5,
       deathReason: 'BEAM IMPACT!',
       player: {
-        x: 0,
-        y: 0,
+        x: 100,
+        y: 260,
         vy: 0,
         radius: 17,
         rotation: 0,
-        armAngle: 0,
-        drumSpin: 0,
-        flameTimer: 0
+        thrustAnim: 0,
+        wheelAngle: 0,
+        bobPhase: 0
       },
       obstacles: [],
+      fallingHazards: [],
       collectibles: [],
       particles: [],
-      floatingTexts: [],
-      clouds: [],
-      skylineFar: [],
-      skylineMid: []
+      floatingTexts: []
     };
 
     // =========================================================================
-    // 4. RESPONSIVE CANVAS & ENVIRONMENT GENERATION
+    // 4. RESPONSIVE CANVAS & SCENERY INITIALIZATION
     // =========================================================================
     const canvas = document.getElementById('game-canvas');
     const ctx = canvas.getContext('2d');
+
     let viewW = window.innerWidth;
     let viewH = window.innerHeight;
-    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let groundHeight = 76;
 
-    function getGroundHeight() {
-      return Math.max(64, Math.min(92, Math.round(viewH * 0.12)));
-    }
+    const skylineBuildings = [];
+    const clouds = [];
+    const stars = [];
 
-    function getPlayableHeight() {
-      return viewH - getGroundHeight();
-    }
+    function initScenery() {
+      skylineBuildings.length = 0;
+      let bx = 0;
+      while (bx < 2200) {
+        const w = 48 + Math.random() * 58;
+        const h = 75 + Math.random() * 145;
+        skylineBuildings.push({
+          x: bx,
+          w,
+          h,
+          hasCrane: Math.random() < 0.34,
+          craneLen: 46 + Math.random() * 34,
+          winSeed: Math.floor(Math.random() * 100)
+        });
+        bx += w + 8 + Math.random() * 18;
+      }
 
-    function getPlayerAnchorX() {
-      if (viewW < 640) return Math.round(viewW * 0.25);
-      if (viewW < 1024) return Math.round(viewW * 0.28);
-      return Math.round(Math.min(340, viewW * 0.28));
+      clouds.length = 0;
+      for (let i = 0; i < 8; i++) {
+        clouds.push({
+          x: Math.random() * 1600,
+          y: 45 + Math.random() * 190,
+          scale: 0.65 + Math.random() * 0.75,
+          speed: 12 + Math.random() * 16
+        });
+      }
+
+      stars.length = 0;
+      for (let i = 0; i < 55; i++) {
+        stars.push({
+          x: Math.random() * 1800,
+          y: Math.random() * 420,
+          r: 0.8 + Math.random() * 1.4,
+          twinkle: Math.random() * Math.PI * 2
+        });
+      }
     }
 
     function resizeCanvas() {
-      viewW = window.innerWidth;
-      viewH = window.innerHeight;
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.floor(viewW * dpr);
-      canvas.height = Math.floor(viewH * dpr);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const vv = window.visualViewport;
+      viewW = Math.round(vv ? vv.width : window.innerWidth);
+      viewH = Math.round(vv ? vv.height : window.innerHeight);
+
+      canvas.width = Math.round(viewW * dpr);
+      canvas.height = Math.round(viewH * dpr);
+      canvas.style.width = `${viewW}px`;
+      canvas.style.height = `${viewH}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      state.player.x = getPlayerAnchorX();
+      groundHeight = Math.max(66, Math.min(92, Math.round(viewH * 0.11)));
+
+      // Responsive horizontal anchor for mobile vs tablet/desktop
+      state.player.x = viewW < 600
+        ? Math.max(76, Math.round(viewW * 0.25))
+        : Math.min(220, Math.round(viewW * 0.23));
+
       if (state.phase === 'MENU' || state.phase === 'READY') {
-        state.player.y = getPlayableHeight() * 0.45;
-      }
-      buildBackgroundLayers();
-    }
-
-    function buildBackgroundLayers() {
-      state.clouds = [];
-      for (let i = 0; i < 6; i++) {
-        state.clouds.push({
-          x: (viewW / 5) * i + Math.random() * 60,
-          y: 45 + Math.random() * (getPlayableHeight() * 0.34),
-          scale: 0.65 + Math.random() * 0.65,
-          speed: 12 + Math.random() * 14
-        });
-      }
-
-      state.skylineFar = [];
-      let fx = 0;
-      while (fx < viewW + 320) {
-        const w = 90 + Math.random() * 90;
-        const h = 110 + Math.random() * 145;
-        state.skylineFar.push({
-          x: fx,
-          w,
-          h,
-          peakOffset: 0.25 + Math.random() * 0.5,
-          hasCrane: Math.random() < 0.24,
-          craneAngle: Math.random() * Math.PI * 2
-        });
-        fx += w - 12;
-      }
-
-      state.skylineMid = [];
-      let mx = 0;
-      while (mx < viewW + 320) {
-        const w = 75 + Math.random() * 80;
-        const h = 65 + Math.random() * 95;
-        const treeCount = 2 + Math.floor(Math.random() * 3);
-        const trees = [];
-        for (let t = 0; t < treeCount; t++) {
-          trees.push({
-            offsetX: 12 + t * ((w - 24) / Math.max(1, treeCount)),
-            height: 24 + Math.random() * 20
-          });
-        }
-        state.skylineMid.push({
-          x: mx,
-          w,
-          h,
-          trees,
-          hasSilo: Math.random() < 0.35
-        });
-        mx += w + 10;
+        state.player.y = (viewH - groundHeight) * 0.46;
       }
     }
 
     // =========================================================================
-    // 5. VOLVO RIG RENDERING (Wheel Loader, Excavator & Articulated Hauler)
+    // 5. VECTOR HEAVY MACHINERY RENDERING (Wheel Loader, Excavator, Hauler)
     // =========================================================================
-    function drawVolvoWheel(targetCtx, wx, wy, radius, spinAngle) {
-      targetCtx.save();
-      targetCtx.translate(wx, wy);
-      targetCtx.rotate(spinAngle);
-
-      // Heavy Off-Road Tire
-      targetCtx.fillStyle = '#0f172a';
-      targetCtx.beginPath();
-      targetCtx.arc(0, 0, radius, 0, Math.PI * 2);
-      targetCtx.fill();
-
-      // Tire Tread Ticks
-      targetCtx.strokeStyle = '#334155';
-      targetCtx.lineWidth = 2;
-      targetCtx.beginPath();
-      targetCtx.arc(0, 0, radius - 1, 0, Math.PI * 2);
-      targetCtx.stroke();
-
-      // Volvo Yellow Steel Rim
-      targetCtx.fillStyle = '#eab308';
-      targetCtx.beginPath();
-      targetCtx.arc(0, 0, radius * 0.52, 0, Math.PI * 2);
-      targetCtx.fill();
-
-      // Dark Planetary Hub
-      targetCtx.fillStyle = '#1e293b';
-      targetCtx.beginPath();
-      targetCtx.arc(0, 0, radius * 0.24, 0, Math.PI * 2);
-      targetCtx.fill();
-
-      targetCtx.restore();
-    }
-
-    function drawConstructionRig(targetCtx, rigType, x, y, radius, rotation, armAngle, drumSpin, flameTimer) {
-      const spec = RIG_SPECS[rigType] || RIG_SPECS.loader;
+    function drawConstructionRig(targetCtx, rigKey, x, y, radius, rotation, thrustAnim, wheelAngle, scale = 1) {
+      const spec = RIG_SPECS[rigKey] || RIG_SPECS.loader;
       targetCtx.save();
       targetCtx.translate(x, y);
       targetCtx.rotate(rotation);
+      targetCtx.scale(scale, scale);
 
-      // Hydraulic / Turbo Jet Lift Flame beneath chassis
-      if (flameTimer > 0) {
-        const flick = 0.8 + Math.random() * 0.45;
-        targetCtx.fillStyle = '#f97316';
+      // Hydraulic Exhaust Flame / Steam Burst on Flap
+      if (thrustAnim > 0.05) {
+        targetCtx.save();
+        const flameLen = (12 + thrustAnim * 18);
+        const grad = targetCtx.createLinearGradient(-14, 4, -14 - flameLen, 12);
+        grad.addColorStop(0, '#fef08a');
+        grad.addColorStop(0.5, '#f97316');
+        grad.addColorStop(1, 'rgba(239, 68, 68, 0)');
+        targetCtx.fillStyle = grad;
         targetCtx.beginPath();
-        targetCtx.moveTo(-12, 12);
-        targetCtx.lineTo(-4, 12 + 18 * flick);
-        targetCtx.lineTo(4, 12);
+        targetCtx.moveTo(-14, 0);
+        targetCtx.lineTo(-14 - flameLen, 7 + Math.sin(thrustAnim * 20) * 3);
+        targetCtx.lineTo(-14, 11);
         targetCtx.closePath();
         targetCtx.fill();
-
-        targetCtx.fillStyle = '#fef08a';
-        targetCtx.beginPath();
-        targetCtx.moveTo(-8, 12);
-        targetCtx.lineTo(-4, 12 + 10 * flick);
-        targetCtx.lineTo(1, 12);
-        targetCtx.closePath();
-        targetCtx.fill();
+        targetCtx.restore();
       }
 
-      if (rigType === 'loader') {
-        // VOLVO L180H WHEEL LOADER
-        // Rear Engine Hood (Volvo Yellow + Dark Charcoal Grille)
+      if (rigKey === 'loader') {
+        // --- WHEEL LOADER ---
+        // Rear Engine Hood & Counterweight
         targetCtx.fillStyle = spec.primaryColor;
         targetCtx.beginPath();
-        targetCtx.roundRect(-22, -6, 22, 14, 4);
+        targetCtx.roundRect(-21, -7, 22, 16, 4);
         targetCtx.fill();
+        targetCtx.strokeStyle = '#0f172a';
+        targetCtx.lineWidth = 1.6;
+        targetCtx.stroke();
 
-        // Dark Rear Counterweight & Grille Stripe
-        targetCtx.fillStyle = '#1e293b';
-        targetCtx.fillRect(-22, -3, 5, 9);
-        targetCtx.fillRect(-15, -6, 12, 2.5);
+        // Dark Grille Stripes
+        targetCtx.fillStyle = '#0f172a';
+        targetCtx.fillRect(-19, -4, 3, 10);
+        targetCtx.fillRect(-14, -4, 3, 10);
 
-        // ROPS/FOPS Volvo Operator Cab
+        // ROPS Operator Cab
         targetCtx.fillStyle = spec.cabColor;
         targetCtx.beginPath();
-        targetCtx.roundRect(-7, -16, 14, 14, 3);
+        targetCtx.roundRect(-7, -17, 15, 12, 3);
         targetCtx.fill();
-
-        // Panoramic Tinted Cab Window
         targetCtx.fillStyle = '#38bdf8';
         targetCtx.beginPath();
-        targetCtx.roundRect(-4, -14, 9, 8, 2);
+        targetCtx.roundRect(-4, -15, 10, 8, 2);
         targetCtx.fill();
 
-        // Articulated Lift Arms & High-Capacity Bucket
-        targetCtx.save();
-        targetCtx.translate(5, -2);
-        targetCtx.rotate(-0.18 + Math.sin(armAngle) * 0.16);
-        targetCtx.fillStyle = spec.secondaryColor;
-        targetCtx.fillRect(0, -2.5, 16, 4.5);
-
-        // Hydraulic Tilt Cylinder
-        targetCtx.strokeStyle = '#cbd5e1';
-        targetCtx.lineWidth = 2;
+        // Roof Beacon
+        targetCtx.fillStyle = '#f97316';
         targetCtx.beginPath();
-        targetCtx.moveTo(1, -5);
-        targetCtx.lineTo(14, -2);
+        targetCtx.arc(0, -19, 2.5, 0, Math.PI * 2);
+        targetCtx.fill();
+
+        // Hydraulic Lift Arms & Front Bucket
+        const armLift = -thrustAnim * 0.35;
+        targetCtx.save();
+        targetCtx.translate(6, -3);
+        targetCtx.rotate(armLift);
+        targetCtx.strokeStyle = spec.secondaryColor;
+        targetCtx.lineWidth = 4;
+        targetCtx.lineCap = 'round';
+        targetCtx.beginPath();
+        targetCtx.moveTo(0, 0);
+        targetCtx.lineTo(13, 4);
         targetCtx.stroke();
 
         // Heavy Steel Loader Bucket
         targetCtx.fillStyle = '#334155';
         targetCtx.beginPath();
-        targetCtx.moveTo(15, -6);
-        targetCtx.lineTo(24, -4);
-        targetCtx.lineTo(26, 7);
-        targetCtx.lineTo(14, 7);
+        targetCtx.moveTo(11, -4);
+        targetCtx.lineTo(22, -2);
+        targetCtx.lineTo(24, 10);
+        targetCtx.lineTo(10, 10);
         targetCtx.closePath();
         targetCtx.fill();
         targetCtx.strokeStyle = '#94a3b8';
@@ -1344,467 +1590,367 @@
         targetCtx.stroke();
         targetCtx.restore();
 
-        // Large Off-Road Tires
-        drawVolvoWheel(targetCtx, -13, 10, 7.2, drumSpin);
-        drawVolvoWheel(targetCtx, 7, 10, 7.2, drumSpin);
-      } else if (rigType === 'excavator') {
-        // VOLVO EC380E CRAWLER EXCAVATOR
-        // Heavy Steel Undercarriage & Tracks
+        // Two Oversized Off-Road Tires with Yellow Rims
+        [-11, 6].forEach((wx) => {
+          targetCtx.save();
+          targetCtx.translate(wx, 11);
+          targetCtx.rotate(wheelAngle);
+          targetCtx.fillStyle = '#0f172a';
+          targetCtx.beginPath();
+          targetCtx.arc(0, 0, 7.5, 0, Math.PI * 2);
+          targetCtx.fill();
+          targetCtx.fillStyle = '#eab308';
+          targetCtx.beginPath();
+          targetCtx.arc(0, 0, 3.8, 0, Math.PI * 2);
+          targetCtx.fill();
+          targetCtx.fillStyle = '#0f172a';
+          targetCtx.fillRect(-1, -3.5, 2, 7);
+          targetCtx.restore();
+        });
+      } else if (rigKey === 'excavator') {
+        // --- CRAWLER EXCAVATOR ---
+        // Heavy Track Undercarriage
         targetCtx.fillStyle = '#1e293b';
         targetCtx.beginPath();
-        targetCtx.roundRect(-20, 6, 36, 10, 5);
+        targetCtx.roundRect(-18, 7, 32, 9, 4.5);
         targetCtx.fill();
         targetCtx.strokeStyle = '#64748b';
         targetCtx.lineWidth = 1.4;
         targetCtx.stroke();
 
-        targetCtx.fillStyle = '#94a3b8';
-        [-13, -4, 5, 12].forEach((wx) => {
+        // Track Rollers
+        targetCtx.fillStyle = '#eab308';
+        [-12, -4, 4, 10].forEach((rx) => {
           targetCtx.beginPath();
-          targetCtx.arc(wx, 11, 2.3, 0, Math.PI * 2);
+          targetCtx.arc(rx, 11.5, 2.1, 0, Math.PI * 2);
           targetCtx.fill();
         });
 
-        // Upper House & Counterweight (Volvo Yellow + Charcoal Trim)
+        // Upper House & Counterweight
         targetCtx.fillStyle = spec.primaryColor;
         targetCtx.beginPath();
-        targetCtx.roundRect(-20, -6, 26, 12, 4);
+        targetCtx.roundRect(-19, -6, 24, 13, 4);
         targetCtx.fill();
+        targetCtx.strokeStyle = '#0f172a';
+        targetCtx.lineWidth = 1.6;
+        targetCtx.stroke();
 
-        targetCtx.fillStyle = '#1e293b';
-        targetCtx.fillRect(-20, -2, 7, 6);
-
-        // Volvo Care Cab
+        // Operator Cab
         targetCtx.fillStyle = spec.cabColor;
         targetCtx.beginPath();
-        targetCtx.roundRect(-5, -16, 14, 14, 3);
+        targetCtx.roundRect(-5, -16, 13, 11, 3);
         targetCtx.fill();
-
         targetCtx.fillStyle = '#38bdf8';
-        targetCtx.beginPath();
-        targetCtx.roundRect(-2, -14, 9, 9, 2);
-        targetCtx.fill();
+        targetCtx.fillRect(-2, -14, 8, 7);
 
-        // Heavy Boom, Dipper Arm & Tooth Bucket
+        // Articulated Excavator Boom, Stick & Bucket
+        const boomAngle = -0.35 - thrustAnim * 0.35;
         targetCtx.save();
-        targetCtx.translate(9, -4);
-        targetCtx.rotate(-0.42 + Math.sin(armAngle) * 0.2);
-        targetCtx.fillStyle = spec.secondaryColor;
-        targetCtx.fillRect(0, -3, 16, 5);
+        targetCtx.translate(4, -4);
+        targetCtx.rotate(boomAngle);
+        targetCtx.strokeStyle = spec.primaryColor;
+        targetCtx.lineWidth = 4.5;
+        targetCtx.lineCap = 'round';
+        targetCtx.beginPath();
+        targetCtx.moveTo(0, 0);
+        targetCtx.lineTo(13, -7);
+        targetCtx.lineTo(20, 5);
+        targetCtx.stroke();
 
-        targetCtx.translate(15, 0);
-        targetCtx.rotate(0.82 + Math.cos(armAngle) * 0.22);
-        targetCtx.fillStyle = spec.primaryColor;
-        targetCtx.fillRect(0, -2.5, 13, 4.5);
-
-        // Excavating Bucket
+        // Digging Bucket with Teeth
         targetCtx.fillStyle = '#334155';
         targetCtx.beginPath();
-        targetCtx.arc(13, 2, 6, -0.4, Math.PI * 0.85);
+        targetCtx.arc(20, 8, 5.5, 0.2, Math.PI * 1.15);
         targetCtx.fill();
         targetCtx.restore();
       } else {
-        // VOLVO A40G ARTICULATED HAULER (DUMPER)
-        // Rear Dump Body (Angled Chute)
+        // --- ARTICULATED HAULER (6x6 DUMP TRUCK) ---
+        // Rear Dump Bed (Tilts up slightly on thrust!)
+        targetCtx.save();
+        targetCtx.translate(-6, 4);
+        targetCtx.rotate(-thrustAnim * 0.28);
         targetCtx.fillStyle = spec.primaryColor;
         targetCtx.beginPath();
-        targetCtx.moveTo(-24, -10);
-        targetCtx.lineTo(1, -8);
-        targetCtx.lineTo(1, 6);
-        targetCtx.lineTo(-21, 6);
+        targetCtx.moveTo(-16, -13);
+        targetCtx.lineTo(8, -11);
+        targetCtx.lineTo(6, 2);
+        targetCtx.lineTo(-14, 2);
         targetCtx.closePath();
         targetCtx.fill();
-
-        // Dump Bed Ribs & Charcoal Top Rail
-        targetCtx.fillStyle = '#1e293b';
-        targetCtx.fillRect(-24, -11, 25, 2.5);
-        targetCtx.strokeStyle = spec.secondaryColor;
-        targetCtx.lineWidth = 1.6;
-        targetCtx.beginPath();
-        targetCtx.moveTo(-15, -8);
-        targetCtx.lineTo(-14, 5);
-        targetCtx.moveTo(-7, -8);
-        targetCtx.lineTo(-7, 5);
+        targetCtx.strokeStyle = '#0f172a';
+        targetCtx.lineWidth = 1.5;
         targetCtx.stroke();
+        targetCtx.restore();
 
-        // Articulated Hitch Joint
-        targetCtx.fillStyle = '#334155';
-        targetCtx.fillRect(1, -2, 4, 8);
+        // Articulated Hitch & Front Tractor Hood
+        targetCtx.fillStyle = '#1e293b';
+        targetCtx.fillRect(1, -2, 5, 8);
 
-        // Front Tractor Nose & Sloped Hood
         targetCtx.fillStyle = spec.primaryColor;
         targetCtx.beginPath();
-        targetCtx.roundRect(4, -5, 18, 11, 3);
+        targetCtx.roundRect(5, -6, 15, 12, 3);
         targetCtx.fill();
+        targetCtx.strokeStyle = '#0f172a';
+        targetCtx.lineWidth = 1.5;
+        targetCtx.stroke();
 
-        // Volvo Black Front Grille
-        targetCtx.fillStyle = '#0f172a';
-        targetCtx.fillRect(19, -4, 3, 9);
-
-        // Front Operator Cab
+        // Front Cab
         targetCtx.fillStyle = spec.cabColor;
         targetCtx.beginPath();
-        targetCtx.roundRect(5, -14, 11, 10, 2.5);
+        targetCtx.roundRect(5, -15, 11, 10, 2.5);
         targetCtx.fill();
-
         targetCtx.fillStyle = '#38bdf8';
-        targetCtx.fillRect(8, -12, 7, 6);
+        targetCtx.fillRect(8, -13, 6, 6);
 
-        // 6x6 Tandem Rear + Front All-Terrain Wheels
-        drawVolvoWheel(targetCtx, -16, 10, 5.8, drumSpin);
-        drawVolvoWheel(targetCtx, -5, 10, 5.8, drumSpin);
-        drawVolvoWheel(targetCtx, 13, 10, 6.2, drumSpin);
+        // 3 Axles (6x6 Hauler Wheels)
+        [-14, -4, 13].forEach((wx) => {
+          targetCtx.save();
+          targetCtx.translate(wx, 11);
+          targetCtx.rotate(wheelAngle);
+          targetCtx.fillStyle = '#0f172a';
+          targetCtx.beginPath();
+          targetCtx.arc(0, 0, 6.2, 0, Math.PI * 2);
+          targetCtx.fill();
+          targetCtx.fillStyle = '#eab308';
+          targetCtx.beginPath();
+          targetCtx.arc(0, 0, 3, 0, Math.PI * 2);
+          targetCtx.fill();
+          targetCtx.restore();
+        });
       }
-
-      // Roof Amber Strobe Beacon
-      targetCtx.fillStyle = '#fef08a';
-      targetCtx.beginPath();
-      targetCtx.arc(rigType === 'hauler' ? 9 : -1, rigType === 'hauler' ? -14.5 : -16.5, 2.8, Math.PI, 0);
-      targetCtx.fill();
 
       targetCtx.restore();
     }
 
     function renderGaragePreviews() {
-      ['loader', 'excavator', 'hauler'].forEach((rig) => {
-        const prevCanvas = document.getElementById(`preview-${rig}`);
-        if (!prevCanvas) return;
-        const pCtx = prevCanvas.getContext('2d');
-        pCtx.save();
-        pCtx.setTransform(1, 0, 0, 1, 0, 0);
-        pCtx.clearRect(0, 0, prevCanvas.width, prevCanvas.height);
-        pCtx.scale(2, 2);
-        drawConstructionRig(pCtx, rig, 27, 25, 17, -0.05, 0.35, 0.85, 0);
-        pCtx.restore();
-      });
-    }
-
-    // Ensure previews and home screen icon render immediately once DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => {
-        renderGaragePreviews();
-        generateHomeScreenAppIcon();
-      });
-    } else {
-      renderGaragePreviews();
-      generateHomeScreenAppIcon();
-    }
-
-    // =========================================================================
-    // 6. OBSTACLE & COLLECTIBLE SPAWNING (Steel I-Beams, Wrecking Balls, Hardhats)
-    // =========================================================================
-    function getDifficultyParams() {
-      // Smooth, capped progression so high-score runs remain rhythmic, readable, and 100% passable
-      const level = Math.min(30, state.obstaclesPassed);
-      const speed = Math.min(285, 200 + level * 2.8);
-
-      const baseGap = Math.max(158, 196 - level * 1.15);
-      const playH = getPlayableHeight();
-      const screenFactor = Math.max(0.9, Math.min(1.18, playH / 640));
-      const minSafeGap = state.player.radius * 2 + 110;
-      const gapHeight = Math.max(minSafeGap, Math.round(baseGap * screenFactor));
-
-      // Time-coupled horizontal spacing: as speed increases, spacing scales proportionally
-      // so the player always has at least ~1.48 seconds of reaction/climb time between beams
-      const minReactionSeconds = viewW < 640 ? 1.48 : 1.56;
-      const speedBasedSpacing = Math.round(speed * minReactionSeconds);
-      const screenBasedSpacing = Math.max(320, Math.min(440, Math.round(viewW * 0.68)));
-      const spacingPx = Math.max(speedBasedSpacing, screenBasedSpacing);
-
-      return {
-        speed,
-        gapHeight,
-        spacingPx
-      };
-    }
-
-    function spawnBeamPair() {
-      const playH = getPlayableHeight();
-      const { speed, gapHeight, spacingPx } = getDifficultyParams();
-      const beamWidth = 66;
-      const minMargin = Math.max(54, Math.round(playH * 0.095));
-      const minCenterY = minMargin + gapHeight * 0.5;
-      const maxCenterY = Math.max(minCenterY + 10, playH - minMargin - gapHeight * 0.5);
-
-      // Constrain vertical delta based on travel time between beams so steep climbs are always reachable
-      const travelTime = spacingPx / speed;
-      const prevCenterY = state.lastGapCenterY !== null ? state.lastGapCenterY : playH * 0.48;
-      const maxReachableDelta = Math.min(maxCenterY - minCenterY, Math.max(125, Math.min(playH * 0.32, travelTime * 125)));
-      const rawCenterY = prevCenterY + (Math.random() * 2 - 1) * maxReachableDelta;
-      const clampedCenterY = Math.max(minCenterY, Math.min(maxCenterY, rawCenterY));
-      state.lastGapCenterY = clampedCenterY;
-
-      const topHeight = clampedCenterY - gapHeight * 0.5;
-      const bottomY = clampedCenterY + gapHeight * 0.5;
-
-      // Oscillate beams gently without narrowing the effective safe corridor
-      const allowMoving = true;
-      const hasWreckingBall = state.obstaclesPassed >= 6 && gapHeight >= 170 && Math.random() < 0.22;
-
-      // Clamp moving amplitude so top & bottom beams always stay inside safe playable bounds
-      const maxSafeAmp = Math.max(12, Math.min(32, clampedCenterY - minCenterY - 6, maxCenterY - clampedCenterY - 6));
-
-      const obs = {
-        x: viewW + 90,
-        width: beamWidth,
-        baseTopHeight: topHeight,
-        topHeight,
-        gapHeight,
-        bottomY,
-        passed: false,
-        moving: allowMoving,
-        movePhase: Math.random() * Math.PI * 2,
-        moveAmp: maxSafeAmp,
-        moveSpeed: 1.45 + Math.random() * 0.55,
-        hasWreckingBall,
-        ballPhase: Math.random() * Math.PI * 2,
-        ballRadius: 10
-      };
-
-      state.obstacles.push(obs);
-      state.spawnDistance = spacingPx;
-
-      // Always spawn a Golden Hardhat bonus safely inside every passable gap (synced to beam movement)
-      const ballClearance = hasWreckingBall ? 36 : 0;
-      const safeZoneTop = topHeight + ballClearance + 22;
-      const safeZoneBot = bottomY - 22;
-      const hardhatY = safeZoneBot > safeZoneTop
-        ? safeZoneTop + (0.25 + Math.random() * 0.5) * (safeZoneBot - safeZoneTop)
-        : (topHeight + ballClearance + bottomY) * 0.5;
-
-      state.collectibles.push({
-        x: obs.x + beamWidth * 0.5,
-        baseY: hardhatY,
-        y: hardhatY,
-        parentObs: obs,
-        radius: 15,
-        bobPhase: Math.random() * Math.PI * 2,
-        collected: false
+      ['loader', 'excavator', 'hauler'].forEach((rigKey) => {
+        const pCanvas = document.getElementById(`preview-${rigKey}`);
+        if (!pCanvas) return;
+        const pCtx = pCanvas.getContext('2d');
+        pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+        drawConstructionRig(pCtx, rigKey, pCanvas.width * 0.48, pCanvas.height * 0.56, 17, -0.06, 0.25, 0.4, 1.55);
       });
     }
 
     // =========================================================================
-    // 7. PARTICLES & FLOATING SCORE POPUPS
+    // 6. BACKGROUND, STEEL BEAMS, WRECKING BALLS & COLLECTIBLE RENDERING
     // =========================================================================
-    function spawnExhaustSparks(x, y, count = 8, color = '#fbbf24') {
-      for (let i = 0; i < count; i++) {
-        const angle = Math.PI * 0.5 + (Math.random() - 0.5) * 1.3;
-        const spd = 70 + Math.random() * 140;
-        state.particles.push({
-          x,
-          y,
-          vx: Math.cos(angle) * spd - 45,
-          vy: Math.sin(angle) * spd,
-          life: 0.35 + Math.random() * 0.25,
-          maxLife: 0.6,
-          size: 3 + Math.random() * 3.5,
-          color
-        });
-      }
-    }
-
-    function spawnCrashDebris(x, y) {
-      const palette = ['#fbbf24', '#ef4444', '#94a3b8', '#ffffff', '#f97316'];
-      for (let i = 0; i < 28; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const spd = 90 + Math.random() * 290;
-        state.particles.push({
-          x,
-          y,
-          vx: Math.cos(angle) * spd,
-          vy: Math.sin(angle) * spd - 60,
-          life: 0.55 + Math.random() * 0.45,
-          maxLife: 1.0,
-          size: 3.5 + Math.random() * 5,
-          color: palette[i % palette.length]
-        });
-      }
-    }
-
-    function spawnFloatingText(x, y, text, color = '#fbbf24') {
-      state.floatingTexts.push({
-        x,
-        y,
-        vy: -55,
-        text,
-        color,
-        life: 0.85,
-        maxLife: 0.85
-      });
-    }
-
-    // =========================================================================
-    // 8. BACKGROUND, BEAMS, COLLECTIBLES & FOREGROUND RENDERING
-    // =========================================================================
-    function drawScene(dt) {
-      const theme = SHIFT_THEMES[state.selectedShift] || SHIFT_THEMES.quarry;
-      const playH = getPlayableHeight();
-      const groundH = getGroundHeight();
+    function drawScene() {
+      const biome = state.currentBiome || PROCEDURAL_BIOMES[0];
+      const light = SHIFT_LIGHTING[state.selectedShift] || SHIFT_LIGHTING.day;
+      const playH = viewH - groundHeight;
 
       ctx.save();
       if (state.shakeTime > 0) {
-        const dx = (Math.random() * 2 - 1) * state.shakeIntensity;
-        const dy = (Math.random() * 2 - 1) * state.shakeIntensity;
-        ctx.translate(dx, dy);
+        const mag = state.shakeIntensity * (state.shakeTime / 0.28);
+        ctx.translate((Math.random() - 0.5) * mag, (Math.random() - 0.5) * mag);
       }
 
       // Sky Gradient
       const skyGrad = ctx.createLinearGradient(0, 0, 0, playH);
-      skyGrad.addColorStop(0, theme.skyTop);
-      skyGrad.addColorStop(1, theme.skyBottom);
+      skyGrad.addColorStop(0, light.isNight ? light.skyTop : biome.daySkyTop);
+      skyGrad.addColorStop(1, light.isNight ? light.skyBottom : biome.daySkyBottom);
       ctx.fillStyle = skyGrad;
       ctx.fillRect(0, 0, viewW, playH);
 
-      // Sun / Moon Disc
+      // Night Stars
+      if (light.isNight) {
+        stars.forEach((st) => {
+          const sx = (st.x - state.skylineScroll * 0.08) % (viewW + 60);
+          const drawX = sx < 0 ? sx + viewW + 60 : sx;
+          const alpha = 0.45 + Math.sin(performance.now() * 0.003 + st.twinkle) * 0.45;
+          ctx.fillStyle = `rgba(248, 250, 252, ${alpha.toFixed(2)})`;
+          ctx.beginPath();
+          ctx.arc(drawX, st.y % (playH * 0.7), st.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      // Sun or Crescent Moon
       const sunX = viewW * 0.78;
-      const sunY = playH * theme.sunY;
-      ctx.fillStyle = theme.sunColor;
+      const sunY = playH * light.sunY;
+      ctx.save();
+      ctx.fillStyle = light.sunColor;
+      ctx.shadowColor = light.sunColor;
+      ctx.shadowBlur = light.isNight ? 24 : 36;
       ctx.beginPath();
-      ctx.arc(sunX, sunY, 34, 0, Math.PI * 2);
+      ctx.arc(sunX, sunY, light.isNight ? 22 : 32, 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
 
-      // Soft Drifting Clouds
-      ctx.fillStyle = state.selectedShift === 'night' ? 'rgba(148, 163, 184, 0.14)' : 'rgba(255, 255, 255, 0.65)';
-      state.clouds.forEach((c) => {
-        ctx.save();
-        ctx.translate(c.x, c.y);
-        ctx.scale(c.scale, c.scale);
+      // Drifting Clouds
+      clouds.forEach((cl) => {
+        const cx = ((cl.x - state.cloudScroll * (cl.speed / 20)) % (viewW + 220)) - 110;
+        const drawX = cx < -110 ? cx + viewW + 220 : cx;
+        ctx.fillStyle = light.isNight ? 'rgba(148, 163, 184, 0.14)' : 'rgba(255, 255, 255, 0.65)';
         ctx.beginPath();
-        ctx.arc(0, 0, 22, 0, Math.PI * 2);
-        ctx.arc(20, -4, 26, 0, Math.PI * 2);
-        ctx.arc(42, 2, 20, 0, Math.PI * 2);
+        ctx.arc(drawX, cl.y, 24 * cl.scale, 0, Math.PI * 2);
+        ctx.arc(drawX + 20 * cl.scale, cl.y - 6 * cl.scale, 28 * cl.scale, 0, Math.PI * 2);
+        ctx.arc(drawX + 44 * cl.scale, cl.y, 22 * cl.scale, 0, Math.PI * 2);
         ctx.fill();
-        ctx.restore();
       });
 
-      // Far Nordic Quarry Terraces / Mountain Ridges + Tower Cranes
-      state.skylineFar.forEach((b) => {
-        const bx = b.x;
-        const by = playH - b.h;
-        ctx.fillStyle = theme.farRidge;
-        ctx.beginPath();
-        ctx.moveTo(bx - 16, playH);
-        ctx.lineTo(bx + b.w * 0.18, by + 18);
-        ctx.lineTo(bx + b.w * b.peakOffset, by);
-        ctx.lineTo(bx + b.w * 0.85, by + 22);
-        ctx.lineTo(bx + b.w + 16, playH);
-        ctx.closePath();
-        ctx.fill();
+      // Far Ridge / Distant Horizon Layer
+      ctx.fillStyle = light.isNight ? biome.nightFar : biome.dayFar;
+      ctx.globalAlpha = 0.55;
+      ctx.beginPath();
+      ctx.moveTo(0, playH);
+      for (let x = 0; x <= viewW + 80; x += 80) {
+        const worldX = x + state.skylineScroll * 0.18;
+        const peak = biome.id === 'alpine'
+          ? Math.abs(Math.sin(worldX * 0.0045)) * 135 + 35
+          : biome.id === 'canyon'
+            ? (Math.floor(worldX / 140) % 2 === 0 ? 95 : 55)
+            : Math.sin(worldX * 0.004) * 45 + 65;
+        ctx.lineTo(x, playH - peak);
+      }
+      ctx.lineTo(viewW + 80, playH);
+      ctx.closePath();
+      ctx.fill();
+      ctx.globalAlpha = 1;
 
-        // Quarry Bench Cut Lines
-        if (!theme.isForest) {
-          ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.moveTo(bx + 10, by + b.h * 0.45);
-          ctx.lineTo(bx + b.w - 10, by + b.h * 0.45);
-          ctx.stroke();
-        }
+      // Midground Biome Silhouettes (Forest Trees, Alpine Peaks, City Skyline, Harbor, or Canyon)
+      const midColor = light.isNight ? biome.nightMid : biome.dayMid;
+      if (biome.id === 'city' || biome.id === 'harbor') {
+        const span = 2200;
+        skylineBuildings.forEach((b) => {
+          let bx = (b.x - state.skylineScroll * 0.42) % span;
+          if (bx < -120) bx += span;
+          if (bx > viewW + 80) return;
 
-        if (b.hasCrane) {
-          const mastX = bx + b.w * b.peakOffset;
-          const mastTop = by - 54;
-          ctx.strokeStyle = theme.craneColor;
-          ctx.lineWidth = 2.5;
-          ctx.beginPath();
-          ctx.moveTo(mastX, by + 6);
-          ctx.lineTo(mastX, mastTop);
-          ctx.moveTo(mastX - 18, mastTop + 8);
-          ctx.lineTo(mastX + 46, mastTop + 8);
-          ctx.stroke();
+          ctx.fillStyle = midColor;
+          ctx.fillRect(bx, playH - b.h, b.w, b.h);
 
-          // Trolley Cable & Hook
-          const hookX = mastX + 32 + Math.sin(b.craneAngle) * 8;
-          ctx.strokeStyle = 'rgba(255,255,255,0.45)';
-          ctx.lineWidth = 1.2;
-          ctx.beginPath();
-          ctx.moveTo(hookX, mastTop + 8);
-          ctx.lineTo(hookX, mastTop + 28);
-          ctx.stroke();
-        }
-      });
-
-      // Midground Quarry Rock Faces, Aggregate Hoppers & Nordic Pine Trees
-      state.skylineMid.forEach((b) => {
-        const bx = b.x;
-        const by = playH - b.h;
-        ctx.fillStyle = theme.midRidge;
-        ctx.beginPath();
-        ctx.moveTo(bx - 10, playH);
-        ctx.lineTo(bx + 12, by);
-        ctx.lineTo(bx + b.w - 12, by + 8);
-        ctx.lineTo(bx + b.w + 10, playH);
-        ctx.closePath();
-        ctx.fill();
-
-        // Aggregate Crusher Silo / Hopper
-        if (b.hasSilo) {
-          const sx = bx + b.w * 0.5 - 12;
-          const sy = by - 22;
-          ctx.fillStyle = '#334155';
-          ctx.fillRect(sx, sy, 24, 24);
-          ctx.fillStyle = '#eab308';
-          ctx.fillRect(sx - 2, sy + 6, 28, 4);
-          if (theme.windowLit) {
-            ctx.fillStyle = 'rgba(253, 224, 71, 0.8)';
-            ctx.fillRect(sx + 6, sy + 13, 12, 6);
+          // Lit Windows
+          ctx.fillStyle = light.isNight ? 'rgba(251, 191, 36, 0.55)' : 'rgba(255, 255, 255, 0.22)';
+          for (let wy = playH - b.h + 12; wy < playH - 16; wy += 16) {
+            for (let wx = bx + 8; wx < bx + b.w - 10; wx += 12) {
+              if ((wx + wy + b.winSeed) % 3 !== 0) {
+                ctx.fillRect(wx, wy, 5, 7);
+              }
+            }
           }
-        }
 
-        // Nordic Pine Trees along Ridge (prominent in Forest Road & Quarry edges)
-        if (theme.isForest || b.trees.length > 0) {
-          const count = theme.isForest ? b.trees.length : 1;
-          for (let t = 0; t < count; t++) {
-            const tree = b.trees[t];
-            const tx = bx + tree.offsetX;
-            const ty = by + 4;
-            const th = tree.height;
-            ctx.fillStyle = theme.isForest ? '#166534' : '#1e3a2f';
+          // Tower Crane on select rooftops
+          if (b.hasCrane) {
+            const mastX = bx + b.w * 0.5;
+            const mastTop = playH - b.h - 46;
+            ctx.strokeStyle = light.craneColor;
+            ctx.lineWidth = 2.2;
             ctx.beginPath();
-            ctx.moveTo(tx, ty - th);
-            ctx.lineTo(tx - th * 0.36, ty);
-            ctx.lineTo(tx + th * 0.36, ty);
+            ctx.moveTo(mastX, playH - b.h);
+            ctx.lineTo(mastX, mastTop);
+            ctx.moveTo(mastX - 14, mastTop + 6);
+            ctx.lineTo(mastX + b.craneLen, mastTop + 6);
+            ctx.stroke();
+          }
+        });
+      } else {
+        // Organic Hills, Pine Trees, Snow Caps, or Red Rock Mesas
+        ctx.fillStyle = midColor;
+        ctx.beginPath();
+        ctx.moveTo(0, playH);
+        for (let x = 0; x <= viewW + 60; x += 60) {
+          const wx = x + state.skylineScroll * 0.42;
+          const h = biome.id === 'alpine'
+            ? Math.abs(Math.cos(wx * 0.006)) * 105 + 28
+            : Math.sin(wx * 0.007) * 32 + 48;
+          ctx.lineTo(x, playH - h);
+        }
+        ctx.lineTo(viewW + 60, playH);
+        ctx.closePath();
+        ctx.fill();
+
+        if (biome.id === 'forest') {
+          for (let tx = -((state.skylineScroll * 0.55) % 44); tx < viewW + 44; tx += 44) {
+            const treeH = 34 + (Math.abs(Math.sin(tx * 0.13)) * 24);
+            ctx.fillStyle = light.isNight ? '#022c22' : '#14532d';
+            ctx.beginPath();
+            ctx.moveTo(tx, playH - treeH);
+            ctx.lineTo(tx + 14, playH);
+            ctx.lineTo(tx - 14, playH);
             ctx.closePath();
             ctx.fill();
           }
         }
-      });
+      }
 
-      // Steel I-Beam Obstacles & Wrecking Balls
+      // Steel I-Beam Obstacles & Swinging Wrecking Balls
       state.obstacles.forEach((obs) => {
-        drawSteelIBeam(obs.x, 0, obs.width, obs.topHeight, true, theme);
-        drawSteelIBeam(obs.x, obs.bottomY, obs.width, playH - obs.bottomY, false, theme);
+        const capH = 22;
+        const flangeOver = 7;
 
-        if (obs.hasWreckingBall) {
-          const swingX = obs.x + obs.width * 0.5 + Math.sin(obs.ballPhase) * 14;
-          const chainTopY = obs.topHeight;
-          const ballY = chainTopY + 24;
+        // Top Beam Shaft
+        if (obs.topHeight > 0) {
+          ctx.fillStyle = light.beamMain;
+          ctx.fillRect(obs.x, 0, obs.width, obs.topHeight);
+          ctx.fillStyle = light.beamHighlight;
+          ctx.fillRect(obs.x + 6, 0, 6, obs.topHeight);
+          ctx.fillStyle = light.beamShadow;
+          ctx.fillRect(obs.x + obs.width - 8, 0, 8, obs.topHeight);
 
-          ctx.strokeStyle = '#cbd5e1';
-          ctx.lineWidth = 2.5;
+          // Top Beam Flange Cap with Yellow Hazard Trim
+          const capY = Math.max(0, obs.topHeight - capH);
+          ctx.fillStyle = '#1e293b';
           ctx.beginPath();
-          ctx.moveTo(obs.x + obs.width * 0.5, chainTopY);
-          ctx.lineTo(swingX, ballY);
+          ctx.roundRect(obs.x - flangeOver, capY, obs.width + flangeOver * 2, capH, 4);
+          ctx.fill();
+          ctx.fillStyle = '#fbbf24';
+          ctx.fillRect(obs.x - flangeOver + 3, capY + capH - 6, obs.width + flangeOver * 2 - 6, 4);
+        }
+
+        // Bottom Beam Shaft
+        if (obs.bottomY < playH) {
+          const botH = playH - obs.bottomY;
+          ctx.fillStyle = light.beamMain;
+          ctx.fillRect(obs.x, obs.bottomY, obs.width, botH);
+          ctx.fillStyle = light.beamHighlight;
+          ctx.fillRect(obs.x + 6, obs.bottomY, 6, botH);
+          ctx.fillStyle = light.beamShadow;
+          ctx.fillRect(obs.x + obs.width - 8, obs.bottomY, 8, botH);
+
+          // Bottom Beam Flange Cap with Yellow Hazard Trim
+          ctx.fillStyle = '#1e293b';
+          ctx.beginPath();
+          ctx.roundRect(obs.x - flangeOver, obs.bottomY, obs.width + flangeOver * 2, capH, 4);
+          ctx.fill();
+          ctx.fillStyle = '#fbbf24';
+          ctx.fillRect(obs.x - flangeOver + 3, obs.bottomY + 2, obs.width + flangeOver * 2 - 6, 4);
+        }
+
+        // Swinging Demolition Wrecking Ball (if present on this beam pair)
+        if (obs.hasWreckingBall) {
+          const pivotX = obs.x + obs.width * 0.5;
+          const pivotY = obs.topHeight;
+          const swingX = pivotX + Math.sin(obs.swingPhase) * 14;
+          const swingY = pivotY + obs.ballDrop;
+
+          ctx.strokeStyle = '#94a3b8';
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.moveTo(pivotX, pivotY);
+          ctx.lineTo(swingX, swingY);
           ctx.stroke();
 
           ctx.fillStyle = '#1e293b';
           ctx.beginPath();
-          ctx.arc(swingX, ballY, obs.ballRadius, 0, Math.PI * 2);
+          ctx.arc(swingX, swingY, obs.ballRadius, 0, Math.PI * 2);
           ctx.fill();
-          ctx.strokeStyle = '#fbbf24';
-          ctx.lineWidth = 2;
-          ctx.stroke();
+          ctx.fillStyle = '#64748b';
+          ctx.beginPath();
+          ctx.arc(swingX - 3, swingY - 3, obs.ballRadius * 0.35, 0, Math.PI * 2);
+          ctx.fill();
         }
       });
 
-      // Golden Hardhat Collectibles
+      // Golden Safety Hardhat Collectibles
       state.collectibles.forEach((item) => {
         if (item.collected) return;
-        const bobY = item.y + Math.sin(item.bobPhase) * 5;
+        const bobY = item.y + Math.sin(performance.now() * 0.006 + item.bobPhase) * 4;
         ctx.save();
         ctx.translate(item.x, bobY);
 
-        // Glow Aura
+        // Soft Golden Halo
         ctx.fillStyle = 'rgba(251, 191, 36, 0.24)';
         ctx.beginPath();
         ctx.arc(0, 0, item.radius + 7, 0, Math.PI * 2);
@@ -1813,19 +1959,94 @@
         // Hardhat Dome
         ctx.fillStyle = '#fbbf24';
         ctx.beginPath();
-        ctx.arc(0, 2, 12, Math.PI, 0);
+        ctx.arc(0, 2, item.radius * 0.85, Math.PI, 0);
         ctx.fill();
 
-        // Center Ridge
+        // Center Ridge & Brim
         ctx.fillStyle = '#fef08a';
-        ctx.fillRect(-2.5, -11, 5, 11);
-
-        // Brim
+        ctx.fillRect(-2, -item.radius * 0.82, 4, item.radius * 0.82);
         ctx.fillStyle = '#d97706';
         ctx.beginPath();
-        ctx.roundRect(-15, 1, 30, 4.5, 2.5);
+        ctx.roundRect(-item.radius * 1.05, 1, item.radius * 2.1, 4.5, 2.2);
         ctx.fill();
+        ctx.restore();
+      });
 
+      // Falling Sky Hazards (Boulders & Suspended Crane Slings) with Top Warning Signs
+      state.fallingHazards.forEach((hz) => {
+        if (hz.warnTimer > 0) {
+          const pulse = 0.55 + Math.sin(performance.now() * 0.025) * 0.45;
+          ctx.save();
+          ctx.translate(hz.x, 34);
+          ctx.globalAlpha = pulse;
+
+          ctx.fillStyle = '#fbbf24';
+          ctx.beginPath();
+          ctx.moveTo(0, -14);
+          ctx.lineTo(15, 12);
+          ctx.lineTo(-15, 12);
+          ctx.closePath();
+          ctx.fill();
+          ctx.strokeStyle = '#0f172a';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          ctx.fillStyle = '#0f172a';
+          ctx.font = '800 14px "Chakra Petch", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('!', 0, 8);
+
+          ctx.strokeStyle = 'rgba(251, 191, 36, 0.32)';
+          ctx.setLineDash([5, 6]);
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(0, 16);
+          ctx.lineTo(0, playH * 0.45);
+          ctx.stroke();
+          ctx.restore();
+          return;
+        }
+
+        ctx.save();
+        ctx.translate(hz.x, hz.y);
+        if (hz.type === 'boulder') {
+          ctx.rotate(hz.rotation);
+          ctx.fillStyle = '#57534e';
+          ctx.beginPath();
+          const pts = 8;
+          for (let p = 0; p < pts; p++) {
+            const ang = (p / pts) * Math.PI * 2;
+            const rad = hz.radius * (p % 2 === 0 ? 1.04 : 0.86);
+            const px = Math.cos(ang) * rad;
+            const py = Math.sin(ang) * rad;
+            if (p === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.strokeStyle = '#292524';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          ctx.fillStyle = '#78716c';
+          ctx.beginPath();
+          ctx.arc(-hz.radius * 0.25, -hz.radius * 0.25, hz.radius * 0.35, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.strokeStyle = '#94a3b8';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(0, -hz.y);
+          ctx.lineTo(0, -6);
+          ctx.stroke();
+
+          ctx.fillStyle = '#ef4444';
+          ctx.beginPath();
+          ctx.roundRect(-22, -7, 44, 14, 4);
+          ctx.fill();
+          ctx.fillStyle = '#fbbf24';
+          ctx.fillRect(-18, -3, 36, 4);
+        }
         ctx.restore();
       });
 
@@ -1837,58 +2058,50 @@
         state.player.y,
         state.player.radius,
         state.player.rotation,
-        state.player.armAngle,
-        state.player.drumSpin,
-        state.player.flameTimer
+        state.player.thrustAnim,
+        state.player.wheelAngle,
+        1
       );
 
-      // Exhaust & Debris Particles
-      state.particles.forEach((p) => {
-        ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
-        ctx.fillStyle = p.color;
+      // Exhaust & Impact Particles
+      state.particles.forEach((pt) => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, pt.life / pt.maxLife);
+        ctx.fillStyle = pt.color;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
         ctx.fill();
+        ctx.restore();
       });
-      ctx.globalAlpha = 1;
 
-      // Floating Score Texts (+1, +2 BONUS!)
+      // Floating Score Callouts
       state.floatingTexts.forEach((ft) => {
+        ctx.save();
         ctx.globalAlpha = Math.max(0, ft.life / ft.maxLife);
-        ctx.font = '800 18px "Chakra Petch", sans-serif';
+        ctx.font = '700 17px "Chakra Petch", sans-serif';
         ctx.textAlign = 'center';
         ctx.fillStyle = '#0f172a';
         ctx.fillText(ft.text, ft.x + 1.5, ft.y + 1.5);
         ctx.fillStyle = ft.color;
         ctx.fillText(ft.text, ft.x, ft.y);
+        ctx.restore();
       });
-      ctx.globalAlpha = 1;
 
-      // Construction Site Ground & Scrolling Hazard Curb
-      ctx.fillStyle = theme.groundDirt;
-      ctx.fillRect(0, playH, viewW, groundH);
+      // Foreground Ground & Hazard Roadbed
+      ctx.fillStyle = biome.groundDirt;
+      ctx.fillRect(0, playH, viewW, groundHeight);
 
-      ctx.fillStyle = theme.groundTop;
-      ctx.fillRect(0, playH, viewW, 18);
+      ctx.fillStyle = biome.groundTop;
+      ctx.fillRect(0, playH, viewW, 14);
 
-      // Yellow/Black Scrolling Caution Curb
+      // Scrolling Yellow/Black Curb Stripes
       const stripeW = 28;
       const offset = -(state.groundScroll % (stripeW * 2));
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(0, playH + 4, viewW, 12);
-      ctx.clip();
-      for (let sx = offset - stripeW * 2; sx < viewW + stripeW * 2; sx += stripeW * 2) {
-        ctx.fillStyle = '#fbbf24';
-        ctx.beginPath();
-        ctx.moveTo(sx, playH + 4);
-        ctx.lineTo(sx + stripeW, playH + 4);
-        ctx.lineTo(sx + stripeW - 10, playH + 16);
-        ctx.lineTo(sx - 10, playH + 16);
-        ctx.closePath();
-        ctx.fill();
+      for (let gx = offset; gx < viewW + stripeW * 2; gx += stripeW) {
+        const idx = Math.floor((gx - offset) / stripeW);
+        ctx.fillStyle = idx % 2 === 0 ? '#fbbf24' : '#0f172a';
+        ctx.fillRect(gx, playH + 14, stripeW, 8);
       }
-      ctx.restore();
 
       // Impact Flash Overlay
       if (state.flashAlpha > 0) {
@@ -1899,162 +2112,80 @@
       ctx.restore();
     }
 
-    function drawSteelIBeam(x, y, width, height, isTop, theme) {
-      if (height <= 0) return;
-      const flangeH = 18;
-      const webInset = 11;
-
-      // Center Steel Web
-      ctx.fillStyle = theme.beamMain;
-      ctx.fillRect(x + webInset, y, width - webInset * 2, height);
-
-      // Left Specular Highlight & Right Shadow on Web
-      ctx.fillStyle = theme.beamHighlight;
-      ctx.fillRect(x + webInset + 2, y, 5, height);
-      ctx.fillStyle = theme.beamShadow;
-      ctx.fillRect(x + width - webInset - 6, y, 6, height);
-
-      // Structural Rivets along Web
-      ctx.fillStyle = 'rgba(255,255,255,0.28)';
-      for (let ry = y + 24; ry < y + height - 20; ry += 32) {
-        ctx.beginPath();
-        ctx.arc(x + width * 0.5, ry, 2.5, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Heavy End Cap Flange at Gap Edge
-      const capY = isTop ? Math.max(0, y + height - flangeH) : y;
-      ctx.fillStyle = theme.beamMain;
-      ctx.beginPath();
-      ctx.roundRect(x - 4, capY, width + 8, flangeH, 4);
-      ctx.fill();
-
-      ctx.strokeStyle = '#0f172a';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Hazard Caution Trim on Gap Flange
-      ctx.fillStyle = '#fbbf24';
-      ctx.fillRect(x - 1, isTop ? capY + flangeH - 5 : capY + 1, width + 2, 4);
-    }
-
     // =========================================================================
-    // 9. PHYSICS, COLLISIONS & STATE TRANSITIONS
+    // 7. OBSTACLE GENERATION, PHYSICS & COLLISION DETECTION
     // =========================================================================
-    function updateHUD() {
-      const scoreEl = document.getElementById('hud-score');
-      if (scoreEl) scoreEl.textContent = state.score;
-      const bestEl = document.getElementById('hud-best');
-      if (bestEl) bestEl.textContent = state.bestScore;
-      const bonusEl = document.getElementById('hud-bonus');
-      if (bonusEl) bonusEl.textContent = `${state.hardhatStreak}x`;
-      const menuBestEl = document.getElementById('menu-best-score');
-      if (menuBestEl) menuBestEl.textContent = state.bestScore;
+    function getCurrentSpeed() {
+      return Math.min(285, 195 + state.obstaclesPassed * 2.4);
     }
 
-    function popScoreAnimation() {
-      const scoreEl = document.getElementById('hud-score');
-      if (!scoreEl) return;
-      scoreEl.classList.add('pop');
-      setTimeout(() => scoreEl.classList.remove('pop'), 140);
-    }
+    function spawnBeamPair() {
+      const playH = viewH - groundHeight;
+      const beamWidth = 64;
+      const speed = getCurrentSpeed();
 
-    function prepareReadyShift() {
-      state.phase = 'READY';
-      state.score = 0;
-      state.bonusPoints = 0;
-      state.hardhatsCollected = 0;
-      state.hardhatStreak = 0;
-      state.obstacles = [];
-      state.collectibles = [];
-      state.particles = [];
-      state.floatingTexts = [];
-      state.spawnDistance = 120;
-      state.lastGapCenterY = null;
-      state.obstaclesPassed = 0;
-      state.shakeTime = 0;
-      state.flashAlpha = 0;
+      // Guarantee generous vertical opening scaled to viewport height
+      const gapHeight = Math.max(158, Math.min(212, Math.round(playH * 0.285 - Math.min(26, state.obstaclesPassed * 0.75))));
+      const margin = 58;
+      const minCenter = margin + gapHeight * 0.5;
+      const maxCenter = playH - margin - gapHeight * 0.5;
 
-      state.player.x = getPlayerAnchorX();
-      state.player.y = getPlayableHeight() * 0.45;
-      state.player.vy = 0;
-      state.player.rotation = 0;
-      state.player.flameTimer = 0;
-
-      document.getElementById('start-modal').classList.add('hidden');
-      document.getElementById('pause-modal').classList.add('hidden');
-      document.getElementById('gameover-modal').classList.add('hidden');
-      document.getElementById('hud').classList.remove('hidden');
-      document.getElementById('ready-hint').classList.remove('hidden');
-      updateHUD();
-    }
-
-    function triggerThrust() {
-      if (state.phase === 'READY') {
-        state.phase = 'PLAYING';
-        document.getElementById('ready-hint').classList.add('hidden');
-      }
-      if (state.phase !== 'PLAYING') return;
-
-      const spec = RIG_SPECS[state.selectedRig] || RIG_SPECS.excavator;
-      state.player.vy = spec.flapVel;
-      state.player.flameTimer = 0.16;
-      audio.playHydraulicThrust();
-      spawnExhaustSparks(state.player.x - 6, state.player.y + 12, 7, '#fbbf24');
-    }
-
-    function triggerGameOver(reason) {
-      if (state.phase === 'GAMEOVER') return;
-      state.phase = 'GAMEOVER';
-      state.deathReason = reason;
-      state.shakeTime = 0.32;
-      state.shakeIntensity = 9;
-      state.flashAlpha = 0.55;
-
-      audio.playClangCrash();
-      spawnCrashDebris(state.player.x, state.player.y);
-
-      const isNewRecord = state.score > state.bestScore;
-      if (isNewRecord) {
-        state.bestScore = state.score;
-        persistHighScore(state.bestScore);
-      }
-      updateHUD();
-
-      document.getElementById('ready-hint').classList.add('hidden');
-      document.getElementById('go-reason').textContent = reason;
-      document.getElementById('go-score').textContent = state.score;
-      document.getElementById('go-best').textContent = state.bestScore;
-      document.getElementById('go-hardhats').textContent = state.hardhatsCollected;
-
-      const newRecEl = document.getElementById('go-new-record');
-      if (isNewRecord && state.score > 0) {
-        newRecEl.classList.remove('hidden');
+      let gapCenterY;
+      if (state.lastGapCenterY === null) {
+        gapCenterY = playH * 0.46 + (Math.random() - 0.5) * 70;
       } else {
-        newRecEl.classList.add('hidden');
+        const maxDelta = Math.min(165, playH * 0.28);
+        gapCenterY = state.lastGapCenterY + (Math.random() * 2 - 1) * maxDelta;
       }
+      gapCenterY = Math.max(minCenter, Math.min(maxCenter, gapCenterY));
+      state.lastGapCenterY = gapCenterY;
 
-      // Rank Badge by Score
-      let medal = '🦺';
-      let rank = 'APPRENTICE OPERATOR';
-      if (state.score >= 35) {
-        medal = '🏆';
-        rank = 'MASTER SITE DIRECTOR';
-      } else if (state.score >= 20) {
-        medal = '🏗️';
-        rank = 'CHIEF CRANE ENGINEER';
-      } else if (state.score >= 10) {
-        medal = '⚙️';
-        rank = 'CERTIFIED RIG FOREMAN';
-      }
-      document.getElementById('go-medal-icon').textContent = medal;
-      document.getElementById('go-rank-title').textContent = rank;
+      // Vertical oscillation amplitude capped so gap stays strictly inside safe margins
+      const maxAmp = Math.min(34, Math.max(0, Math.min(gapCenterY - minCenter, maxCenter - gapCenterY) - 6));
+      const moveAmp = state.obstaclesPassed >= 1 ? Math.max(12, maxAmp * 0.78) : 0;
+      const moveSpeed = 1.45 + Math.random() * 0.75;
+      const movePhase = Math.random() * Math.PI * 2;
 
-      setTimeout(() => {
-        if (state.phase === 'GAMEOVER') {
-          document.getElementById('gameover-modal').classList.remove('hidden');
-        }
-      }, 360);
+      const hasWreckingBall = state.obstaclesPassed >= 3 && Math.random() < 0.32;
+      const ballDrop = hasWreckingBall ? Math.min(32, gapHeight * 0.2) : 0;
+      const ballRadius = 12;
+
+      const topHeight = Math.max(24, gapCenterY - gapHeight * 0.5);
+      const bottomY = Math.min(playH - 24, gapCenterY + gapHeight * 0.5);
+
+      const obs = {
+        x: viewW + 40,
+        width: beamWidth,
+        baseGapCenterY: gapCenterY,
+        gapHeight,
+        moveAmp,
+        moveSpeed,
+        movePhase,
+        topHeight,
+        bottomY,
+        hasWreckingBall,
+        ballDrop,
+        ballRadius,
+        swingPhase: Math.random() * Math.PI * 2,
+        passed: false
+      };
+      state.obstacles.push(obs);
+
+      // Always place a Golden Safety Hardhat inside the clear flight corridor of every beam gap
+      const safeOffsetY = hasWreckingBall ? Math.min(26, gapHeight * 0.16) : (Math.random() - 0.5) * 18;
+      state.collectibles.push({
+        obsRef: obs,
+        offsetY: safeOffsetY,
+        x: obs.x + beamWidth * 0.5,
+        y: gapCenterY + safeOffsetY,
+        radius: 14,
+        bobPhase: Math.random() * Math.PI * 2,
+        collected: false
+      });
+
+      // Pace next beam pair by travel time so high speeds never crowd pillars together
+      const minReactionSec = viewW < 600 ? 1.54 : 1.62;
+      state.spawnDistance = Math.round(speed * minReactionSec);
     }
 
     function circleRectOverlap(cx, cy, cr, rx, ry, rw, rh) {
@@ -2065,97 +2196,240 @@
       return dx * dx + dy * dy < cr * cr;
     }
 
-    function updateSimulation(dt) {
-      const playH = getPlayableHeight();
-      const { speed } = getDifficultyParams();
-      const scrollSpeed = state.phase === 'PLAYING' ? speed : (state.phase === 'READY' || state.phase === 'MENU' ? 85 : 0);
+    function spawnExhaustSparks(x, y, count = 7, color = '#fbbf24') {
+      for (let i = 0; i < count; i++) {
+        state.particles.push({
+          x,
+          y,
+          vx: -60 - Math.random() * 110,
+          vy: (Math.random() - 0.5) * 120,
+          size: 2.2 + Math.random() * 2.8,
+          color,
+          life: 0.28 + Math.random() * 0.22,
+          maxLife: 0.5
+        });
+      }
+    }
 
-      // Ambient Clouds & Parallax City
-      state.clouds.forEach((c) => {
-        c.x -= (c.speed + scrollSpeed * 0.08) * dt;
-        if (c.x < -90) c.x = viewW + 90;
+    function addFloatingText(x, y, text, color = '#fbbf24') {
+      state.floatingTexts.push({
+        x,
+        y,
+        text,
+        color,
+        life: 0.85,
+        maxLife: 0.85
       });
+    }
 
-      if (scrollSpeed > 0) {
-        state.groundScroll += scrollSpeed * dt;
+    function updateHUD() {
+      const activeName = state.playerNames[state.activePlayerIdx] || `Player ${state.activePlayerIdx + 1}`;
+      document.getElementById('hud-player-tag').textContent = state.playerCount > 1
+        ? `P${state.activePlayerIdx + 1}/${state.playerCount} SHIFT`
+        : 'OPERATOR';
+      document.getElementById('hud-player-name').textContent = activeName;
+      document.getElementById('hud-best').textContent = state.bestScore;
+      document.getElementById('hud-bonus').textContent = `${state.hardhatStreak}x`;
+      document.getElementById('hud-score').textContent = state.score;
+      document.getElementById('hud-biome-pill').textContent = state.currentBiome.label;
+    }
 
-        state.skylineFar.forEach((b) => {
-          b.x -= scrollSpeed * 0.16 * dt;
-          b.craneAngle += dt * 0.9;
-        });
-        if (state.skylineFar.length && state.skylineFar[0].x + state.skylineFar[0].w < -40) {
-          const first = state.skylineFar.shift();
-          const last = state.skylineFar[state.skylineFar.length - 1];
-          first.x = last.x + last.w + 12;
-          state.skylineFar.push(first);
-        }
+    function popScoreHUD() {
+      const el = document.getElementById('hud-score');
+      el.textContent = state.score;
+      el.classList.remove('pop');
+      void el.offsetWidth;
+      el.classList.add('pop');
+      setTimeout(() => el.classList.remove('pop'), 140);
+    }
 
-        state.skylineMid.forEach((b) => {
-          b.x -= scrollSpeed * 0.34 * dt;
-        });
-        if (state.skylineMid.length && state.skylineMid[0].x + state.skylineMid[0].w < -40) {
-          const first = state.skylineMid.shift();
-          const last = state.skylineMid[state.skylineMid.length - 1];
-          first.x = last.x + last.w + 18;
-          state.skylineMid.push(first);
-        }
+    function renderLeaderboardList(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      if (!state.leaderboard.length) {
+        container.innerHTML = `<div style="font-size:0.76rem; color:#94a3b8; padding:0.25rem 0;">No shifts recorded yet — grab golden hardhats to set the record!</div>`;
+        return;
+      }
+      container.innerHTML = state.leaderboard.slice(0, 5).map((entry, idx) => {
+        const medal = idx === 0 ? '🏆' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
+        return `
+          <div class="lb-row">
+            <span style="color:#e2e8f0; font-weight:600;"><strong style="color:#fbbf24; margin-right:6px;">${medal}</strong>${entry.name}</span>
+            <span class="font-display" style="font-weight:700; color:#fbbf24;">${entry.score}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function prepareReadyShift() {
+      const playH = viewH - groundHeight;
+      // Pick a fresh procedural landscape biome for the entire shift
+      const prevId = state.currentBiome ? state.currentBiome.id : '';
+      const pool = PROCEDURAL_BIOMES.filter((b) => b.id !== prevId);
+      state.currentBiome = pool[Math.floor(Math.random() * pool.length)] || PROCEDURAL_BIOMES[0];
+
+      state.phase = 'READY';
+      state.score = 0;
+      state.bonusPoints = 0;
+      state.hardhatsCollected = 0;
+      state.hardhatStreak = 0;
+      state.obstacles = [];
+      state.fallingHazards = [];
+      state.collectibles = [];
+      state.particles = [];
+      state.floatingTexts = [];
+      state.spawnDistance = 120;
+      state.lastGapCenterY = null;
+      state.obstaclesPassed = 0;
+      state.hazardTimer = 3.6 + Math.random() * 2.2;
+      state.shakeTime = 0;
+      state.flashAlpha = 0;
+
+      state.player.y = playH * 0.46;
+      state.player.vy = 0;
+      state.player.rotation = 0;
+      state.player.thrustAnim = 0;
+
+      document.getElementById('start-modal').classList.add('hidden');
+      document.getElementById('pause-modal').classList.add('hidden');
+      document.getElementById('gameover-modal').classList.add('hidden');
+      document.getElementById('hud').classList.remove('hidden');
+
+      const activeName = state.playerNames[state.activePlayerIdx] || `Player ${state.activePlayerIdx + 1}`;
+      document.getElementById('ready-hint-text').textContent = state.playerCount > 1
+        ? `${activeName.toUpperCase()} — TAP TO LAUNCH`
+        : 'TAP, CLICK OR PRESS SPACE';
+      document.getElementById('ready-hint').classList.remove('hidden');
+
+      updateHUD();
+    }
+
+    function triggerThrust() {
+      if (state.phase === 'READY') {
+        state.phase = 'PLAYING';
+        document.getElementById('ready-hint').classList.add('hidden');
+      }
+      if (state.phase !== 'PLAYING') return;
+
+      const spec = RIG_SPECS[state.selectedRig] || RIG_SPECS.loader;
+      state.player.vy = spec.flapVel;
+      state.player.thrustAnim = 1;
+      audio.playHydraulicThrust();
+      spawnExhaustSparks(state.player.x - 16, state.player.y + 4, 6, '#fbbf24');
+    }
+
+    function triggerGameOver(reason = 'BEAM IMPACT!') {
+      if (state.phase === 'GAMEOVER') return;
+      state.phase = 'GAMEOVER';
+      state.deathReason = reason;
+      state.shakeTime = 0.28;
+      state.shakeIntensity = 14;
+      state.flashAlpha = 0.55;
+      audio.playClangCrash();
+      spawnExhaustSparks(state.player.x, state.player.y, 18, '#f97316');
+
+      const prevOverallBest = state.bestScore;
+      const currentName = state.playerNames[state.activePlayerIdx] || `Player ${state.activePlayerIdx + 1}`;
+      const modeTag = state.playerCount > 1 ? `${state.playerCount}P Pass & Play` : 'Solo';
+      recordPlayerScore(currentName, state.score, state.selectedRig, modeTag);
+      const isNewBest = state.score > 0 && state.score >= state.bestScore && state.score > prevOverallBest;
+
+      document.getElementById('go-reason').textContent = reason;
+      document.getElementById('go-player-title').textContent = `${currentName.toUpperCase()} — SHIFT OVER`;
+      document.getElementById('go-score').textContent = state.score;
+      document.getElementById('go-best').textContent = state.bestScore;
+      document.getElementById('go-hardhats').textContent = state.hardhatsCollected;
+
+      const newRecEl = document.getElementById('go-new-record');
+      if (isNewBest) newRecEl.classList.remove('hidden');
+      else newRecEl.classList.add('hidden');
+
+      // Rank Badge
+      let rank = 'APPRENTICE OPERATOR';
+      let medal = '🦺';
+      if (state.score >= 30) { rank = 'LEGENDARY SITE MASTER'; medal = '👑'; }
+      else if (state.score >= 18) { rank = 'MASTER EARTHMOVER'; medal = '🏆'; }
+      else if (state.score >= 8) { rank = 'SENIOR FOREMAN'; medal = '⭐'; }
+      document.getElementById('go-rank-title').textContent = rank;
+      document.getElementById('go-medal-icon').textContent = medal;
+
+      renderLeaderboardList('go-leaderboard-list');
+
+      // Advance turn in local Pass & Play multiplayer
+      if (state.playerCount > 1) {
+        state.activePlayerIdx = (state.activePlayerIdx + 1) % state.playerCount;
+        const nextName = state.playerNames[state.activePlayerIdx] || `Player ${state.activePlayerIdx + 1}`;
+        document.getElementById('go-next-up-hint').textContent = `Next: ${nextName}`;
+        document.getElementById('btn-retry-label').textContent = `Next: ${nextName}`;
+      } else {
+        document.getElementById('go-next-up-hint').textContent = '';
+        document.getElementById('btn-retry-label').textContent = 'Retry Shift';
       }
 
-      // Screen Shake & Impact Flash Decay
-      if (state.shakeTime > 0) state.shakeTime = Math.max(0, state.shakeTime - dt);
-      if (state.flashAlpha > 0) state.flashAlpha = Math.max(0, state.flashAlpha - dt * 1.8);
+      document.getElementById('ready-hint').classList.add('hidden');
+      document.getElementById('gameover-modal').classList.remove('hidden');
+    }
 
-      // Particle & Floating Text Updates
+    function updateSimulation(dt) {
+      const playH = viewH - groundHeight;
+      const spec = RIG_SPECS[state.selectedRig] || RIG_SPECS.loader;
+
+      if (state.shakeTime > 0) state.shakeTime = Math.max(0, state.shakeTime - dt);
+      if (state.flashAlpha > 0) state.flashAlpha = Math.max(0, state.flashAlpha - dt * 2.2);
+
+      // Update particles & floating callouts
       for (let i = state.particles.length - 1; i >= 0; i--) {
-        const p = state.particles[i];
-        p.x += p.vx * dt;
-        p.y += p.vy * dt;
-        p.vy += 320 * dt;
-        p.life -= dt;
-        if (p.life <= 0) state.particles.splice(i, 1);
+        const pt = state.particles[i];
+        pt.x += pt.vx * dt;
+        pt.y += pt.vy * dt;
+        pt.life -= dt;
+        if (pt.life <= 0) state.particles.splice(i, 1);
       }
 
       for (let i = state.floatingTexts.length - 1; i >= 0; i--) {
         const ft = state.floatingTexts[i];
-        ft.y += ft.vy * dt;
+        ft.y -= 34 * dt;
         ft.life -= dt;
         if (ft.life <= 0) state.floatingTexts.splice(i, 1);
       }
 
-      // Hover Animation on Menu / Ready Screen
       if (state.phase === 'MENU' || state.phase === 'READY') {
-        const t = performance.now() * 0.004;
-        state.player.y = playH * 0.45 + Math.sin(t) * 9;
-        state.player.rotation = Math.cos(t) * 0.06;
-        state.player.armAngle += dt * 2.2;
-        state.player.drumSpin += dt * 3.2;
+        state.groundScroll += 95 * dt;
+        state.skylineScroll += 95 * dt;
+        state.cloudScroll += 28 * dt;
+        state.player.bobPhase += dt * 4.2;
+        state.player.y = playH * 0.46 + Math.sin(state.player.bobPhase) * 9;
+        state.player.rotation = Math.sin(state.player.bobPhase * 0.8) * 0.06;
+        state.player.wheelAngle += dt * 4;
         return;
       }
 
       if (state.phase !== 'PLAYING') return;
 
-      // Active Flight Physics
-      const spec = RIG_SPECS[state.selectedRig] || RIG_SPECS.loader;
+      const speed = getCurrentSpeed();
+      state.groundScroll += speed * dt;
+      state.skylineScroll += speed * dt;
+      state.cloudScroll += speed * 0.25 * dt;
+
+      // Player Vertical Physics
       state.player.vy = Math.min(spec.maxFall, state.player.vy + spec.gravity * dt);
       state.player.y += state.player.vy * dt;
-      state.player.armAngle += dt * 4.5;
-      state.player.drumSpin += dt * 6.5;
-      if (state.player.flameTimer > 0) state.player.flameTimer = Math.max(0, state.player.flameTimer - dt);
+      state.player.thrustAnim = Math.max(0, state.player.thrustAnim - dt * 4.5);
+      state.player.wheelAngle += dt * 9;
 
-      // Pitch Tilt synced to vertical velocity
-      const targetRot = Math.max(-0.42, Math.min(0.68, state.player.vy / 650));
-      state.player.rotation += (targetRot - state.player.rotation) * Math.min(1, dt * 12);
+      const targetRot = Math.max(-0.42, Math.min(0.68, state.player.vy / 640));
+      state.player.rotation += (targetRot - state.player.rotation) * Math.min(1, dt * 14);
 
-      // Ceiling Clamp (generous bounce so tapping high never unfairly kills you)
-      if (state.player.y < state.player.radius + 6) {
-        state.player.y = state.player.radius + 6;
-        if (state.player.vy < 0) state.player.vy = 40;
+      const hitR = state.player.radius - 3.5;
+
+      // Ceiling Clamp & Ground Crash Check
+      if (state.player.y - hitR < 4) {
+        state.player.y = hitR + 4;
+        if (state.player.vy < 0) state.player.vy = 0;
       }
-
-      // Ground Impact Check (small 2px forgiveness margin so grazing the curb feels fair)
-      if (state.player.y + state.player.radius - 2 >= playH) {
-        state.player.y = playH - state.player.radius;
-        triggerGameOver('GROUND CRASH!');
+      if (state.player.y + hitR >= playH) {
+        state.player.y = playH - hitR;
+        triggerGameOver('GROUND IMPACT!');
         return;
       }
 
@@ -2165,252 +2439,372 @@
         spawnBeamPair();
       }
 
+      // Dynamic Sky Hazards (Falling Boulders / Dropped Crane Girders)
+      state.hazardTimer -= dt;
+      if (state.hazardTimer <= 0 && state.obstaclesPassed >= 2) {
+        state.hazardTimer = Math.max(3.2, 5.8 - Math.min(2.2, state.obstaclesPassed * 0.08)) + Math.random() * 2.4;
+        const dropX = Math.min(viewW - 44, Math.max(state.player.x + 75, state.player.x + speed * 0.62));
+        const nearBeam = state.obstacles.some((o) => Math.abs((o.x + o.width * 0.5) - dropX) < 75);
+        if (!nearBeam) {
+          const isCityOrHarbor = state.currentBiome && (state.currentBiome.id === 'city' || state.currentBiome.id === 'harbor');
+          state.fallingHazards.push({
+            type: isCityOrHarbor && Math.random() < 0.55 ? 'girder' : 'boulder',
+            x: dropX,
+            y: -24,
+            vy: 140,
+            radius: 17,
+            rotation: Math.random() * Math.PI * 2,
+            rotSpeed: (Math.random() < 0.5 ? -1 : 1) * (2.4 + Math.random() * 2.2),
+            warnTimer: 0.78
+          });
+        }
+      }
+
+      for (let i = state.fallingHazards.length - 1; i >= 0; i--) {
+        const hz = state.fallingHazards[i];
+        if (hz.warnTimer > 0) {
+          hz.warnTimer -= dt;
+          hz.x -= speed * 0.35 * dt;
+          continue;
+        }
+        hz.x -= speed * 0.65 * dt;
+        hz.vy += 420 * dt;
+        hz.y += hz.vy * dt;
+        hz.rotation += hz.rotSpeed * dt;
+
+        if (hz.type === 'boulder') {
+          const dx = state.player.x - hz.x;
+          const dy = state.player.y - hz.y;
+          if (dx * dx + dy * dy < (hitR + hz.radius - 2) ** 2) {
+            triggerGameOver('FALLING BOULDER!');
+            return;
+          }
+        } else if (circleRectOverlap(state.player.x, state.player.y, hitR, hz.x - 20, hz.y - 6, 40, 12)) {
+          triggerGameOver('FALLING CRANE LOAD!');
+          return;
+        }
+
+        if (hz.y + hz.radius >= playH) {
+          spawnExhaustSparks(hz.x, playH - 4, 8, '#a8a29e');
+          state.fallingHazards.splice(i, 1);
+        } else if (hz.x < -60) {
+          state.fallingHazards.splice(i, 1);
+        }
+      }
+
       // Update Obstacles & Forgiving Hitboxes
-      const hitR = state.player.radius - 3.5;
       for (let i = state.obstacles.length - 1; i >= 0; i--) {
         const obs = state.obstacles[i];
         obs.x -= speed * dt;
 
-        if (obs.moving) {
+        if (obs.moveAmp > 0) {
           obs.movePhase += obs.moveSpeed * dt;
-          const deltaY = Math.sin(obs.movePhase) * obs.moveAmp;
-          obs.topHeight = obs.baseTopHeight + deltaY;
-          obs.bottomY = obs.topHeight + obs.gapHeight;
+          const curCenter = obs.baseGapCenterY + Math.sin(obs.movePhase) * obs.moveAmp;
+          obs.topHeight = Math.max(24, curCenter - obs.gapHeight * 0.5);
+          obs.bottomY = Math.min(playH - 24, curCenter + obs.gapHeight * 0.5);
         }
 
         if (obs.hasWreckingBall) {
-          obs.ballPhase += 2.6 * dt;
-          const swingX = obs.x + obs.width * 0.5 + Math.sin(obs.ballPhase) * 14;
-          const ballY = obs.topHeight + 24;
+          obs.swingPhase += dt * 3.1;
+          const pivotX = obs.x + obs.width * 0.5;
+          const swingX = pivotX + Math.sin(obs.swingPhase) * 14;
+          const swingY = obs.topHeight + obs.ballDrop;
           const dx = state.player.x - swingX;
-          const dy = state.player.y - ballY;
+          const dy = state.player.y - swingY;
           if (dx * dx + dy * dy < (hitR + obs.ballRadius - 2) ** 2) {
-            triggerGameOver('WRECKING BALL HIT!');
+            triggerGameOver('WRECKING BALL!');
             return;
           }
         }
 
-        // Top & Bottom Steel I-Beam Collision
-        const hitTop = circleRectOverlap(state.player.x, state.player.y, hitR, obs.x + 3, 0, obs.width - 6, obs.topHeight);
-        const hitBot = circleRectOverlap(state.player.x, state.player.y, hitR, obs.x + 3, obs.bottomY, obs.width - 6, playH - obs.bottomY);
+        const hitTop = obs.topHeight > 0 && circleRectOverlap(state.player.x, state.player.y, hitR, obs.x + 2, 0, obs.width - 4, obs.topHeight);
+        const hitBot = obs.bottomY < playH && circleRectOverlap(state.player.x, state.player.y, hitR, obs.x + 2, obs.bottomY, obs.width - 4, playH - obs.bottomY);
         if (hitTop || hitBot) {
-          triggerGameOver('STEEL BEAM IMPACT!');
+          triggerGameOver('BEAM IMPACT!');
           return;
         }
 
-        // Track Beam Clearance (No points awarded unless the Golden Hardhat is collected)
-        if (!obs.passed && obs.x + obs.width * 0.5 < state.player.x) {
+        if (!obs.passed && obs.x + obs.width < state.player.x - hitR) {
           obs.passed = true;
-          state.obstaclesPassed += 1;
+          state.obstaclesPassed++;
+          audio.playBeamScore();
         }
 
-        if (obs.x + obs.width < -90) {
+        if (obs.x + obs.width < -60) {
           state.obstacles.splice(i, 1);
         }
       }
 
-      // Update Golden Hardhat Collectibles (Primary Scoring Objective)
+      // Update Golden Safety Hardhat Collectibles
       for (let i = state.collectibles.length - 1; i >= 0; i--) {
         const item = state.collectibles[i];
-        item.x -= speed * dt;
-        item.bobPhase += 4.2 * dt;
-
-        // Keep hardhat aligned vertically with its oscillating beam gap
-        if (item.parentObs) {
-          const beamDeltaY = item.parentObs.topHeight - item.parentObs.baseTopHeight;
-          item.y = item.baseY + beamDeltaY;
+        if (item.obsRef) {
+          item.x = item.obsRef.x + item.obsRef.width * 0.5;
+          const gapCenter = (item.obsRef.topHeight + item.obsRef.bottomY) * 0.5;
+          item.y = gapCenter + item.offsetY;
+        } else {
+          item.x -= speed * dt;
         }
 
         if (!item.collected) {
           const dx = state.player.x - item.x;
           const dy = state.player.y - item.y;
-          if (dx * dx + dy * dy < (state.player.radius + item.radius + 5) ** 2) {
+          if (dx * dx + dy * dy < (hitR + item.radius + 4) ** 2) {
             item.collected = true;
-            state.hardhatsCollected += 1;
-            state.hardhatStreak += 1;
-            const streakBonus = state.hardhatStreak >= 3 ? 2 : 1;
-            state.score += streakBonus;
-            state.bonusPoints += streakBonus;
-            updateHUD();
-            popScoreAnimation();
+            state.hardhatsCollected++;
+            state.hardhatStreak++;
+            const pts = state.hardhatStreak >= 3 ? 2 : 1;
+            state.score += pts;
+            state.bonusPoints += pts > 1 ? 1 : 0;
             audio.playHardhatPickup();
-            spawnExhaustSparks(item.x, item.y, 12, '#fef08a');
-            const label = streakBonus > 1 ? `+${streakBonus} STREAK!` : '+1 HARDHAT!';
-            spawnFloatingText(item.x, item.y - 18, label, '#fbbf24');
-          } else if (item.x + item.radius < state.player.x - state.player.radius - 8 && !item.missed) {
-            // Reset streak if player flies past a hardhat without collecting it
-            item.missed = true;
-            if (state.hardhatStreak > 0) {
-              state.hardhatStreak = 0;
-              updateHUD();
-              spawnFloatingText(item.x, item.y - 16, 'MISSED!', '#94a3b8');
-            }
+            spawnExhaustSparks(item.x, item.y, 10, '#fbbf24');
+            addFloatingText(item.x, item.y - 12, pts > 1 ? `+${pts} STREAK!` : '+1 HARDHAT', '#fbbf24');
+            popScoreHUD();
+            updateHUD();
+          } else if (item.x < state.player.x - hitR - 22 && !item.missedNotified) {
+            item.missedNotified = true;
+            state.hardhatStreak = 0;
+            addFloatingText(state.player.x, state.player.y - 24, 'MISSED!', '#fb7185');
+            updateHUD();
           }
         }
 
-        if (item.x < -60) {
+        if (item.collected || item.x < -60) {
           state.collectibles.splice(i, 1);
         }
       }
     }
 
     // =========================================================================
-    // 10. UI EVENT LISTENERS, INPUT HANDLERS & MAIN LOOP
+    // 8. UI CONTROLS, ROSTER SETUP & MAIN ANIMATION LOOP
     // =========================================================================
-    function bindUIControls() {
-      // Rig Selector Cards
-      document.querySelectorAll('#rig-selector .rig-card').forEach((card) => {
-        card.addEventListener('click', () => {
-          audio.playClick();
-          document.querySelectorAll('#rig-selector .rig-card').forEach((c) => c.classList.remove('selected'));
-          card.classList.add('selected');
-          state.selectedRig = card.dataset.rig;
-        });
-      });
+    function renderRosterInputs() {
+      const container = document.getElementById('roster-inputs');
+      const summary = document.getElementById('mode-summary-label');
+      if (!container) return;
 
-      // Site Shift Theme Selector
-      document.querySelectorAll('#shift-selector .shift-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          audio.playClick();
-          document.querySelectorAll('#shift-selector .shift-btn').forEach((b) => b.classList.remove('selected'));
-          btn.classList.add('selected');
-          state.selectedShift = btn.dataset.shift;
-        });
-      });
+      summary.textContent = state.playerCount === 1
+        ? 'Solo Shift'
+        : `${state.playerCount} Players (Pass & Play)`;
 
-      // Start Shift Button
-      document.getElementById('btn-start-shift').addEventListener('click', () => {
-        audio.init();
-        audio.playClick();
-        prepareReadyShift();
-      });
+      container.classList.toggle('two-col', state.playerCount > 1);
+      container.innerHTML = '';
 
-      // Manual Sync Latest Version Button
-      const syncBtn = document.getElementById('btn-sync-latest');
-      if (syncBtn) {
-        syncBtn.addEventListener('click', () => {
-          audio.playClick();
-          checkAndApplyLatestBuild(true);
+      for (let i = 0; i < state.playerCount; i++) {
+        const row = document.createElement('div');
+        row.className = 'player-input-row';
+        row.innerHTML = `
+          <span class="player-tag">P${i + 1}</span>
+          <input type="text" class="player-name-input" maxlength="16" value="${state.playerNames[i]}" placeholder="Player ${i + 1}" data-pidx="${i}" />
+        `;
+        const input = row.querySelector('input');
+        input.addEventListener('input', (e) => {
+          const idx = Number(e.target.dataset.pidx);
+          state.playerNames[idx] = e.target.value.trim() || `Player ${idx + 1}`;
+          updateStartButtonLabel();
         });
+        container.appendChild(row);
       }
-
-      // Sound Toggle Button
-      const soundBtn = document.getElementById('btn-sound');
-      soundBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const enabled = audio.toggle();
-        document.getElementById('icon-sound-on').classList.toggle('hidden', !enabled);
-        document.getElementById('icon-sound-off').classList.toggle('hidden', enabled);
-        const soundLabel = document.getElementById('sound-label');
-        if (soundLabel) soundLabel.textContent = enabled ? 'SFX ON' : 'MUTED';
-        soundBtn.classList.toggle('sound-active', enabled);
-        soundBtn.classList.toggle('sound-muted', !enabled);
-        if (enabled) audio.playClick();
-      });
-
-      // Pause Button
-      document.getElementById('btn-pause').addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (state.phase === 'PLAYING' || state.phase === 'READY') {
-          audio.playClick();
-          state.prevPhase = state.phase;
-          state.phase = 'PAUSED';
-          document.getElementById('pause-modal').classList.remove('hidden');
-        }
-      });
-
-      // Resume Shift
-      document.getElementById('btn-resume-shift').addEventListener('click', () => {
-        audio.playClick();
-        document.getElementById('pause-modal').classList.add('hidden');
-        state.phase = state.prevPhase || 'PLAYING';
-      });
-
-      // Return to Garage from Pause or Game Over
-      const returnToGarage = () => {
-        audio.playClick();
-        state.phase = 'MENU';
-        document.getElementById('pause-modal').classList.add('hidden');
-        document.getElementById('gameover-modal').classList.add('hidden');
-        document.getElementById('hud').classList.add('hidden');
-        document.getElementById('ready-hint').classList.add('hidden');
-        document.getElementById('start-modal').classList.remove('hidden');
-        renderGaragePreviews();
-        updateHUD();
-      };
-
-      document.getElementById('btn-pause-garage').addEventListener('click', returnToGarage);
-      document.getElementById('btn-go-garage').addEventListener('click', returnToGarage);
-
-      // Retry Shift from Game Over
-      document.getElementById('btn-retry-shift').addEventListener('click', () => {
-        audio.playClick();
-        prepareReadyShift();
-      });
-
-      // Pointer / Touch / Mouse Flight Controls on Canvas
-      canvas.addEventListener('pointerdown', (e) => {
-        if (e.button !== undefined && e.button !== 0) return;
-        e.preventDefault();
-        if (state.phase === 'READY' || state.phase === 'PLAYING') {
-          triggerThrust();
-        }
-      }, { passive: false });
-
-      // Keyboard Controls (Space, ArrowUp, W, P / Escape)
-      window.addEventListener('keydown', (e) => {
-        if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
-          if (state.phase === 'READY' || state.phase === 'PLAYING') {
-            e.preventDefault();
-            triggerThrust();
-          } else if (state.phase === 'GAMEOVER' && !document.getElementById('gameover-modal').classList.contains('hidden')) {
-            e.preventDefault();
-            prepareReadyShift();
-          }
-        } else if (e.code === 'KeyP' || e.code === 'Escape') {
-          if (state.phase === 'PLAYING' || state.phase === 'READY') {
-            state.prevPhase = state.phase;
-            state.phase = 'PAUSED';
-            document.getElementById('pause-modal').classList.remove('hidden');
-          } else if (state.phase === 'PAUSED') {
-            document.getElementById('pause-modal').classList.add('hidden');
-            state.phase = state.prevPhase || 'PLAYING';
-          }
-        }
-      });
-
-      window.addEventListener('resize', resizeCanvas);
-      window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 80));
-      if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', resizeCanvas);
-      }
+      updateStartButtonLabel();
     }
 
-    let lastFrameTime = performance.now();
-    function gameLoop(now) {
-      const dt = Math.min(0.05, Math.max(0.001, (now - lastFrameTime) / 1000));
-      lastFrameTime = now;
-
-      updateSimulation(dt);
-      drawScene(dt);
-      requestAnimationFrame(gameLoop);
+    function updateStartButtonLabel() {
+      const firstPlayer = state.playerNames[0] || 'Player 1';
+      document.getElementById('btn-start-label').textContent = state.playerCount > 1
+        ? `Start (${firstPlayer})`
+        : 'Start Shift';
     }
 
-    window.addEventListener('load', () => {
-      resizeCanvas();
+    function refreshMenuRecordDisplay() {
+      document.getElementById('menu-best-score').textContent = state.bestScore;
+      document.getElementById('menu-best-holder').textContent = state.bestScore > 0 ? state.bestHolder : '—';
+    }
+
+    function openGarageMenu() {
+      state.phase = 'MENU';
+      state.activePlayerIdx = 0;
+      refreshMenuRecordDisplay();
       renderGaragePreviews();
-      bindUIControls();
-      updateHUD();
-      checkAndApplyLatestBuild(false);
-      lastFrameTime = performance.now();
-      requestAnimationFrame(gameLoop);
+      document.getElementById('hud').classList.add('hidden');
+      document.getElementById('ready-hint').classList.add('hidden');
+      document.getElementById('pause-modal').classList.add('hidden');
+      document.getElementById('gameover-modal').classList.add('hidden');
+      document.getElementById('start-modal').classList.remove('hidden');
+    }
+
+    function togglePauseState() {
+      if (state.phase === 'PLAYING') {
+        state.phase = 'PAUSED';
+        document.getElementById('pause-modal').classList.remove('hidden');
+      } else if (state.phase === 'PAUSED') {
+        state.phase = 'PLAYING';
+        document.getElementById('pause-modal').classList.add('hidden');
+      }
+    }
+
+    // Player Count Buttons
+    document.querySelectorAll('#player-count-selector .mode-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        audio.playClick();
+        document.querySelectorAll('#player-count-selector .mode-btn').forEach((b) => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        state.playerCount = Number(btn.dataset.count) || 1;
+        state.activePlayerIdx = 0;
+        renderRosterInputs();
+      });
     });
 
-    // Automatically check for new GitHub Pages deployment when reopened from Home Screen
+    // Rig Selection Cards
+    document.querySelectorAll('#rig-selector .rig-card').forEach((card) => {
+      card.addEventListener('click', () => {
+        audio.playClick();
+        document.querySelectorAll('#rig-selector .rig-card').forEach((c) => c.classList.remove('selected'));
+        card.classList.add('selected');
+        state.selectedRig = card.dataset.rig;
+      });
+    });
+
+    // Day / Night Shift Buttons
+    document.querySelectorAll('#shift-selector .shift-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        audio.playClick();
+        document.querySelectorAll('#shift-selector .shift-btn').forEach((b) => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        state.selectedShift = btn.dataset.shift;
+      });
+    });
+
+    // Action Buttons
+    document.getElementById('btn-start-shift').addEventListener('click', () => {
+      audio.playClick();
+      state.activePlayerIdx = 0;
+      prepareReadyShift();
+    });
+
+    document.getElementById('btn-retry-shift').addEventListener('click', () => {
+      audio.playClick();
+      prepareReadyShift();
+    });
+
+    document.getElementById('btn-go-garage').addEventListener('click', () => {
+      audio.playClick();
+      openGarageMenu();
+    });
+
+    document.getElementById('btn-pause').addEventListener('click', (e) => {
+      e.stopPropagation();
+      audio.playClick();
+      togglePauseState();
+    });
+
+    document.getElementById('btn-resume-shift').addEventListener('click', () => {
+      audio.playClick();
+      togglePauseState();
+    });
+
+    document.getElementById('btn-pause-garage').addEventListener('click', () => {
+      audio.playClick();
+      openGarageMenu();
+    });
+
+    document.getElementById('btn-sound').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const on = audio.toggle();
+      const btn = document.getElementById('btn-sound');
+      const iconOn = document.getElementById('icon-sound-on');
+      const iconOff = document.getElementById('icon-sound-off');
+      const label = document.getElementById('sound-label');
+      if (on) {
+        btn.classList.add('sound-active');
+        btn.classList.remove('sound-muted');
+        iconOn.classList.remove('hidden');
+        iconOff.classList.add('hidden');
+        label.textContent = 'SFX ON';
+        audio.playClick();
+      } else {
+        btn.classList.remove('sound-active');
+        btn.classList.add('sound-muted');
+        iconOn.classList.add('hidden');
+        iconOff.classList.remove('hidden');
+        label.textContent = 'MUTED';
+      }
+    });
+
+    document.getElementById('btn-sync-latest').addEventListener('click', () => {
+      audio.playClick();
+      checkAndApplyLatestBuild(true);
+    });
+
+    document.getElementById('btn-open-leaderboard').addEventListener('click', openTop10Leaderboard);
+    document.getElementById('btn-hud-leaderboard').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openTop10Leaderboard();
+    });
+    document.getElementById('btn-close-leaderboard').addEventListener('click', closeTop10Leaderboard);
+    document.getElementById('btn-close-leaderboard-bottom').addEventListener('click', closeTop10Leaderboard);
+    document.getElementById('leaderboard-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'leaderboard-modal') closeTop10Leaderboard();
+    });
+
+    // Canvas Touch & Mouse Input
+    canvas.addEventListener('pointerdown', (e) => {
+      if (e.button !== undefined && e.button !== 0) return;
+      if (state.phase === 'READY' || state.phase === 'PLAYING') {
+        e.preventDefault();
+        triggerThrust();
+      }
+    }, { passive: false });
+
+    // Keyboard Controls (Space, ArrowUp, W, P, Escape)
+    window.addEventListener('keydown', (e) => {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+
+      if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+        if (state.phase === 'READY' || state.phase === 'PLAYING') {
+          e.preventDefault();
+          triggerThrust();
+        }
+      } else if (e.code === 'KeyP' || e.code === 'Escape') {
+        if (state.phase === 'PLAYING' || state.phase === 'PAUSED') {
+          e.preventDefault();
+          togglePauseState();
+        }
+      }
+    });
+
+    window.addEventListener('resize', resizeCanvas);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', resizeCanvas);
+    }
+
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
+      if (!document.hidden) {
         checkAndApplyLatestBuild(false);
       }
+    });
+
+    // Main Animation Loop
+    let lastTimestamp = 0;
+    function gameLoop(timestamp) {
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const dt = Math.min(0.05, Math.max(0.001, (timestamp - lastTimestamp) / 1000));
+      lastTimestamp = timestamp;
+
+      updateSimulation(dt);
+      drawScene();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Boot Application
+    window.addEventListener('load', () => {
+      generateHomeScreenAppIcon();
+      initScenery();
+      resizeCanvas();
+      renderRosterInputs();
+      renderGaragePreviews();
+      refreshMenuRecordDisplay();
+      checkAndApplyLatestBuild(false);
+      requestAnimationFrame(gameLoop);
     });
   </script>
 </body>
