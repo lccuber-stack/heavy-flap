@@ -3177,7 +3177,9 @@
         state.activePlayerIndex = (state.activePlayerIndex + 1) % state.playerCount;
       }
 
-      rollNewProceduralBiome(true);
+      if (state.mode !== 'menu') {
+        rollNewProceduralBiome(true);
+      }
       state.mode = 'ready';
       state.score = 0;
       state.hardhatsCollected = 0;
@@ -3228,6 +3230,7 @@
 
     function returnToGarage() {
       state.mode = 'menu';
+      rollNewProceduralBiome(true);
       state.obstacles = [];
       state.collectibles = [];
       state.fallingHazards = [];
