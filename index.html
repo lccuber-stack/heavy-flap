@@ -465,8 +465,8 @@
         </div>
         <div style="width:1px; height:24px; background:rgba(255,255,255,0.14);"></div>
         <div>
-          <div style="font-size:0.65rem; font-weight:700; color:#94a3b8; letter-spacing:0.06em;">BONUS</div>
-          <div class="font-display" style="font-size:1.15rem; font-weight:700; color:#38bdf8;" id="hud-bonus">+0</div>
+          <div style="font-size:0.65rem; font-weight:700; color:#94a3b8; letter-spacing:0.06em;">STREAK</div>
+          <div class="font-display" style="font-size:1.15rem; font-weight:700; color:#38bdf8;" id="hud-bonus">0x</div>
         </div>
       </div>
 
@@ -531,40 +531,40 @@
         </div>
 
         <p style="font-size:0.86rem; color:#cbd5e1; margin-top:0.6rem; line-height:1.45;">
-          Pilot your turbocharged construction rig through suspended steel I-beams, tower cranes, and swinging wrecking balls. Collect golden hardhats for bonus points!
+          Pilot your Swedish-engineered Volvo heavy machinery through suspended steel I-beams and Nordic quarry cranes. Collect golden hardhats to score—missing a hardhat breaks your streak!
         </p>
 
         <!-- Choose Heavy Equipment Rig -->
         <div style="margin-top:1.1rem;">
-          <label style="font-size:0.72rem; font-weight:800; letter-spacing:0.08em; color:#94a3b8; display:block;">SELECT CONSTRUCTION RIG</label>
+          <label style="font-size:0.72rem; font-weight:800; letter-spacing:0.08em; color:#94a3b8; display:block;">SELECT VOLVO FLEET MACHINE</label>
           <div class="rig-grid" id="rig-selector">
-            <button type="button" class="rig-card selected" data-rig="excavator">
+            <button type="button" class="rig-card selected" data-rig="loader">
+              <canvas class="rig-preview" id="preview-loader" width="112" height="88"></canvas>
+              <div class="font-display" style="font-size:0.84rem; font-weight:700; color:#fff;">Wheel Loader</div>
+              <div style="font-size:0.66rem; color:#94a3b8; margin-top:2px;">L180H • Balanced</div>
+            </button>
+
+            <button type="button" class="rig-card" data-rig="excavator">
               <canvas class="rig-preview" id="preview-excavator" width="112" height="88"></canvas>
-              <div class="font-display" style="font-size:0.86rem; font-weight:700; color:#fff;">Turbo Digger</div>
-              <div style="font-size:0.68rem; color:#94a3b8; margin-top:2px;">Balanced Lift</div>
+              <div class="font-display" style="font-size:0.84rem; font-weight:700; color:#fff;">Excavator</div>
+              <div style="font-size:0.66rem; color:#94a3b8; margin-top:2px;">EC380E • Snappy</div>
             </button>
 
-            <button type="button" class="rig-card" data-rig="bulldozer">
-              <canvas class="rig-preview" id="preview-bulldozer" width="112" height="88"></canvas>
-              <div class="font-display" style="font-size:0.86rem; font-weight:700; color:#fff;">Jet Dozer</div>
-              <div style="font-size:0.68rem; color:#94a3b8; margin-top:2px;">Snappy Thrust</div>
-            </button>
-
-            <button type="button" class="rig-card" data-rig="mixer">
-              <canvas class="rig-preview" id="preview-mixer" width="112" height="88"></canvas>
-              <div class="font-display" style="font-size:0.86rem; font-weight:700; color:#fff;">Aero Mixer</div>
-              <div style="font-size:0.68rem; color:#94a3b8; margin-top:2px;">Smooth Glide</div>
+            <button type="button" class="rig-card" data-rig="hauler">
+              <canvas class="rig-preview" id="preview-hauler" width="112" height="88"></canvas>
+              <div class="font-display" style="font-size:0.84rem; font-weight:700; color:#fff;">Artic Hauler</div>
+              <div style="font-size:0.66rem; color:#94a3b8; margin-top:2px;">A40G • Smooth</div>
             </button>
           </div>
         </div>
 
         <!-- Shift Lighting / Atmosphere Selector -->
         <div style="margin-top:1rem;">
-          <label style="font-size:0.72rem; font-weight:800; letter-spacing:0.08em; color:#94a3b8; display:block;">SITE SHIFT</label>
+          <label style="font-size:0.72rem; font-weight:800; letter-spacing:0.08em; color:#94a3b8; display:block;">QUARRY & SITE ENVIRONMENT</label>
           <div class="shift-selector" id="shift-selector">
-            <button type="button" class="shift-btn selected" data-shift="day">☀️ Day Shift</button>
-            <button type="button" class="shift-btn" data-shift="sunset">🌅 Golden Hour</button>
-            <button type="button" class="shift-btn" data-shift="night">🌙 Night Crew</button>
+            <button type="button" class="shift-btn selected" data-shift="quarry">🏔️ Nordic Quarry</button>
+            <button type="button" class="shift-btn" data-shift="timber">🌲 Forest Road</button>
+            <button type="button" class="shift-btn" data-shift="night">🌙 Night Blast</button>
           </div>
         </div>
 
@@ -899,11 +899,11 @@
         ic.fill();
         ic.restore();
 
-        // Hero Turbo Digger Rig Soaring Center-Stage
+        // Hero Volvo Wheel Loader Soaring Center-Stage
         ic.save();
         ic.translate(226, 276);
-        ic.scale(5.4, 5.4);
-        drawConstructionRig(ic, 'excavator', 0, 0, 17, -0.22, 0.45, 0, 1);
+        ic.scale(5.2, 5.2);
+        drawConstructionRig(ic, 'loader', 0, 0, 17, -0.22, 0.45, 0, 1);
         ic.restore();
 
         const dataUrl = iconCanvas.toDataURL('image/png');
@@ -936,82 +936,85 @@
     }
 
     // =========================================================================
-    // 2. RIG CONFIGURATIONS & SHIFT ATMOSPHERE THEMES
+    // 2. VOLVO RIG CONFIGURATIONS & NORDIC SITE ATMOSPHERE THEMES
     // =========================================================================
     const RIG_SPECS = {
-      excavator: {
-        name: 'Turbo Digger',
-        gravity: 1380,
-        flapVel: -445,
-        maxFall: 620,
-        primaryColor: '#f59e0b',
-        secondaryColor: '#d97706',
-        cabColor: '#1e293b'
-      },
-      bulldozer: {
-        name: 'Jet Dozer',
-        gravity: 1480,
-        flapVel: -468,
-        maxFall: 650,
+      loader: {
+        name: 'Volvo L180H Loader',
+        gravity: 1360,
+        flapVel: -442,
+        maxFall: 615,
         primaryColor: '#eab308',
         secondaryColor: '#ca8a04',
+        cabColor: '#1e293b'
+      },
+      excavator: {
+        name: 'Volvo EC380E Excavator',
+        gravity: 1470,
+        flapVel: -465,
+        maxFall: 645,
+        primaryColor: '#f59e0b',
+        secondaryColor: '#d97706',
         cabColor: '#0f172a'
       },
-      mixer: {
-        name: 'Aero Mixer',
-        gravity: 1260,
-        flapVel: -422,
+      hauler: {
+        name: 'Volvo A40G Hauler',
+        gravity: 1265,
+        flapVel: -424,
         maxFall: 580,
-        primaryColor: '#f97316',
-        secondaryColor: '#ea580c',
+        primaryColor: '#eab308',
+        secondaryColor: '#a16207',
         cabColor: '#1e293b'
       }
     };
 
     const SHIFT_THEMES = {
-      day: {
-        skyTop: '#38bdf8',
+      quarry: {
+        skyTop: '#0284c7',
         skyBottom: '#bae6fd',
-        sunColor: '#fef08a',
-        sunY: 0.2,
-        farSkyline: '#7dd3fc',
-        midSkyline: '#3b82f6',
-        craneColor: '#f59e0b',
-        beamMain: '#475569',
+        sunColor: '#fef9c3',
+        sunY: 0.19,
+        farRidge: '#64748b',
+        midRidge: '#475569',
+        isForest: false,
+        craneColor: '#eab308',
+        beamMain: '#334155',
         beamHighlight: '#94a3b8',
-        beamShadow: '#1e293b',
+        beamShadow: '#0f172a',
         groundTop: '#334155',
-        groundDirt: '#78350f',
+        groundDirt: '#57534e',
         windowLit: false
       },
-      sunset: {
-        skyTop: '#7c2d12',
-        skyBottom: '#fb923c',
-        sunColor: '#fde047',
-        sunY: 0.34,
-        farSkyline: '#9a3412',
-        midSkyline: '#431407',
-        craneColor: '#fbbf24',
-        beamMain: '#334155',
-        beamHighlight: '#64748b',
-        beamShadow: '#0f172a',
-        groundTop: '#1e293b',
+      timber: {
+        skyTop: '#0369a1',
+        skyBottom: '#fde68a',
+        sunColor: '#fef08a',
+        sunY: 0.28,
+        farRidge: '#1e3a8a',
+        midRidge: '#14532d',
+        isForest: true,
+        craneColor: '#f59e0b',
+        beamMain: '#3f3f46',
+        beamHighlight: '#71717a',
+        beamShadow: '#18181b',
+        groundTop: '#365314',
         groundDirt: '#451a03',
-        windowLit: true
+        windowLit: false
       },
       night: {
         skyTop: '#020617',
-        skyBottom: '#1e1b4b',
+        skyBottom: '#1e293b',
         sunColor: '#f8fafc',
         sunY: 0.18,
-        farSkyline: '#0f172a',
-        midSkyline: '#1e293b',
-        craneColor: '#fbbf24',
-        beamMain: '#64748b',
+        farRidge: '#0f172a',
+        midRidge: '#1e293b',
+        isForest: false,
+        craneColor: '#facc15',
+        beamMain: '#475569',
         beamHighlight: '#cbd5e1',
-        beamShadow: '#334155',
+        beamShadow: '#1e293b',
         groundTop: '#1e293b',
-        groundDirt: '#0f172a',
+        groundDirt: '#090d16',
         windowLit: true
       }
     };
@@ -1100,11 +1103,12 @@
 
     const state = {
       phase: 'MENU', // MENU, READY, PLAYING, PAUSED, GAMEOVER
-      selectedRig: 'excavator',
-      selectedShift: 'day',
+      selectedRig: 'loader',
+      selectedShift: 'quarry',
       score: 0,
       bonusPoints: 0,
       hardhatsCollected: 0,
+      hardhatStreak: 0,
       bestScore: savedBestScore,
       shakeTime: 0,
       shakeIntensity: 0,
@@ -1186,55 +1190,87 @@
 
       state.skylineFar = [];
       let fx = 0;
-      while (fx < viewW + 300) {
-        const w = 55 + Math.random() * 65;
-        const h = 90 + Math.random() * 150;
+      while (fx < viewW + 320) {
+        const w = 90 + Math.random() * 90;
+        const h = 110 + Math.random() * 145;
         state.skylineFar.push({
           x: fx,
           w,
           h,
-          hasCrane: Math.random() < 0.28,
+          peakOffset: 0.25 + Math.random() * 0.5,
+          hasCrane: Math.random() < 0.24,
           craneAngle: Math.random() * Math.PI * 2
         });
-        fx += w + 12;
+        fx += w - 12;
       }
 
       state.skylineMid = [];
       let mx = 0;
-      while (mx < viewW + 300) {
-        const w = 65 + Math.random() * 75;
-        const h = 65 + Math.random() * 120;
-        const cols = Math.floor((w - 16) / 14);
-        const rows = Math.floor((h - 24) / 18);
-        const windows = [];
-        for (let r = 0; r < rows; r++) {
-          for (let c = 0; c < cols; c++) {
-            windows.push(Math.random() < 0.55);
-          }
+      while (mx < viewW + 320) {
+        const w = 75 + Math.random() * 80;
+        const h = 65 + Math.random() * 95;
+        const treeCount = 2 + Math.floor(Math.random() * 3);
+        const trees = [];
+        for (let t = 0; t < treeCount; t++) {
+          trees.push({
+            offsetX: 12 + t * ((w - 24) / Math.max(1, treeCount)),
+            height: 24 + Math.random() * 20
+          });
         }
         state.skylineMid.push({
           x: mx,
           w,
           h,
-          cols,
-          rows,
-          windows,
-          underConstruction: Math.random() < 0.35
+          trees,
+          hasSilo: Math.random() < 0.35
         });
-        mx += w + 18;
+        mx += w + 10;
       }
     }
 
     // =========================================================================
-    // 5. RIG RENDERING (Used both in Garage Preview & Live Game)
+    // 5. VOLVO RIG RENDERING (Wheel Loader, Excavator & Articulated Hauler)
     // =========================================================================
+    function drawVolvoWheel(targetCtx, wx, wy, radius, spinAngle) {
+      targetCtx.save();
+      targetCtx.translate(wx, wy);
+      targetCtx.rotate(spinAngle);
+
+      // Heavy Off-Road Tire
+      targetCtx.fillStyle = '#0f172a';
+      targetCtx.beginPath();
+      targetCtx.arc(0, 0, radius, 0, Math.PI * 2);
+      targetCtx.fill();
+
+      // Tire Tread Ticks
+      targetCtx.strokeStyle = '#334155';
+      targetCtx.lineWidth = 2;
+      targetCtx.beginPath();
+      targetCtx.arc(0, 0, radius - 1, 0, Math.PI * 2);
+      targetCtx.stroke();
+
+      // Volvo Yellow Steel Rim
+      targetCtx.fillStyle = '#eab308';
+      targetCtx.beginPath();
+      targetCtx.arc(0, 0, radius * 0.52, 0, Math.PI * 2);
+      targetCtx.fill();
+
+      // Dark Planetary Hub
+      targetCtx.fillStyle = '#1e293b';
+      targetCtx.beginPath();
+      targetCtx.arc(0, 0, radius * 0.24, 0, Math.PI * 2);
+      targetCtx.fill();
+
+      targetCtx.restore();
+    }
+
     function drawConstructionRig(targetCtx, rigType, x, y, radius, rotation, armAngle, drumSpin, flameTimer) {
-      const spec = RIG_SPECS[rigType] || RIG_SPECS.excavator;
+      const spec = RIG_SPECS[rigType] || RIG_SPECS.loader;
       targetCtx.save();
       targetCtx.translate(x, y);
       targetCtx.rotate(rotation);
 
-      // Jet Booster Flame beneath chassis
+      // Hydraulic / Turbo Jet Lift Flame beneath chassis
       if (flameTimer > 0) {
         const flick = 0.8 + Math.random() * 0.45;
         targetCtx.fillStyle = '#f97316';
@@ -1254,142 +1290,183 @@
         targetCtx.fill();
       }
 
-      // Heavy Caterpillar Tracks / Chassis Base
-      targetCtx.fillStyle = '#1e293b';
-      targetCtx.beginPath();
-      targetCtx.roundRect(-20, 6, 38, 11, 5);
-      targetCtx.fill();
-      targetCtx.strokeStyle = '#64748b';
-      targetCtx.lineWidth = 1.5;
-      targetCtx.stroke();
-
-      // Track Rollers
-      targetCtx.fillStyle = '#94a3b8';
-      [-13, -4, 5, 13].forEach((wx) => {
-        targetCtx.beginPath();
-        targetCtx.arc(wx, 11.5, 2.6, 0, Math.PI * 2);
-        targetCtx.fill();
-      });
-
-      if (rigType === 'excavator') {
-        // Counterweight & Engine Deck
+      if (rigType === 'loader') {
+        // VOLVO L180H WHEEL LOADER
+        // Rear Engine Hood (Volvo Yellow + Dark Charcoal Grille)
         targetCtx.fillStyle = spec.primaryColor;
         targetCtx.beginPath();
-        targetCtx.roundRect(-20, -6, 26, 13, 4);
+        targetCtx.roundRect(-22, -6, 22, 14, 4);
         targetCtx.fill();
 
-        // Hazard Stripe on Rear
-        targetCtx.fillStyle = '#0f172a';
-        targetCtx.fillRect(-19, -2, 6, 6);
+        // Dark Rear Counterweight & Grille Stripe
+        targetCtx.fillStyle = '#1e293b';
+        targetCtx.fillRect(-22, -3, 5, 9);
+        targetCtx.fillRect(-15, -6, 12, 2.5);
 
-        // Operator Cab
+        // ROPS/FOPS Volvo Operator Cab
         targetCtx.fillStyle = spec.cabColor;
         targetCtx.beginPath();
-        targetCtx.roundRect(-6, -15, 16, 14, 3);
+        targetCtx.roundRect(-7, -16, 14, 14, 3);
         targetCtx.fill();
 
-        // Cab Glass
+        // Panoramic Tinted Cab Window
         targetCtx.fillStyle = '#38bdf8';
         targetCtx.beginPath();
-        targetCtx.roundRect(-2, -13, 10, 8, 2);
+        targetCtx.roundRect(-4, -14, 9, 8, 2);
         targetCtx.fill();
 
-        // Articulated Boom Arm & Bucket
+        // Articulated Lift Arms & High-Capacity Bucket
         targetCtx.save();
-        targetCtx.translate(10, -4);
-        targetCtx.rotate(-0.35 + Math.sin(armAngle) * 0.22);
+        targetCtx.translate(5, -2);
+        targetCtx.rotate(-0.18 + Math.sin(armAngle) * 0.16);
+        targetCtx.fillStyle = spec.secondaryColor;
+        targetCtx.fillRect(0, -2.5, 16, 4.5);
+
+        // Hydraulic Tilt Cylinder
+        targetCtx.strokeStyle = '#cbd5e1';
+        targetCtx.lineWidth = 2;
+        targetCtx.beginPath();
+        targetCtx.moveTo(1, -5);
+        targetCtx.lineTo(14, -2);
+        targetCtx.stroke();
+
+        // Heavy Steel Loader Bucket
+        targetCtx.fillStyle = '#334155';
+        targetCtx.beginPath();
+        targetCtx.moveTo(15, -6);
+        targetCtx.lineTo(24, -4);
+        targetCtx.lineTo(26, 7);
+        targetCtx.lineTo(14, 7);
+        targetCtx.closePath();
+        targetCtx.fill();
+        targetCtx.strokeStyle = '#94a3b8';
+        targetCtx.lineWidth = 1.2;
+        targetCtx.stroke();
+        targetCtx.restore();
+
+        // Large Off-Road Tires
+        drawVolvoWheel(targetCtx, -13, 10, 7.2, drumSpin);
+        drawVolvoWheel(targetCtx, 7, 10, 7.2, drumSpin);
+      } else if (rigType === 'excavator') {
+        // VOLVO EC380E CRAWLER EXCAVATOR
+        // Heavy Steel Undercarriage & Tracks
+        targetCtx.fillStyle = '#1e293b';
+        targetCtx.beginPath();
+        targetCtx.roundRect(-20, 6, 36, 10, 5);
+        targetCtx.fill();
+        targetCtx.strokeStyle = '#64748b';
+        targetCtx.lineWidth = 1.4;
+        targetCtx.stroke();
+
+        targetCtx.fillStyle = '#94a3b8';
+        [-13, -4, 5, 12].forEach((wx) => {
+          targetCtx.beginPath();
+          targetCtx.arc(wx, 11, 2.3, 0, Math.PI * 2);
+          targetCtx.fill();
+        });
+
+        // Upper House & Counterweight (Volvo Yellow + Charcoal Trim)
+        targetCtx.fillStyle = spec.primaryColor;
+        targetCtx.beginPath();
+        targetCtx.roundRect(-20, -6, 26, 12, 4);
+        targetCtx.fill();
+
+        targetCtx.fillStyle = '#1e293b';
+        targetCtx.fillRect(-20, -2, 7, 6);
+
+        // Volvo Care Cab
+        targetCtx.fillStyle = spec.cabColor;
+        targetCtx.beginPath();
+        targetCtx.roundRect(-5, -16, 14, 14, 3);
+        targetCtx.fill();
+
+        targetCtx.fillStyle = '#38bdf8';
+        targetCtx.beginPath();
+        targetCtx.roundRect(-2, -14, 9, 9, 2);
+        targetCtx.fill();
+
+        // Heavy Boom, Dipper Arm & Tooth Bucket
+        targetCtx.save();
+        targetCtx.translate(9, -4);
+        targetCtx.rotate(-0.42 + Math.sin(armAngle) * 0.2);
         targetCtx.fillStyle = spec.secondaryColor;
         targetCtx.fillRect(0, -3, 16, 5);
 
         targetCtx.translate(15, 0);
-        targetCtx.rotate(0.75 + Math.cos(armAngle) * 0.25);
+        targetCtx.rotate(0.82 + Math.cos(armAngle) * 0.22);
         targetCtx.fillStyle = spec.primaryColor;
-        targetCtx.fillRect(0, -2.5, 12, 4.5);
+        targetCtx.fillRect(0, -2.5, 13, 4.5);
 
-        // Steel Bucket
-        targetCtx.fillStyle = '#475569';
-        targetCtx.beginPath();
-        targetCtx.arc(12, 2, 6, -0.4, Math.PI * 0.85);
-        targetCtx.fill();
-        targetCtx.restore();
-      } else if (rigType === 'bulldozer') {
-        // Heavy Armored Engine Hood
-        targetCtx.fillStyle = spec.primaryColor;
-        targetCtx.beginPath();
-        targetCtx.roundRect(-18, -8, 28, 15, 4);
-        targetCtx.fill();
-
-        // Exhaust Stack
+        // Excavating Bucket
         targetCtx.fillStyle = '#334155';
-        targetCtx.fillRect(2, -16, 4, 8);
-
-        // Roll Cage / Cab
-        targetCtx.fillStyle = spec.cabColor;
         targetCtx.beginPath();
-        targetCtx.roundRect(-15, -16, 15, 10, 3);
+        targetCtx.arc(13, 2, 6, -0.4, Math.PI * 0.85);
         targetCtx.fill();
-
-        targetCtx.fillStyle = '#38bdf8';
-        targetCtx.fillRect(-12, -14, 10, 6);
-
-        // Hydraulic Push Arms
-        targetCtx.strokeStyle = '#cbd5e1';
-        targetCtx.lineWidth = 3;
-        targetCtx.beginPath();
-        targetCtx.moveTo(6, 2);
-        targetCtx.lineTo(18, 4);
-        targetCtx.stroke();
-
-        // Curved Steel Dozer Blade
-        targetCtx.strokeStyle = spec.secondaryColor;
-        targetCtx.lineWidth = 5;
-        targetCtx.lineCap = 'round';
-        targetCtx.beginPath();
-        targetCtx.arc(15, 1, 13, -0.55, 0.65);
-        targetCtx.stroke();
+        targetCtx.restore();
       } else {
-        // Aero Cement Mixer
-        targetCtx.fillStyle = spec.cabColor;
-        targetCtx.beginPath();
-        targetCtx.roundRect(4, -12, 14, 18, 4);
-        targetCtx.fill();
-
-        targetCtx.fillStyle = '#38bdf8';
-        targetCtx.beginPath();
-        targetCtx.roundRect(8, -10, 8, 8, 2);
-        targetCtx.fill();
-
-        // Rotating Mixing Drum
-        targetCtx.save();
-        targetCtx.translate(-6, -5);
-        targetCtx.rotate(-0.22);
+        // VOLVO A40G ARTICULATED HAULER (DUMPER)
+        // Rear Dump Body (Angled Chute)
         targetCtx.fillStyle = spec.primaryColor;
         targetCtx.beginPath();
-        targetCtx.ellipse(0, 0, 15, 11, 0, 0, Math.PI * 2);
+        targetCtx.moveTo(-24, -10);
+        targetCtx.lineTo(1, -8);
+        targetCtx.lineTo(1, 6);
+        targetCtx.lineTo(-21, 6);
+        targetCtx.closePath();
         targetCtx.fill();
 
-        // Spiral Stripes on Drum
-        targetCtx.strokeStyle = '#ffffff';
-        targetCtx.lineWidth = 3;
-        const stripeOffset = Math.sin(drumSpin) * 5;
+        // Dump Bed Ribs & Charcoal Top Rail
+        targetCtx.fillStyle = '#1e293b';
+        targetCtx.fillRect(-24, -11, 25, 2.5);
+        targetCtx.strokeStyle = spec.secondaryColor;
+        targetCtx.lineWidth = 1.6;
         targetCtx.beginPath();
-        targetCtx.moveTo(-5 + stripeOffset, -9);
-        targetCtx.lineTo(-1 + stripeOffset, 9);
+        targetCtx.moveTo(-15, -8);
+        targetCtx.lineTo(-14, 5);
+        targetCtx.moveTo(-7, -8);
+        targetCtx.lineTo(-7, 5);
         targetCtx.stroke();
-        targetCtx.restore();
+
+        // Articulated Hitch Joint
+        targetCtx.fillStyle = '#334155';
+        targetCtx.fillRect(1, -2, 4, 8);
+
+        // Front Tractor Nose & Sloped Hood
+        targetCtx.fillStyle = spec.primaryColor;
+        targetCtx.beginPath();
+        targetCtx.roundRect(4, -5, 18, 11, 3);
+        targetCtx.fill();
+
+        // Volvo Black Front Grille
+        targetCtx.fillStyle = '#0f172a';
+        targetCtx.fillRect(19, -4, 3, 9);
+
+        // Front Operator Cab
+        targetCtx.fillStyle = spec.cabColor;
+        targetCtx.beginPath();
+        targetCtx.roundRect(5, -14, 11, 10, 2.5);
+        targetCtx.fill();
+
+        targetCtx.fillStyle = '#38bdf8';
+        targetCtx.fillRect(8, -12, 7, 6);
+
+        // 6x6 Tandem Rear + Front All-Terrain Wheels
+        drawVolvoWheel(targetCtx, -16, 10, 5.8, drumSpin);
+        drawVolvoWheel(targetCtx, -5, 10, 5.8, drumSpin);
+        drawVolvoWheel(targetCtx, 13, 10, 6.2, drumSpin);
       }
 
-      // Hardhat Pilot Beacon on Roof
+      // Roof Amber Strobe Beacon
       targetCtx.fillStyle = '#fef08a';
       targetCtx.beginPath();
-      targetCtx.arc(-2, -16.5, 3, Math.PI, 0);
+      targetCtx.arc(rigType === 'hauler' ? 9 : -1, rigType === 'hauler' ? -14.5 : -16.5, 2.8, Math.PI, 0);
       targetCtx.fill();
 
       targetCtx.restore();
     }
 
     function renderGaragePreviews() {
-      ['excavator', 'bulldozer', 'mixer'].forEach((rig) => {
+      ['loader', 'excavator', 'hauler'].forEach((rig) => {
         const prevCanvas = document.getElementById(`preview-${rig}`);
         if (!prevCanvas) return;
         const pCtx = prevCanvas.getContext('2d');
@@ -1560,7 +1637,7 @@
     // 8. BACKGROUND, BEAMS, COLLECTIBLES & FOREGROUND RENDERING
     // =========================================================================
     function drawScene(dt) {
-      const theme = SHIFT_THEMES[state.selectedShift] || SHIFT_THEMES.day;
+      const theme = SHIFT_THEMES[state.selectedShift] || SHIFT_THEMES.quarry;
       const playH = getPlayableHeight();
       const groundH = getGroundHeight();
 
@@ -1582,36 +1659,55 @@
       const sunX = viewW * 0.78;
       const sunY = playH * theme.sunY;
       ctx.fillStyle = theme.sunColor;
-      ctx.globalAlpha = state.selectedShift === 'night' ? 0.9 : 0.82;
       ctx.beginPath();
-      ctx.arc(sunX, sunY, Math.min(44, viewW * 0.06), 0, Math.PI * 2);
+      ctx.arc(sunX, sunY, 34, 0, Math.PI * 2);
       ctx.fill();
-      ctx.globalAlpha = 1;
 
-      // Drifting Clouds / Night Mist
-      ctx.fillStyle = state.selectedShift === 'night' ? 'rgba(148,163,184,0.12)' : 'rgba(255,255,255,0.45)';
+      // Soft Drifting Clouds
+      ctx.fillStyle = state.selectedShift === 'night' ? 'rgba(148, 163, 184, 0.14)' : 'rgba(255, 255, 255, 0.65)';
       state.clouds.forEach((c) => {
+        ctx.save();
+        ctx.translate(c.x, c.y);
+        ctx.scale(c.scale, c.scale);
         ctx.beginPath();
-        ctx.arc(c.x, c.y, 22 * c.scale, 0, Math.PI * 2);
-        ctx.arc(c.x + 18 * c.scale, c.y - 6 * c.scale, 26 * c.scale, 0, Math.PI * 2);
-        ctx.arc(c.x + 38 * c.scale, c.y, 20 * c.scale, 0, Math.PI * 2);
+        ctx.arc(0, 0, 22, 0, Math.PI * 2);
+        ctx.arc(20, -4, 26, 0, Math.PI * 2);
+        ctx.arc(42, 2, 20, 0, Math.PI * 2);
         ctx.fill();
+        ctx.restore();
       });
 
-      // Far City Skyline + Tower Cranes
+      // Far Nordic Quarry Terraces / Mountain Ridges + Tower Cranes
       state.skylineFar.forEach((b) => {
         const bx = b.x;
         const by = playH - b.h;
-        ctx.fillStyle = theme.farSkyline;
-        ctx.fillRect(bx, by, b.w, b.h);
+        ctx.fillStyle = theme.farRidge;
+        ctx.beginPath();
+        ctx.moveTo(bx - 16, playH);
+        ctx.lineTo(bx + b.w * 0.18, by + 18);
+        ctx.lineTo(bx + b.w * b.peakOffset, by);
+        ctx.lineTo(bx + b.w * 0.85, by + 22);
+        ctx.lineTo(bx + b.w + 16, playH);
+        ctx.closePath();
+        ctx.fill();
+
+        // Quarry Bench Cut Lines
+        if (!theme.isForest) {
+          ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(bx + 10, by + b.h * 0.45);
+          ctx.lineTo(bx + b.w - 10, by + b.h * 0.45);
+          ctx.stroke();
+        }
 
         if (b.hasCrane) {
-          const mastX = bx + b.w * 0.5;
-          const mastTop = by - 58;
+          const mastX = bx + b.w * b.peakOffset;
+          const mastTop = by - 54;
           ctx.strokeStyle = theme.craneColor;
           ctx.lineWidth = 2.5;
           ctx.beginPath();
-          ctx.moveTo(mastX, by);
+          ctx.moveTo(mastX, by + 6);
           ctx.lineTo(mastX, mastTop);
           ctx.moveTo(mastX - 18, mastTop + 8);
           ctx.lineTo(mastX + 46, mastTop + 8);
@@ -1628,34 +1724,48 @@
         }
       });
 
-      // Midground Construction Buildings
+      // Midground Quarry Rock Faces, Aggregate Hoppers & Nordic Pine Trees
       state.skylineMid.forEach((b) => {
         const bx = b.x;
         const by = playH - b.h;
-        ctx.fillStyle = theme.midSkyline;
-        ctx.fillRect(bx, by, b.w, b.h);
+        ctx.fillStyle = theme.midRidge;
+        ctx.beginPath();
+        ctx.moveTo(bx - 10, playH);
+        ctx.lineTo(bx + 12, by);
+        ctx.lineTo(bx + b.w - 12, by + 8);
+        ctx.lineTo(bx + b.w + 10, playH);
+        ctx.closePath();
+        ctx.fill();
 
-        // Exposed Rebar / Steel Frame Top
-        if (b.underConstruction) {
-          ctx.strokeStyle = '#94a3b8';
-          ctx.lineWidth = 2;
-          for (let rx = bx + 8; rx < bx + b.w - 6; rx += 14) {
-            ctx.beginPath();
-            ctx.moveTo(rx, by);
-            ctx.lineTo(rx, by - 12);
-            ctx.stroke();
+        // Aggregate Crusher Silo / Hopper
+        if (b.hasSilo) {
+          const sx = bx + b.w * 0.5 - 12;
+          const sy = by - 22;
+          ctx.fillStyle = '#334155';
+          ctx.fillRect(sx, sy, 24, 24);
+          ctx.fillStyle = '#eab308';
+          ctx.fillRect(sx - 2, sy + 6, 28, 4);
+          if (theme.windowLit) {
+            ctx.fillStyle = 'rgba(253, 224, 71, 0.8)';
+            ctx.fillRect(sx + 6, sy + 13, 12, 6);
           }
         }
 
-        // Building Windows
-        let idx = 0;
-        for (let r = 0; r < b.rows; r++) {
-          for (let c = 0; c < b.cols; c++) {
-            const lit = b.windows[idx++];
-            ctx.fillStyle = theme.windowLit && lit
-              ? 'rgba(253, 224, 71, 0.72)'
-              : 'rgba(15, 23, 42, 0.35)';
-            ctx.fillRect(bx + 10 + c * 14, by + 12 + r * 18, 8, 10);
+        // Nordic Pine Trees along Ridge (prominent in Forest Road & Quarry edges)
+        if (theme.isForest || b.trees.length > 0) {
+          const count = theme.isForest ? b.trees.length : 1;
+          for (let t = 0; t < count; t++) {
+            const tree = b.trees[t];
+            const tx = bx + tree.offsetX;
+            const ty = by + 4;
+            const th = tree.height;
+            ctx.fillStyle = theme.isForest ? '#166534' : '#1e3a2f';
+            ctx.beginPath();
+            ctx.moveTo(tx, ty - th);
+            ctx.lineTo(tx - th * 0.36, ty);
+            ctx.lineTo(tx + th * 0.36, ty);
+            ctx.closePath();
+            ctx.fill();
           }
         }
       });
@@ -1837,7 +1947,7 @@
       const bestEl = document.getElementById('hud-best');
       if (bestEl) bestEl.textContent = state.bestScore;
       const bonusEl = document.getElementById('hud-bonus');
-      if (bonusEl) bonusEl.textContent = `+${state.bonusPoints}`;
+      if (bonusEl) bonusEl.textContent = `${state.hardhatStreak}x`;
       const menuBestEl = document.getElementById('menu-best-score');
       if (menuBestEl) menuBestEl.textContent = state.bestScore;
     }
@@ -1854,6 +1964,7 @@
       state.score = 0;
       state.bonusPoints = 0;
       state.hardhatsCollected = 0;
+      state.hardhatStreak = 0;
       state.obstacles = [];
       state.collectibles = [];
       state.particles = [];
@@ -2024,7 +2135,7 @@
       if (state.phase !== 'PLAYING') return;
 
       // Active Flight Physics
-      const spec = RIG_SPECS[state.selectedRig] || RIG_SPECS.excavator;
+      const spec = RIG_SPECS[state.selectedRig] || RIG_SPECS.loader;
       state.player.vy = Math.min(spec.maxFall, state.player.vy + spec.gravity * dt);
       state.player.y += state.player.vy * dt;
       state.player.armAngle += dt * 4.5;
@@ -2087,15 +2198,10 @@
           return;
         }
 
-        // Score Point when passing Beam Center
+        // Track Beam Clearance (No points awarded unless the Golden Hardhat is collected)
         if (!obs.passed && obs.x + obs.width * 0.5 < state.player.x) {
           obs.passed = true;
           state.obstaclesPassed += 1;
-          state.score += 1;
-          updateHUD();
-          popScoreAnimation();
-          audio.playBeamScore();
-          spawnFloatingText(state.player.x, state.player.y - 26, '+1', '#ffffff');
         }
 
         if (obs.x + obs.width < -90) {
@@ -2103,7 +2209,7 @@
         }
       }
 
-      // Update Golden Hardhat Collectibles
+      // Update Golden Hardhat Collectibles (Primary Scoring Objective)
       for (let i = state.collectibles.length - 1; i >= 0; i--) {
         const item = state.collectibles[i];
         item.x -= speed * dt;
@@ -2118,16 +2224,27 @@
         if (!item.collected) {
           const dx = state.player.x - item.x;
           const dy = state.player.y - item.y;
-          if (dx * dx + dy * dy < (state.player.radius + item.radius + 4) ** 2) {
+          if (dx * dx + dy * dy < (state.player.radius + item.radius + 5) ** 2) {
             item.collected = true;
             state.hardhatsCollected += 1;
-            state.bonusPoints += 2;
-            state.score += 2;
+            state.hardhatStreak += 1;
+            const streakBonus = state.hardhatStreak >= 3 ? 2 : 1;
+            state.score += streakBonus;
+            state.bonusPoints += streakBonus;
             updateHUD();
             popScoreAnimation();
             audio.playHardhatPickup();
             spawnExhaustSparks(item.x, item.y, 12, '#fef08a');
-            spawnFloatingText(item.x, item.y - 18, '+2 HARDHAT!', '#fbbf24');
+            const label = streakBonus > 1 ? `+${streakBonus} STREAK!` : '+1 HARDHAT!';
+            spawnFloatingText(item.x, item.y - 18, label, '#fbbf24');
+          } else if (item.x + item.radius < state.player.x - state.player.radius - 8 && !item.missed) {
+            // Reset streak if player flies past a hardhat without collecting it
+            item.missed = true;
+            if (state.hardhatStreak > 0) {
+              state.hardhatStreak = 0;
+              updateHUD();
+              spawnFloatingText(item.x, item.y - 16, 'MISSED!', '#94a3b8');
+            }
           }
         }
 
