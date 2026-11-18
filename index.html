@@ -46,6 +46,14 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       -webkit-user-select: none;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    *::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
     }
 
     html, body {
@@ -658,7 +666,7 @@
       <div id="hud-score">0</div>
       <div style="margin-top:4px; display:flex; align-items:center; justify-content:center; gap:5px; flex-wrap:wrap;">
         <div id="hud-biome-pill" style="display:inline-block; background:rgba(15,23,42,0.92); border:1px solid rgba(255,255,255,0.22); border-radius:999px; padding:2px 9px; font-size:0.62rem; font-weight:700; letter-spacing:0.06em; color:#f1f5f9; white-space:nowrap;">🌲 DEEP PINE FOREST</div>
-        <div id="hud-tier-pill" style="display:inline-block; background:rgba(15,23,42,0.92); border:1px solid rgba(56,189,248,0.55); border-radius:999px; padding:2px 9px; font-size:0.62rem; font-weight:800; letter-spacing:0.05em; color:#7dd3fc; white-space:nowrap;">PHASE 1 • STEADY</div>
+        <div id="hud-tier-pill" style="display:inline-block; background:rgba(15,23,42,0.92); border:1px solid rgba(56,189,248,0.55); border-radius:999px; padding:2px 9px; font-size:0.62rem; font-weight:800; letter-spacing:0.05em; color:#7dd3fc; white-space:nowrap;">PHASE 1 • WARM-UP</div>
       </div>
     </div>
 
@@ -682,13 +690,13 @@
         <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:0.5rem;">
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
-            <span style="font-size:0.66rem; font-weight:800; letter-spacing:0.12em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-            <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v3.2</span>
-          </div>
-          <h1 class="font-display" style="font-size:clamp(1.6rem, 6.8vw, 2.1rem); font-weight:700; line-height:1.05; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
-          <button type="button" id="btn-sync-latest" style="margin-top:4px; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.38); color:#e0f2fe; border-radius:999px; padding:0.2rem 0.65rem; font-size:0.65rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.28rem;">
-            <span id="sync-status-text">↻ Get Latest (v3.2)</span>
-          </button>
+              <span style="font-size:0.66rem; font-weight:800; letter-spacing:0.12em; color:#fbbf24;">EARTHMOVER ARCADE</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v3.5</span>
+            </div>
+            <h1 class="font-display" style="font-size:clamp(1.6rem, 6.8vw, 2.1rem); font-weight:700; line-height:1.05; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
+            <button type="button" id="btn-sync-latest" style="margin-top:4px; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.38); color:#e0f2fe; border-radius:999px; padding:0.2rem 0.65rem; font-size:0.65rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.28rem;">
+              <span id="sync-status-text">↻ Get Latest (v3.5)</span>
+            </button>
           </div>
           <button type="button" class="record-btn" id="btn-open-leaderboard" title="View Top 10 High Scores">
             <div style="font-size:0.58rem; font-weight:800; letter-spacing:0.06em; color:#94a3b8; white-space:nowrap;">TOP 10 RECORD ▾</div>
@@ -818,8 +826,8 @@
 
         <!-- Device Overall Leaderboard -->
         <div class="leaderboard-box">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem; gap:0.4rem;">
-            <span style="font-size:0.62rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8;">DEVICE TOP SCORES</span>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; gap:0.4rem;">
+            <span style="font-size:0.62rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8;">DEVICE TOP SCORES (SCROLL)</span>
             <div style="display:flex; align-items:center; gap:0.45rem;">
               <span style="font-size:0.64rem; font-weight:700; color:#38bdf8;" id="go-next-up-hint"></span>
               <button type="button" id="btn-go-top10" style="background:rgba(251,191,36,0.16); border:1px solid rgba(251,191,36,0.45); color:#fbbf24; border-radius:999px; padding:2px 8px; font-family:'Chakra Petch',sans-serif; font-size:0.64rem; font-weight:700; cursor:pointer;">
@@ -827,7 +835,7 @@
               </button>
             </div>
           </div>
-          <div id="go-leaderboard-list"></div>
+          <div id="go-leaderboard-list" style="max-height:158px; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-right:2px;"></div>
         </div>
 
         <div style="display:flex; align-items:stretch; gap:0.45rem; margin-top:0.85rem;">
@@ -1305,7 +1313,7 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v3.3';
+    const APP_VERSION = 'v3.6';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const MAX_LEADERBOARD_ENTRIES = 10;
@@ -1565,7 +1573,7 @@
       width: window.innerWidth,
       height: window.innerHeight,
       groundHeight: 84,
-      scrollSpeed: 235,
+      scrollSpeed: 230,
       bgScrollFar: 0,
       bgScrollMid: 0,
       groundScroll: 0,
@@ -1587,97 +1595,97 @@
       clouds: [],
       stars: [],
       spawnTimer: 0,
-      hazardTimer: 2.8,
+      hazardTimer: 3.6,
       lastTier: 1
     };
 
     function getDifficultyTier() {
       const s = state.score;
-      if (s >= 26) {
+      if (s >= 34) {
         return {
           tier: 5,
           label: 'PHASE 5 • OVERDRIVE',
           color: '#fb7185',
           speedMult: 1.32,
-          gapScale: 0.84,
+          gapScale: 0.85,
           movingChance: 0.72,
           movingSpeedMult: 1.55,
           ballChance: 0.44,
           wireChance: 0.34,
           droneChance: 0.42,
-          hazardIntervalMin: 2.1,
-          hazardIntervalRange: 1.8,
-          doubleHazardChance: 0.35,
-          hazardMult: 1.35
+          hazardIntervalMin: 2.9,
+          hazardIntervalRange: 2.1,
+          doubleHazardChance: 0.18,
+          hazardMult: 1.3
         };
       }
-      if (s >= 18) {
+      if (s >= 24) {
         return {
           tier: 4,
           label: 'PHASE 4 • HEAVY SURGE',
           color: '#fb923c',
-          speedMult: 1.24,
-          gapScale: 0.88,
-          movingChance: 0.58,
-          movingSpeedMult: 1.38,
-          ballChance: 0.36,
-          wireChance: 0.28,
+          speedMult: 1.23,
+          gapScale: 0.89,
+          movingChance: 0.56,
+          movingSpeedMult: 1.36,
+          ballChance: 0.34,
+          wireChance: 0.26,
           droneChance: 0.32,
-          hazardIntervalMin: 2.5,
-          hazardIntervalRange: 2.1,
-          doubleHazardChance: 0.22,
-          hazardMult: 1.25
+          hazardIntervalMin: 3.4,
+          hazardIntervalRange: 2.4,
+          doubleHazardChance: 0.1,
+          hazardMult: 1.2
         };
       }
-      if (s >= 11) {
+      if (s >= 16) {
         return {
           tier: 3,
           label: 'PHASE 3 • RUSH HOUR',
           color: '#fbbf24',
-          speedMult: 1.16,
-          gapScale: 0.92,
-          movingChance: 0.42,
-          movingSpeedMult: 1.22,
-          ballChance: 0.28,
-          wireChance: 0.22,
-          droneChance: 0.22,
-          hazardIntervalMin: 3.0,
-          hazardIntervalRange: 2.4,
-          doubleHazardChance: 0.1,
-          hazardMult: 1.15
+          speedMult: 1.15,
+          gapScale: 0.93,
+          movingChance: 0.38,
+          movingSpeedMult: 1.2,
+          ballChance: 0.24,
+          wireChance: 0.18,
+          droneChance: 0.2,
+          hazardIntervalMin: 4.1,
+          hazardIntervalRange: 2.6,
+          doubleHazardChance: 0,
+          hazardMult: 1.1
         };
       }
-      if (s >= 5) {
+      if (s >= 10) {
         return {
           tier: 2,
           label: 'PHASE 2 • DOUBLE SHIFT',
           color: '#34d399',
-          speedMult: 1.08,
-          gapScale: 0.96,
-          movingChance: 0.24,
-          movingSpeedMult: 1.1,
-          ballChance: 0.2,
-          wireChance: 0.16,
-          droneChance: 0.14,
-          hazardIntervalMin: 3.5,
-          hazardIntervalRange: 2.8,
+          speedMult: 1.07,
+          gapScale: 0.98,
+          movingChance: 0.22,
+          movingSpeedMult: 1.05,
+          ballChance: 0.12,
+          wireChance: 0,
+          droneChance: 0,
+          hazardIntervalMin: 0,
+          hazardIntervalRange: 0,
           doubleHazardChance: 0,
-          hazardMult: 1.06
+          hazardMult: 1.0
         };
       }
       return {
         tier: 1,
-        label: 'PHASE 1 • STEADY',
+        label: 'PHASE 1 • WARM-UP',
         color: '#7dd3fc',
-        speedMult: 1.0,
-        gapScale: 1.0,
+        speedMult: 0.96,
+        gapScale: 1.06,
         movingChance: 0,
         movingSpeedMult: 1.0,
-        ballChance: 0.14,
+        ballChance: 0,
         wireChance: 0,
         droneChance: 0,
-        hazardIntervalMin: 4.1,
-        hazardIntervalRange: 3.2,
+        hazardIntervalMin: 0,
+        hazardIntervalRange: 0,
         doubleHazardChance: 0,
         hazardMult: 1.0
       };
@@ -1762,7 +1770,7 @@
     initScenery();
 
     // =========================================================================
-    // 5. PROCEDURAL VECTOR DRAWING (Rigs, Beams, Wrecking Balls, Hardhats)
+    // 5. PROCEDURAL VECTOR DRAWING (Clean Rigs without Shadow Halo)
     // =========================================================================
     function drawConstructionRig(context, rigType, x, y, radius, rotation, bucketAngle, wheelSpin, dir = 1) {
       const spec = RIG_SPECS[rigType] || RIG_SPECS.loader;
@@ -1772,11 +1780,6 @@
       context.scale(dir, 1);
 
       const r = radius;
-
-      // Subtle dark contrast aura so all machines pop clearly against bright orange/blue skies
-      context.shadowColor = 'rgba(15, 23, 42, 0.55)';
-      context.shadowBlur = 7;
-      context.shadowOffsetY = 2;
 
       // Exhaust puff pipe
       context.fillStyle = '#0f172a';
@@ -1869,7 +1872,7 @@
           context.restore();
         });
       } else if (rigType === 'excavator') {
-        // --- CRAWLER EXCAVATOR (High-contrast boom & stick so it pops on all skies) ---
+        // --- CRAWLER EXCAVATOR ---
         context.fillStyle = '#0f172a';
         context.beginPath();
         context.roundRect(-r * 0.92, r * 0.22, r * 1.66, r * 0.5, 9);
@@ -1885,7 +1888,6 @@
           context.fill();
         });
 
-        // Counterweight & House with bold dark outline
         context.fillStyle = '#0f172a';
         context.beginPath();
         context.roundRect(-r * 0.9, -r * 0.44, r * 1.44, r * 0.68, 7);
@@ -1902,7 +1904,6 @@
         context.fillStyle = '#f8fafc';
         context.fillRect(-r * 0.84, -r * 0.16, r * 0.22, r * 0.08);
 
-        // Operator Cab
         context.fillStyle = spec.cabColor;
         context.beginPath();
         context.roundRect(-r * 0.36, -r * 0.96, r * 0.68, r * 0.56, 5);
@@ -1912,12 +1913,10 @@
         context.roundRect(-r * 0.28, -r * 0.86, r * 0.52, r * 0.38, 3);
         context.fill();
 
-        // Heavy Outlined Excavator Boom, Stick & Bucket
         context.save();
         context.translate(r * 0.3, -r * 0.22);
         context.rotate(-0.48 + bucketAngle * 0.42);
 
-        // Outer dark steel border for Boom
         context.strokeStyle = '#0f172a';
         context.lineWidth = r * 0.36;
         context.lineCap = 'round';
@@ -1926,7 +1925,6 @@
         context.lineTo(r * 0.84, -r * 0.36);
         context.stroke();
 
-        // Bright yellow inner Boom
         context.strokeStyle = '#fde047';
         context.lineWidth = r * 0.22;
         context.beginPath();
@@ -1934,7 +1932,6 @@
         context.lineTo(r * 0.84, -r * 0.36);
         context.stroke();
 
-        // Hydraulic cylinder accent
         context.strokeStyle = '#cbd5e1';
         context.lineWidth = r * 0.08;
         context.beginPath();
@@ -1942,13 +1939,11 @@
         context.lineTo(r * 0.58, -r * 0.14);
         context.stroke();
 
-        // Pivot pin
         context.fillStyle = '#0f172a';
         context.beginPath();
         context.arc(r * 0.84, -r * 0.36, r * 0.16, 0, Math.PI * 2);
         context.fill();
 
-        // Stick / Dipper Arm
         context.translate(r * 0.84, -r * 0.36);
         context.rotate(0.95 + bucketAngle * 0.42);
 
@@ -1966,7 +1961,6 @@
         context.lineTo(r * 0.72, r * 0.28);
         context.stroke();
 
-        // Digging Bucket with Teeth
         context.translate(r * 0.72, r * 0.28);
         context.fillStyle = '#1e293b';
         context.strokeStyle = '#0f172a';
@@ -1978,7 +1972,7 @@
         context.stroke();
         context.restore();
       } else {
-        // --- ARTICULATED HAULER (6x6 Dump Truck) ---
+        // --- ARTICULATED HAULER ---
         context.fillStyle = '#0f172a';
         context.beginPath();
         context.roundRect(-r * 0.96, r * 0.06, r * 1.72, r * 0.32, 4);
@@ -2067,7 +2061,6 @@
       const midColor = isNight ? biome.nightMid : biome.dayMid;
 
       if (biome.id === 'forest') {
-        // Distant rolling pine ridges
         ctx.fillStyle = farColor;
         ctx.beginPath();
         ctx.moveTo(0, horizonY);
@@ -2080,7 +2073,6 @@
         ctx.closePath();
         ctx.fill();
 
-        // Midground dense pine forest silhouettes
         ctx.fillStyle = midColor;
         ctx.fillRect(0, horizonY - 26, state.width, 30);
         const step = 46;
@@ -2097,7 +2089,6 @@
           idx++;
         }
       } else if (biome.id === 'alpine') {
-        // Jagged snow-capped mountain peaks
         const peakW = 280;
         const startFar = -(state.bgScrollFar % peakW) - peakW;
         let pIdx = Math.floor(state.bgScrollFar / peakW);
@@ -2111,7 +2102,6 @@
           ctx.closePath();
           ctx.fill();
 
-          // Snow cap
           ctx.fillStyle = isNight ? 'rgba(226, 232, 240, 0.35)' : 'rgba(255, 255, 255, 0.85)';
           ctx.beginPath();
           ctx.moveTo(x + peakW * 0.5, horizonY - h);
@@ -2124,7 +2114,6 @@
           pIdx++;
         }
 
-        // Foothills
         ctx.fillStyle = midColor;
         ctx.beginPath();
         ctx.moveTo(0, horizonY);
@@ -2137,7 +2126,6 @@
         ctx.closePath();
         ctx.fill();
       } else if (biome.id === 'city') {
-        // Distant high-rises & tower cranes
         const bStep = 74;
         const startFar = -(state.bgScrollFar % bStep) - bStep;
         let bIdx = Math.floor(state.bgScrollFar / bStep);
@@ -2158,7 +2146,6 @@
           bIdx++;
         }
 
-        // Foreground city blocks with lit windows
         const mStep = 64;
         const startMid = -(state.bgScrollMid % mStep) - mStep;
         let mIdx = Math.floor(state.bgScrollMid / mStep);
@@ -2177,7 +2164,6 @@
           mIdx++;
         }
       } else if (biome.id === 'harbor') {
-        // Suspension bridge towers & harbor cranes
         const span = 320;
         const startFar = -(state.bgScrollFar % span) - span;
         for (let x = startFar; x < state.width + span; x += span) {
@@ -2198,7 +2184,6 @@
           ctx.stroke();
         }
 
-        // Waterfront container stacks & gantry cranes
         const cStep = 95;
         const startMid = -(state.bgScrollMid % cStep) - cStep;
         let cIdx = Math.floor(state.bgScrollMid / cStep);
@@ -2210,7 +2195,6 @@
           cIdx++;
         }
       } else {
-        // Red Rock Canyon Mesas & Buttes
         const mesaW = 260;
         const startFar = -(state.bgScrollFar % mesaW) - mesaW;
         let rIdx = Math.floor(state.bgScrollFar / mesaW);
@@ -2352,16 +2336,12 @@
           const wireY = obs.topHeight + obs.wireOffset;
           const pulse = 0.55 + 0.45 * Math.sin(state.time * 14 + obs.x * 0.05);
 
-          // Insulated end mounts on beam edges
           ctx.fillStyle = '#0f172a';
           ctx.fillRect(obs.x - 4, wireY - 5, 8, 10);
           ctx.fillRect(obs.x + obs.width - 4, wireY - 5, 8, 10);
 
-          // High-voltage glowing arc line
           ctx.save();
           ctx.strokeStyle = `rgba(56, 189, 248, ${pulse.toFixed(2)})`;
-          ctx.shadowColor = '#38bdf8';
-          ctx.shadowBlur = 10;
           ctx.lineWidth = 3.5;
           ctx.beginPath();
           ctx.moveTo(obs.x, wireY);
@@ -2374,7 +2354,7 @@
         }
       });
 
-      // 5. Golden Safety Hardhats (Transform into radiant 2X Super Hardhats at 3+ streak!)
+      // 5. Golden Safety Hardhats
       const isBonusActive = state.streak >= 3;
       state.collectibles.forEach((hat) => {
         if (hat.collected) return;
@@ -2384,13 +2364,11 @@
         ctx.translate(hat.x, bobY);
 
         if (isBonusActive) {
-          // Dark high-contrast circular badge backing matching standard hardhat for crisp visibility on all skies
           ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
           ctx.beginPath();
           ctx.arc(0, 0, 22, 0, Math.PI * 2);
           ctx.fill();
 
-          // Pulsing emerald-gold ring
           const ringRadius = 22 + blink * 3.5;
           ctx.strokeStyle = blink > 0.5 ? '#34d399' : '#fbbf24';
           ctx.lineWidth = 2.4;
@@ -2398,18 +2376,6 @@
           ctx.arc(0, 0, ringRadius, 0, Math.PI * 2);
           ctx.stroke();
 
-          // Orbiting sparkles
-          for (let sp = 0; sp < 3; sp++) {
-            const ang = state.time * 4.2 + (sp * Math.PI * 2) / 3;
-            const sx = Math.cos(ang) * 24;
-            const sy = Math.sin(ang) * 24;
-            ctx.fillStyle = sp % 2 === 0 ? '#fef08a' : '#34d399';
-            ctx.beginPath();
-            ctx.arc(sx, sy, 2.4, 0, Math.PI * 2);
-            ctx.fill();
-          }
-
-          // Super Hardhat Shell with dark steel outline (matches standard hat geometry & contrast)
           ctx.fillStyle = blink > 0.5 ? '#fde047' : '#34d399';
           ctx.strokeStyle = '#0f172a';
           ctx.lineWidth = 2.2;
@@ -2418,11 +2384,9 @@
           ctx.fill();
           ctx.stroke();
 
-          // Center Crest
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(-2.5, -11, 5, 11);
 
-          // Brim with dark steel outline
           ctx.fillStyle = '#10b981';
           ctx.strokeStyle = '#0f172a';
           ctx.lineWidth = 2;
@@ -2431,7 +2395,6 @@
           ctx.fill();
           ctx.stroke();
 
-          // Crisp "2X" Badge floating above hat
           ctx.fillStyle = '#064e3b';
           ctx.strokeStyle = '#34d399';
           ctx.lineWidth = 1.6;
@@ -2446,7 +2409,6 @@
           ctx.textBaseline = 'middle';
           ctx.fillText('2X', 0, -21);
         } else {
-          // Standard Golden Hardhat with high-contrast dark backing & rim so it pops against orange canyon skies
           ctx.fillStyle = 'rgba(15, 23, 42, 0.58)';
           ctx.beginPath();
           ctx.arc(0, 0, 21, 0, Math.PI * 2);
@@ -2506,33 +2468,42 @@
         ctx.fill();
       });
 
-      // 8. Falling Boulders & Crane Loads (with top warning indicators)
+      // 8. Falling Boulders & Crane Loads (Lowered high-visibility warning & lightweight 60 FPS shapes)
       state.fallingHazards.forEach((hz) => {
         if (hz.warnTimer > 0) {
-          const pulse = 0.55 + 0.45 * Math.sin(state.time * 22);
-          const warnY = Math.max(54, state.height * 0.08);
+          const flash = Math.sin(state.time * 24) > 0;
+          const warnY = Math.max(98, state.height * 0.145);
           ctx.save();
           ctx.translate(hz.x, warnY);
-          ctx.fillStyle = `rgba(239, 68, 68, ${pulse.toFixed(2)})`;
+
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+          ctx.strokeStyle = flash ? '#ef4444' : '#fbbf24';
+          ctx.lineWidth = 2.5;
           ctx.beginPath();
-          ctx.moveTo(0, -14);
-          ctx.lineTo(15, 12);
-          ctx.lineTo(-15, 12);
+          ctx.roundRect(-24, -18, 48, 36, 10);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = flash ? '#ef4444' : '#f59e0b';
+          ctx.beginPath();
+          ctx.moveTo(0, -12);
+          ctx.lineTo(13, 8);
+          ctx.lineTo(-13, 8);
           ctx.closePath();
           ctx.fill();
 
           ctx.fillStyle = '#ffffff';
-          ctx.font = '800 13px "Chakra Petch", sans-serif';
+          ctx.font = '800 12px "Chakra Petch", sans-serif';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText('!', 0, 3);
+          ctx.fillText('!', 0, 1);
 
-          ctx.strokeStyle = `rgba(251, 191, 36, ${(pulse * 0.65).toFixed(2)})`;
-          ctx.setLineDash([5, 5]);
-          ctx.lineWidth = 2;
+          ctx.strokeStyle = flash ? '#fca5a5' : '#fde047';
+          ctx.lineWidth = 2.5;
           ctx.beginPath();
-          ctx.moveTo(0, 16);
-          ctx.lineTo(0, 56);
+          ctx.moveTo(-7, 23);
+          ctx.lineTo(0, 30);
+          ctx.lineTo(7, 23);
           ctx.stroke();
           ctx.restore();
         } else {
@@ -2540,37 +2511,29 @@
           ctx.translate(hz.x, hz.y);
           if (hz.type === 'boulder') {
             ctx.rotate(hz.rotation);
-            ctx.fillStyle = '#475569';
+            ctx.fillStyle = '#1e293b';
             ctx.beginPath();
-            const pts = 8;
-            for (let i = 0; i < pts; i++) {
-              const ang = (i / pts) * Math.PI * 2;
-              const rad = hz.radius * (i % 2 === 0 ? 1.0 : 0.82);
-              const px = Math.cos(ang) * rad;
-              const py = Math.sin(ang) * rad;
-              if (i === 0) ctx.moveTo(px, py);
-              else ctx.lineTo(px, py);
-            }
-            ctx.closePath();
+            ctx.arc(0, 0, hz.radius, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.fillStyle = '#64748b';
             ctx.beginPath();
-            ctx.arc(-hz.radius * 0.25, -hz.radius * 0.25, hz.radius * 0.36, 0, Math.PI * 2);
+            ctx.arc(0, 0, hz.radius - 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#94a3b8';
+            ctx.beginPath();
+            ctx.arc(-hz.radius * 0.28, -hz.radius * 0.28, hz.radius * 0.34, 0, Math.PI * 2);
             ctx.fill();
           } else {
-            // Lowered Crane Steel Bundle
-            ctx.strokeStyle = '#cbd5e1';
-            ctx.lineWidth = 2.5;
-            ctx.beginPath();
-            ctx.moveTo(0, -hz.y - 20);
-            ctx.lineTo(0, -hz.radius * 0.6);
-            ctx.stroke();
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fillRect(-1.5, -hz.y - 20, 3, hz.y + 20 - hz.radius * 0.6);
+
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(-hz.radius * 1.15 - 2, -hz.radius * 0.65 - 2, hz.radius * 2.3 + 4, hz.radius * 1.3 + 4);
 
             ctx.fillStyle = '#ea580c';
-            ctx.beginPath();
-            ctx.roundRect(-hz.radius * 1.15, -hz.radius * 0.65, hz.radius * 2.3, hz.radius * 1.3, 5);
-            ctx.fill();
+            ctx.fillRect(-hz.radius * 1.15, -hz.radius * 0.65, hz.radius * 2.3, hz.radius * 1.3);
 
             ctx.fillStyle = '#fbbf24';
             ctx.fillRect(-hz.radius * 1.05, -3, hz.radius * 2.1, 6);
@@ -2667,6 +2630,7 @@
     }
 
     function spawnFallingHazard() {
+      if (state.fallingHazards.length >= 2) return;
       const tier = getDifficultyTier();
       const isCityOrHarbor = state.biome.id === 'city' || state.biome.id === 'harbor';
       const type = isCityOrHarbor ? 'crane_load' : 'boulder';
@@ -2762,7 +2726,7 @@
       document.getElementById('go-hardhats').textContent = state.hardhatsCollected;
       updateHUD();
 
-      renderLeaderboardList('go-leaderboard-list', 4, false, state.lastRunEntryId);
+      renderLeaderboardList('go-leaderboard-list', 10, false, state.lastRunEntryId);
 
       const nextHint = document.getElementById('go-next-up-hint');
       const retryLabel = document.getElementById('btn-retry-label');
@@ -2849,16 +2813,18 @@
         }
       }
 
-      // 3B. Falling Boulders & Crane Loads
-      state.hazardTimer -= dt;
-      if (state.hazardTimer <= 0) {
-        spawnFallingHazard();
-        if (tier.doubleHazardChance > 0 && Math.random() < tier.doubleHazardChance) {
-          setTimeout(() => {
-            if (state.mode === 'playing') spawnFallingHazard();
-          }, 420);
+      // 3B. Falling Boulders & Crane Loads (only active once warmed up in Phase 3+)
+      if (tier.hazardIntervalMin > 0) {
+        state.hazardTimer -= dt;
+        if (state.hazardTimer <= 0) {
+          spawnFallingHazard();
+          if (tier.doubleHazardChance > 0 && Math.random() < tier.doubleHazardChance) {
+            setTimeout(() => {
+              if (state.mode === 'playing') spawnFallingHazard();
+            }, 420);
+          }
+          state.hazardTimer = tier.hazardIntervalMin + Math.random() * tier.hazardIntervalRange;
         }
-        state.hazardTimer = tier.hazardIntervalMin + Math.random() * tier.hazardIntervalRange;
       }
 
       const hitR = state.player.radius * 0.82;
@@ -3207,7 +3173,7 @@
       state.particles = [];
       state.floatingTexts = [];
       state.spawnTimer = 0;
-      state.hazardTimer = 2.6;
+      state.hazardTimer = 3.6;
 
       // Pre-populate opening obstacles with exact uniform spacing across all devices
       const spacing = state.width < 600 ? 275 : 315;
@@ -3262,7 +3228,7 @@
       handleFlapAction();
     });
 
-    // Keyboard Controls (Space, Up Arrow, W, P / Esc)
+    // Keyboard Controls (Space, Up Arrow, W)
     window.addEventListener('keydown', (e) => {
       if (document.activeElement && document.activeElement.tagName === 'INPUT') {
         if (e.code === 'Enter') document.activeElement.blur();
@@ -3359,7 +3325,6 @@
         }
       }
 
-      // Fallback clipboard copy for desktop / non-WebShare browsers
       const fullMessage = `${shareText} ${shareUrl}`;
       const ta = document.createElement('textarea');
       ta.value = fullMessage;
