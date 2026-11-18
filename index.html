@@ -1,0 +1,2082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>CRANE FLAP — Construction Site Arcade</title>
+
+  <!-- Typography: Chakra Petch (Industrial Display) & Inter (Clean UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+
+      --cat-yellow: #f59e0b;
+      --cat-yellow-bright: #fbbf24;
+      --cat-orange: #ea580c;
+      --steel-dark: #0f172a;
+      --steel-panel: rgba(15, 23, 42, 0.84);
+      --steel-border: rgba(251, 191, 36, 0.35);
+      --text-light: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      overflow: hidden;
+      background: #0f172a;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text-light);
+      touch-action: none;
+    }
+
+    .font-display {
+      font-family: 'Chakra Petch', sans-serif;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Full-bleed Canvas */
+    #game-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: calc(100vh + var(--safe-bottom));
+      height: calc(100lvh + var(--safe-bottom));
+      display: block;
+      z-index: 1;
+    }
+
+    /* Industrial Hazard Stripe Accent */
+    .hazard-bar {
+      height: 8px;
+      width: 100%;
+      background: repeating-linear-gradient(
+        -45deg,
+        #fbbf24,
+        #fbbf24 10px,
+        #1e293b 10px,
+        #1e293b 20px
+      );
+    }
+
+    /* HUD Layer */
+    #hud {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: calc(0.75rem + var(--safe-top)) calc(1rem + var(--safe-right)) calc(1rem + var(--safe-bottom)) calc(1rem + var(--safe-left));
+    }
+
+    .hud-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .hud-badge {
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 16px;
+      padding: 0.55rem 0.9rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .score-center {
+      position: fixed;
+      top: calc(1.1rem + var(--safe-top));
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      pointer-events: none;
+      z-index: 11;
+    }
+
+    #hud-score {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: clamp(3rem, 8vw, 4.5rem);
+      font-weight: 700;
+      line-height: 1;
+      color: #ffffff;
+      text-shadow: 0 4px 0 #0f172a, 0 8px 24px rgba(0, 0, 0, 0.55);
+      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    #hud-score.pop {
+      transform: scale(1.24);
+      color: var(--cat-yellow-bright);
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #f8fafc;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      pointer-events: auto;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+      transition: transform 0.14s ease, background 0.14s ease, border-color 0.14s ease;
+    }
+
+    .icon-btn:hover {
+      background: rgba(30, 41, 59, 0.9);
+      border-color: var(--cat-yellow);
+    }
+
+    .icon-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* Ready Prompt Overlay */
+    #ready-hint {
+      position: fixed;
+      bottom: calc(22% + var(--safe-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 12;
+      pointer-events: none;
+      text-align: center;
+      animation: floatPulse 1.6s ease-in-out infinite;
+    }
+
+    .tap-pill {
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 2px solid var(--cat-yellow);
+      border-radius: 999px;
+      padding: 0.7rem 1.4rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: 0.04em;
+      color: #ffffff;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+      white-space: nowrap;
+    }
+
+    @keyframes floatPulse {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-8px); }
+    }
+
+    /* Modal Overlays (Start Screen & Game Over) */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: calc(1rem + var(--safe-top)) calc(1rem + var(--safe-right)) calc(1rem + var(--safe-bottom)) calc(1rem + var(--safe-left));
+      background: radial-gradient(circle at 50% 35%, rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.86));
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      transition: opacity 0.25s ease;
+    }
+
+    .industrial-card {
+      width: 100%;
+      max-width: 460px;
+      background: var(--steel-panel);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--steel-border);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+      animation: cardEntrance 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes cardEntrance {
+      from { opacity: 0; transform: translateY(16px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .card-body {
+      padding: 1.35rem 1.4rem 1.5rem 1.4rem;
+    }
+
+    @media (min-width: 640px) {
+      .card-body {
+        padding: 1.75rem 1.85rem 1.85rem 1.85rem;
+      }
+    }
+
+    /* Machine Selector Cards */
+    .rig-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+      margin-top: 0.65rem;
+    }
+
+    .rig-card {
+      background: rgba(30, 41, 59, 0.68);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 0.7rem 0.45rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .rig-card:hover {
+      background: rgba(30, 41, 59, 0.92);
+      border-color: rgba(251, 191, 36, 0.45);
+    }
+
+    .rig-card.selected {
+      background: rgba(245, 158, 11, 0.18);
+      border-color: var(--cat-yellow-bright);
+      box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.4), 0 8px 20px rgba(245, 158, 11, 0.22);
+      transform: translateY(-2px);
+    }
+
+    .rig-preview {
+      width: 56px;
+      height: 44px;
+      margin-bottom: 0.35rem;
+    }
+
+    /* Shift Shift-Shift/Time Toggle */
+    .shift-selector {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.45rem;
+      background: rgba(15, 23, 42, 0.65);
+      padding: 0.32rem;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 0.45rem;
+    }
+
+    .shift-btn {
+      padding: 0.5rem 0.35rem;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .shift-btn.selected {
+      background: rgba(245, 158, 11, 0.24);
+      color: #ffffff;
+      border: 1px solid rgba(251, 191, 36, 0.5);
+    }
+
+    /* Action Buttons */
+    .btn-launch {
+      width: 100%;
+      margin-top: 1.25rem;
+      padding: 0.95rem 1.25rem;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+      color: #0f172a;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      box-shadow: 0 10px 26px rgba(217, 119, 6, 0.45);
+      transition: transform 0.14s ease, filter 0.14s ease;
+    }
+
+    .btn-launch:hover {
+      filter: brightness(1.06);
+      transform: translateY(-1px);
+    }
+
+    .btn-launch:active {
+      transform: scale(0.97);
+    }
+
+    .btn-secondary {
+      padding: 0.85rem 1rem;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #f8fafc;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.14s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .btn-secondary:active {
+      transform: scale(0.96);
+    }
+
+    /* Game Over Score Grid */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+      margin-top: 1rem;
+    }
+
+    .stat-box {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 0.7rem 0.5rem;
+      text-align: center;
+    }
+
+    .new-record-tag {
+      display: inline-block;
+      background: #10b981;
+      color: #064e3b;
+      font-weight: 800;
+      font-size: 0.68rem;
+      padding: 0.18rem 0.55rem;
+      border-radius: 999px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-left: 0.4rem;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <!-- Main Interactive Game Canvas -->
+  <canvas id="game-canvas"></canvas>
+
+  <!-- Live In-Game HUD -->
+  <div id="hud" class="hidden">
+    <div class="hud-top">
+      <!-- Best & Hardhats Collected -->
+      <div class="hud-badge">
+        <div>
+          <div style="font-size:0.65rem; font-weight:700; color:#94a3b8; letter-spacing:0.06em;">BEST SHIFT</div>
+          <div class="font-display" style="font-size:1.15rem; font-weight:700; color:#fbbf24;" id="hud-best">0</div>
+        </div>
+        <div style="width:1px; height:24px; background:rgba(255,255,255,0.14);"></div>
+        <div>
+          <div style="font-size:0.65rem; font-weight:700; color:#94a3b8; letter-spacing:0.06em;">BONUS</div>
+          <div class="font-display" style="font-size:1.15rem; font-weight:700; color:#38bdf8;" id="hud-bonus">+0</div>
+        </div>
+      </div>
+
+      <!-- Audio & Pause/Garage Buttons -->
+      <div style="display:flex; gap:0.5rem;">
+        <button type="button" class="icon-btn" id="btn-sound" title="Toggle Construction Audio">
+          <svg id="icon-sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+          <svg id="icon-sound-off" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+        </button>
+
+        <button type="button" class="icon-btn" id="btn-pause" title="Pause / Change Rig">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+            <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Giant Center Score -->
+    <div class="score-center">
+      <div id="hud-score">0</div>
+    </div>
+
+    <!-- Tap to Thrust Cue -->
+    <div id="ready-hint" class="hidden">
+      <div class="tap-pill">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 19V5"></path>
+          <polyline points="5 12 12 5 19 12"></polyline>
+        </svg>
+        <span id="ready-hint-text">TAP, CLICK OR PRESS SPACE</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Start / Garage Menu Modal -->
+  <div id="start-modal" class="modal-backdrop">
+    <div class="industrial-card">
+      <div class="hazard-bar"></div>
+      <div class="card-body">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:0.5rem;">
+          <div>
+            <div style="font-size:0.72rem; font-weight:800; letter-spacing:0.14em; color:#fbbf24;">HEAVY DUTY ARCADE</div>
+            <h1 class="font-display" style="font-size:2.15rem; font-weight:700; line-height:1.05; letter-spacing:-0.01em; margin-top:2px;">CRANE FLAP</h1>
+            <button type="button" id="btn-sync-latest" style="margin-top:6px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.16); color:#cbd5e1; border-radius:999px; padding:0.22rem 0.65rem; font-size:0.68rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.3rem;">
+              <span id="sync-status-text">↻ Sync Latest</span>
+            </button>
+          </div>
+          <div style="background:rgba(251,191,36,0.14); border:1px solid rgba(251,191,36,0.35); border-radius:14px; padding:0.45rem 0.75rem; text-align:right;">
+            <div style="font-size:0.65rem; font-weight:700; color:#94a3b8;">HIGH SCORE</div>
+            <div class="font-display" style="font-size:1.25rem; font-weight:700; color:#fbbf24;" id="menu-best-score">0</div>
+          </div>
+        </div>
+
+        <p style="font-size:0.86rem; color:#cbd5e1; margin-top:0.6rem; line-height:1.45;">
+          Pilot your turbocharged construction rig through suspended steel I-beams, tower cranes, and swinging wrecking balls. Collect golden hardhats for bonus points!
+        </p>
+
+        <!-- Choose Heavy Equipment Rig -->
+        <div style="margin-top:1.1rem;">
+          <label style="font-size:0.72rem; font-weight:800; letter-spacing:0.08em; color:#94a3b8; display:block;">SELECT CONSTRUCTION RIG</label>
+          <div class="rig-grid" id="rig-selector">
+            <button type="button" class="rig-card selected" data-rig="excavator">
+              <canvas class="rig-preview" id="preview-excavator" width="112" height="88"></canvas>
+              <div class="font-display" style="font-size:0.86rem; font-weight:700; color:#fff;">Turbo Digger</div>
+              <div style="font-size:0.68rem; color:#94a3b8; margin-top:2px;">Balanced Lift</div>
+            </button>
+
+            <button type="button" class="rig-card" data-rig="bulldozer">
+              <canvas class="rig-preview" id="preview-bulldozer" width="112" height="88"></canvas>
+              <div class="font-display" style="font-size:0.86rem; font-weight:700; color:#fff;">Jet Dozer</div>
+              <div style="font-size:0.68rem; color:#94a3b8; margin-top:2px;">Snappy Thrust</div>
+            </button>
+
+            <button type="button" class="rig-card" data-rig="mixer">
+              <canvas class="rig-preview" id="preview-mixer" width="112" height="88"></canvas>
+              <div class="font-display" style="font-size:0.86rem; font-weight:700; color:#fff;">Aero Mixer</div>
+              <div style="font-size:0.68rem; color:#94a3b8; margin-top:2px;">Smooth Glide</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Shift Lighting / Atmosphere Selector -->
+        <div style="margin-top:1rem;">
+          <label style="font-size:0.72rem; font-weight:800; letter-spacing:0.08em; color:#94a3b8; display:block;">SITE SHIFT</label>
+          <div class="shift-selector" id="shift-selector">
+            <button type="button" class="shift-btn selected" data-shift="day">☀️ Day Shift</button>
+            <button type="button" class="shift-btn" data-shift="sunset">🌅 Golden Hour</button>
+            <button type="button" class="shift-btn" data-shift="night">🌙 Night Crew</button>
+          </div>
+        </div>
+
+        <button type="button" class="btn-launch" id="btn-start-shift">
+          <span>Start Shift</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+        </button>
+      </div>
+      <div class="hazard-bar"></div>
+    </div>
+  </div>
+
+  <!-- Pause Overlay -->
+  <div id="pause-modal" class="modal-backdrop hidden">
+    <div class="industrial-card" style="max-width:360px;">
+      <div class="hazard-bar"></div>
+      <div class="card-body" style="text-align:center;">
+        <div style="font-size:0.72rem; font-weight:800; letter-spacing:0.14em; color:#fbbf24;">SHIFT ON HOLD</div>
+        <h2 class="font-display" style="font-size:1.85rem; font-weight:700; margin-top:0.2rem;">GAME PAUSED</h2>
+        <p style="font-size:0.85rem; color:#94a3b8; margin-top:0.4rem;">Take a coffee break or switch your heavy machinery in the garage.</p>
+
+        <button type="button" class="btn-launch" id="btn-resume-shift" style="margin-top:1.15rem;">
+          Resume Shift
+        </button>
+        <button type="button" class="btn-secondary" id="btn-pause-garage" style="width:100%; margin-top:0.6rem;">
+          Change Rig / Garage
+        </button>
+      </div>
+      <div class="hazard-bar"></div>
+    </div>
+  </div>
+
+  <!-- Game Over Modal -->
+  <div id="gameover-modal" class="modal-backdrop hidden">
+    <div class="industrial-card">
+      <div class="hazard-bar"></div>
+      <div class="card-body" style="text-align:center;">
+        <div style="font-size:0.74rem; font-weight:800; letter-spacing:0.14em; color:#fb7185;" id="go-reason">BEAM IMPACT!</div>
+        <h2 class="font-display" style="font-size:2rem; font-weight:700; margin-top:0.15rem;">
+          SHIFT OVER <span id="go-new-record" class="new-record-tag hidden">NEW BEST!</span>
+        </h2>
+
+        <!-- Safety Rank Badge -->
+        <div style="margin-top:0.6rem; display:inline-flex; align-items:center; gap:0.45rem; background:rgba(251,191,36,0.14); border:1px solid rgba(251,191,36,0.35); border-radius:999px; padding:0.35rem 0.9rem;">
+          <span style="font-size:0.95rem;" id="go-medal-icon">🦺</span>
+          <span class="font-display" style="font-size:0.85rem; font-weight:700; color:#fbbf24;" id="go-rank-title">APPRENTICE OPERATOR</span>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-box">
+            <div style="font-size:0.66rem; font-weight:700; color:#94a3b8;">TOTAL SCORE</div>
+            <div class="font-display" style="font-size:1.65rem; font-weight:700; color:#ffffff; margin-top:2px;" id="go-score">0</div>
+          </div>
+          <div class="stat-box">
+            <div style="font-size:0.66rem; font-weight:700; color:#94a3b8;">BEST SHIFT</div>
+            <div class="font-display" style="font-size:1.65rem; font-weight:700; color:#fbbf24; margin-top:2px;" id="go-best">0</div>
+          </div>
+          <div class="stat-box">
+            <div style="font-size:0.66rem; font-weight:700; color:#94a3b8;">HARDHATS</div>
+            <div class="font-display" style="font-size:1.65rem; font-weight:700; color:#38bdf8; margin-top:2px;" id="go-hardhats">0</div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:0.65rem; margin-top:1.25rem;">
+          <button type="button" class="btn-secondary" id="btn-go-garage" style="flex:1;">
+            Garage
+          </button>
+          <button type="button" class="btn-launch" id="btn-retry-shift" style="flex:2; margin-top:0;">
+            <span>Retry Shift</span>
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="hazard-bar"></div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. SYNTHESIZED INDUSTRIAL AUDIO ENGINE (Web Audio API — Zero External URLs)
+    // =========================================================================
+    class ConstructionAudio {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      toggle() {
+        this.enabled = !this.enabled;
+        return this.enabled;
+      }
+
+      playHydraulicThrust() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(115, now);
+        osc.frequency.exponentialRampToValueAtTime(240, now + 0.12);
+        gain.gain.setValueAtTime(0.11, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.14);
+
+        const hiss = this.ctx.createOscillator();
+        const hissGain = this.ctx.createGain();
+        hiss.type = 'triangle';
+        hiss.frequency.setValueAtTime(520, now);
+        hiss.frequency.exponentialRampToValueAtTime(190, now + 0.1);
+        hissGain.gain.setValueAtTime(0.06, now);
+        hissGain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+        hiss.connect(hissGain);
+        hissGain.connect(this.ctx.destination);
+        hiss.start(now);
+        hiss.stop(now + 0.11);
+      }
+
+      playBeamScore() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        [587.33, 880].forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.055);
+          gain.gain.setValueAtTime(0.09, now + idx * 0.055);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.055 + 0.18);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.055);
+          osc.stop(now + idx * 0.055 + 0.18);
+        });
+      }
+
+      playHardhatPickup() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        [659.25, 987.77, 1318.51].forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.045);
+          gain.gain.setValueAtTime(0.11, now + idx * 0.045);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.045 + 0.22);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.045);
+          osc.stop(now + idx * 0.045 + 0.22);
+        });
+      }
+
+      playClangCrash() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        [140, 96, 62].forEach((freq) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(freq, now);
+          osc.frequency.exponentialRampToValueAtTime(34, now + 0.34);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        });
+      }
+
+      playClick() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(620, now + 0.045);
+        gain.gain.setValueAtTime(0.07, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      }
+    }
+
+    const audio = new ConstructionAudio();
+
+    // =========================================================================
+    // 2. RIG CONFIGURATIONS & SHIFT ATMOSPHERE THEMES
+    // =========================================================================
+    const RIG_SPECS = {
+      excavator: {
+        name: 'Turbo Digger',
+        gravity: 1380,
+        flapVel: -445,
+        maxFall: 620,
+        primaryColor: '#f59e0b',
+        secondaryColor: '#d97706',
+        cabColor: '#1e293b'
+      },
+      bulldozer: {
+        name: 'Jet Dozer',
+        gravity: 1480,
+        flapVel: -468,
+        maxFall: 650,
+        primaryColor: '#eab308',
+        secondaryColor: '#ca8a04',
+        cabColor: '#0f172a'
+      },
+      mixer: {
+        name: 'Aero Mixer',
+        gravity: 1260,
+        flapVel: -422,
+        maxFall: 580,
+        primaryColor: '#f97316',
+        secondaryColor: '#ea580c',
+        cabColor: '#1e293b'
+      }
+    };
+
+    const SHIFT_THEMES = {
+      day: {
+        skyTop: '#38bdf8',
+        skyBottom: '#bae6fd',
+        sunColor: '#fef08a',
+        sunY: 0.2,
+        farSkyline: '#7dd3fc',
+        midSkyline: '#3b82f6',
+        craneColor: '#f59e0b',
+        beamMain: '#475569',
+        beamHighlight: '#94a3b8',
+        beamShadow: '#1e293b',
+        groundTop: '#334155',
+        groundDirt: '#78350f',
+        windowLit: false
+      },
+      sunset: {
+        skyTop: '#7c2d12',
+        skyBottom: '#fb923c',
+        sunColor: '#fde047',
+        sunY: 0.34,
+        farSkyline: '#9a3412',
+        midSkyline: '#431407',
+        craneColor: '#fbbf24',
+        beamMain: '#334155',
+        beamHighlight: '#64748b',
+        beamShadow: '#0f172a',
+        groundTop: '#1e293b',
+        groundDirt: '#451a03',
+        windowLit: true
+      },
+      night: {
+        skyTop: '#020617',
+        skyBottom: '#1e1b4b',
+        sunColor: '#f8fafc',
+        sunY: 0.18,
+        farSkyline: '#0f172a',
+        midSkyline: '#1e293b',
+        craneColor: '#fbbf24',
+        beamMain: '#64748b',
+        beamHighlight: '#cbd5e1',
+        beamShadow: '#334155',
+        groundTop: '#1e293b',
+        groundDirt: '#0f172a',
+        windowLit: true
+      }
+    };
+
+    // =========================================================================
+    // 3. GAME STATE & PERSISTENT HIGH SCORE + AUTO-UPDATE FROM GITHUB PAGES
+    // =========================================================================
+    const HIGH_SCORE_COOKIE = 'crane_flap_best_v1';
+
+    function loadSavedHighScore() {
+      let best = 0;
+      try {
+        const match = document.cookie.match(new RegExp('(?:^|; )' + HIGH_SCORE_COOKIE + '=([^;]*)'));
+        if (match) best = Math.max(best, parseInt(decodeURIComponent(match[1]), 10) || 0);
+      } catch (e) {}
+      try {
+        if (window.name && window.name.startsWith('CRANE_BEST:')) {
+          best = Math.max(best, parseInt(window.name.split(':')[1], 10) || 0);
+        }
+      } catch (e) {}
+      return best;
+    }
+
+    function persistHighScore(score) {
+      const val = Math.max(0, Math.floor(score));
+      try {
+        const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
+        document.cookie = `${HIGH_SCORE_COOKIE}=${encodeURIComponent(val)}; expires=${expires}; path=/; SameSite=Lax`;
+      } catch (e) {}
+      try {
+        window.name = `CRANE_BEST:${val}`;
+      } catch (e) {}
+    }
+
+    let initialSignature = null;
+    async function checkAndApplyLatestBuild(manual = false) {
+      if (window.location.protocol === 'file:' || window.location.protocol === 'about:' || window.location.protocol === 'blob:') {
+        if (manual) {
+          const el = document.getElementById('sync-status-text');
+          if (el) el.textContent = '✓ Local Preview';
+        }
+        return;
+      }
+
+      const statusEl = document.getElementById('sync-status-text');
+      if (manual && statusEl) statusEl.textContent = '↻ Checking...';
+
+      try {
+        const baseUrl = window.location.href.split('?')[0].split('#')[0];
+        const res = await fetch(`${baseUrl}?cb=${Date.now()}`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache' }
+        });
+        if (!res.ok) return;
+        const htmlText = await res.text();
+        if (!htmlText || htmlText.length < 1000) return;
+
+        // Compute lightweight content fingerprint
+        let hash = 0;
+        for (let i = 0; i < htmlText.length; i++) {
+          hash = ((hash << 5) - hash + htmlText.charCodeAt(i)) | 0;
+        }
+        const sig = `${htmlText.length}_${hash}`;
+
+        if (initialSignature === null) {
+          initialSignature = sig;
+          if (manual && statusEl) statusEl.textContent = '✓ Up to Date';
+          return;
+        }
+
+        if (sig !== initialSignature) {
+          if (statusEl) statusEl.textContent = '↻ Updating...';
+          // Preserve high score before reloading with cache-busting query
+          persistHighScore(state.bestScore);
+          const nextUrl = `${baseUrl}?v=${Date.now()}`;
+          window.location.replace(nextUrl);
+        } else if (manual && statusEl) {
+          statusEl.textContent = '✓ Latest Version';
+        }
+      } catch (err) {
+        if (manual && statusEl) statusEl.textContent = '↻ Sync Latest';
+      }
+    }
+
+    let savedBestScore = loadSavedHighScore();
+
+    const state = {
+      phase: 'MENU', // MENU, READY, PLAYING, PAUSED, GAMEOVER
+      selectedRig: 'excavator',
+      selectedShift: 'day',
+      score: 0,
+      bonusPoints: 0,
+      hardhatsCollected: 0,
+      bestScore: savedBestScore,
+      shakeTime: 0,
+      shakeIntensity: 0,
+      flashAlpha: 0,
+      groundScroll: 0,
+      skylineScroll: 0,
+      cloudScroll: 0,
+      spawnDistance: 0,
+      lastGapCenterY: null,
+      obstaclesPassed: 0,
+      deathReason: 'BEAM IMPACT!',
+      player: {
+        x: 0,
+        y: 0,
+        vy: 0,
+        radius: 17,
+        rotation: 0,
+        armAngle: 0,
+        drumSpin: 0,
+        flameTimer: 0
+      },
+      obstacles: [],
+      collectibles: [],
+      particles: [],
+      floatingTexts: [],
+      clouds: [],
+      skylineFar: [],
+      skylineMid: []
+    };
+
+    // =========================================================================
+    // 4. RESPONSIVE CANVAS & ENVIRONMENT GENERATION
+    // =========================================================================
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+    let viewW = window.innerWidth;
+    let viewH = window.innerHeight;
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    function getGroundHeight() {
+      return Math.max(64, Math.min(92, Math.round(viewH * 0.12)));
+    }
+
+    function getPlayableHeight() {
+      return viewH - getGroundHeight();
+    }
+
+    function getPlayerAnchorX() {
+      if (viewW < 640) return Math.round(viewW * 0.25);
+      if (viewW < 1024) return Math.round(viewW * 0.28);
+      return Math.round(Math.min(340, viewW * 0.28));
+    }
+
+    function resizeCanvas() {
+      viewW = window.innerWidth;
+      viewH = window.innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.floor(viewW * dpr);
+      canvas.height = Math.floor(viewH * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      state.player.x = getPlayerAnchorX();
+      if (state.phase === 'MENU' || state.phase === 'READY') {
+        state.player.y = getPlayableHeight() * 0.45;
+      }
+      buildBackgroundLayers();
+    }
+
+    function buildBackgroundLayers() {
+      state.clouds = [];
+      for (let i = 0; i < 6; i++) {
+        state.clouds.push({
+          x: (viewW / 5) * i + Math.random() * 60,
+          y: 45 + Math.random() * (getPlayableHeight() * 0.34),
+          scale: 0.65 + Math.random() * 0.65,
+          speed: 12 + Math.random() * 14
+        });
+      }
+
+      state.skylineFar = [];
+      let fx = 0;
+      while (fx < viewW + 300) {
+        const w = 55 + Math.random() * 65;
+        const h = 90 + Math.random() * 150;
+        state.skylineFar.push({
+          x: fx,
+          w,
+          h,
+          hasCrane: Math.random() < 0.28,
+          craneAngle: Math.random() * Math.PI * 2
+        });
+        fx += w + 12;
+      }
+
+      state.skylineMid = [];
+      let mx = 0;
+      while (mx < viewW + 300) {
+        const w = 65 + Math.random() * 75;
+        const h = 65 + Math.random() * 120;
+        const cols = Math.floor((w - 16) / 14);
+        const rows = Math.floor((h - 24) / 18);
+        const windows = [];
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            windows.push(Math.random() < 0.55);
+          }
+        }
+        state.skylineMid.push({
+          x: mx,
+          w,
+          h,
+          cols,
+          rows,
+          windows,
+          underConstruction: Math.random() < 0.35
+        });
+        mx += w + 18;
+      }
+    }
+
+    // =========================================================================
+    // 5. RIG RENDERING (Used both in Garage Preview & Live Game)
+    // =========================================================================
+    function drawConstructionRig(targetCtx, rigType, x, y, radius, rotation, armAngle, drumSpin, flameTimer) {
+      const spec = RIG_SPECS[rigType] || RIG_SPECS.excavator;
+      targetCtx.save();
+      targetCtx.translate(x, y);
+      targetCtx.rotate(rotation);
+
+      // Jet Booster Flame beneath chassis
+      if (flameTimer > 0) {
+        const flick = 0.8 + Math.random() * 0.45;
+        targetCtx.fillStyle = '#f97316';
+        targetCtx.beginPath();
+        targetCtx.moveTo(-12, 12);
+        targetCtx.lineTo(-4, 12 + 18 * flick);
+        targetCtx.lineTo(4, 12);
+        targetCtx.closePath();
+        targetCtx.fill();
+
+        targetCtx.fillStyle = '#fef08a';
+        targetCtx.beginPath();
+        targetCtx.moveTo(-8, 12);
+        targetCtx.lineTo(-4, 12 + 10 * flick);
+        targetCtx.lineTo(1, 12);
+        targetCtx.closePath();
+        targetCtx.fill();
+      }
+
+      // Heavy Caterpillar Tracks / Chassis Base
+      targetCtx.fillStyle = '#1e293b';
+      targetCtx.beginPath();
+      targetCtx.roundRect(-20, 6, 38, 11, 5);
+      targetCtx.fill();
+      targetCtx.strokeStyle = '#64748b';
+      targetCtx.lineWidth = 1.5;
+      targetCtx.stroke();
+
+      // Track Rollers
+      targetCtx.fillStyle = '#94a3b8';
+      [-13, -4, 5, 13].forEach((wx) => {
+        targetCtx.beginPath();
+        targetCtx.arc(wx, 11.5, 2.6, 0, Math.PI * 2);
+        targetCtx.fill();
+      });
+
+      if (rigType === 'excavator') {
+        // Counterweight & Engine Deck
+        targetCtx.fillStyle = spec.primaryColor;
+        targetCtx.beginPath();
+        targetCtx.roundRect(-20, -6, 26, 13, 4);
+        targetCtx.fill();
+
+        // Hazard Stripe on Rear
+        targetCtx.fillStyle = '#0f172a';
+        targetCtx.fillRect(-19, -2, 6, 6);
+
+        // Operator Cab
+        targetCtx.fillStyle = spec.cabColor;
+        targetCtx.beginPath();
+        targetCtx.roundRect(-6, -15, 16, 14, 3);
+        targetCtx.fill();
+
+        // Cab Glass
+        targetCtx.fillStyle = '#38bdf8';
+        targetCtx.beginPath();
+        targetCtx.roundRect(-2, -13, 10, 8, 2);
+        targetCtx.fill();
+
+        // Articulated Boom Arm & Bucket
+        targetCtx.save();
+        targetCtx.translate(10, -4);
+        targetCtx.rotate(-0.35 + Math.sin(armAngle) * 0.22);
+        targetCtx.fillStyle = spec.secondaryColor;
+        targetCtx.fillRect(0, -3, 16, 5);
+
+        targetCtx.translate(15, 0);
+        targetCtx.rotate(0.75 + Math.cos(armAngle) * 0.25);
+        targetCtx.fillStyle = spec.primaryColor;
+        targetCtx.fillRect(0, -2.5, 12, 4.5);
+
+        // Steel Bucket
+        targetCtx.fillStyle = '#475569';
+        targetCtx.beginPath();
+        targetCtx.arc(12, 2, 6, -0.4, Math.PI * 0.85);
+        targetCtx.fill();
+        targetCtx.restore();
+      } else if (rigType === 'bulldozer') {
+        // Heavy Armored Engine Hood
+        targetCtx.fillStyle = spec.primaryColor;
+        targetCtx.beginPath();
+        targetCtx.roundRect(-18, -8, 28, 15, 4);
+        targetCtx.fill();
+
+        // Exhaust Stack
+        targetCtx.fillStyle = '#334155';
+        targetCtx.fillRect(2, -16, 4, 8);
+
+        // Roll Cage / Cab
+        targetCtx.fillStyle = spec.cabColor;
+        targetCtx.beginPath();
+        targetCtx.roundRect(-15, -16, 15, 10, 3);
+        targetCtx.fill();
+
+        targetCtx.fillStyle = '#38bdf8';
+        targetCtx.fillRect(-12, -14, 10, 6);
+
+        // Hydraulic Push Arms
+        targetCtx.strokeStyle = '#cbd5e1';
+        targetCtx.lineWidth = 3;
+        targetCtx.beginPath();
+        targetCtx.moveTo(6, 2);
+        targetCtx.lineTo(18, 4);
+        targetCtx.stroke();
+
+        // Curved Steel Dozer Blade
+        targetCtx.strokeStyle = spec.secondaryColor;
+        targetCtx.lineWidth = 5;
+        targetCtx.lineCap = 'round';
+        targetCtx.beginPath();
+        targetCtx.arc(15, 1, 13, -0.55, 0.65);
+        targetCtx.stroke();
+      } else {
+        // Aero Cement Mixer
+        targetCtx.fillStyle = spec.cabColor;
+        targetCtx.beginPath();
+        targetCtx.roundRect(4, -12, 14, 18, 4);
+        targetCtx.fill();
+
+        targetCtx.fillStyle = '#38bdf8';
+        targetCtx.beginPath();
+        targetCtx.roundRect(8, -10, 8, 8, 2);
+        targetCtx.fill();
+
+        // Rotating Mixing Drum
+        targetCtx.save();
+        targetCtx.translate(-6, -5);
+        targetCtx.rotate(-0.22);
+        targetCtx.fillStyle = spec.primaryColor;
+        targetCtx.beginPath();
+        targetCtx.ellipse(0, 0, 15, 11, 0, 0, Math.PI * 2);
+        targetCtx.fill();
+
+        // Spiral Stripes on Drum
+        targetCtx.strokeStyle = '#ffffff';
+        targetCtx.lineWidth = 3;
+        const stripeOffset = Math.sin(drumSpin) * 5;
+        targetCtx.beginPath();
+        targetCtx.moveTo(-5 + stripeOffset, -9);
+        targetCtx.lineTo(-1 + stripeOffset, 9);
+        targetCtx.stroke();
+        targetCtx.restore();
+      }
+
+      // Hardhat Pilot Beacon on Roof
+      targetCtx.fillStyle = '#fef08a';
+      targetCtx.beginPath();
+      targetCtx.arc(-2, -16.5, 3, Math.PI, 0);
+      targetCtx.fill();
+
+      targetCtx.restore();
+    }
+
+    function renderGaragePreviews() {
+      ['excavator', 'bulldozer', 'mixer'].forEach((rig) => {
+        const prevCanvas = document.getElementById(`preview-${rig}`);
+        if (!prevCanvas) return;
+        const pCtx = prevCanvas.getContext('2d');
+        pCtx.save();
+        pCtx.setTransform(1, 0, 0, 1, 0, 0);
+        pCtx.clearRect(0, 0, prevCanvas.width, prevCanvas.height);
+        pCtx.scale(2, 2);
+        drawConstructionRig(pCtx, rig, 27, 25, 17, -0.05, 0.35, 0.85, 0);
+        pCtx.restore();
+      });
+    }
+
+    // Ensure previews render immediately once DOM & fonts are ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', renderGaragePreviews);
+    } else {
+      renderGaragePreviews();
+    }
+
+    // =========================================================================
+    // 6. OBSTACLE & COLLECTIBLE SPAWNING (Steel I-Beams, Wrecking Balls, Hardhats)
+    // =========================================================================
+    function getDifficultyParams() {
+      // Distance-based pacing guarantees identical horizontal spacing on 60Hz, 120Hz ProMotion, and desktop
+      const level = Math.min(25, state.obstaclesPassed);
+      const speed = Math.min(325, 210 + level * 4.2);
+      const baseGap = Math.max(152, 192 - level * 1.45);
+      // Scale gap proportionally to playable height so short mobile screens remain 100% fair
+      const playH = getPlayableHeight();
+      const screenFactor = Math.max(0.88, Math.min(1.18, playH / 640));
+      const minSafeGap = state.player.radius * 2 + 104;
+      const gapHeight = Math.max(minSafeGap, Math.round(baseGap * screenFactor));
+      // Fixed horizontal distance between beam centers (never crowds together)
+      const spacingPx = Math.max(295, Math.min(390, Math.round(viewW * 0.62)));
+      return {
+        speed,
+        gapHeight,
+        spacingPx
+      };
+    }
+
+    function spawnBeamPair() {
+      const playH = getPlayableHeight();
+      const { gapHeight, spacingPx } = getDifficultyParams();
+      const beamWidth = 66;
+      const minMargin = Math.max(52, Math.round(playH * 0.09));
+      const minCenterY = minMargin + gapHeight * 0.5;
+      const maxCenterY = Math.max(minCenterY + 10, playH - minMargin - gapHeight * 0.5);
+
+      // Constrain vertical delta from previous gap so the player never faces an impossible steep climb/drop
+      const prevCenterY = state.lastGapCenterY !== null ? state.lastGapCenterY : playH * 0.48;
+      const maxReachableDelta = Math.min(maxCenterY - minCenterY, Math.max(135, playH * 0.34));
+      const rawCenterY = prevCenterY + (Math.random() * 2 - 1) * maxReachableDelta;
+      const clampedCenterY = Math.max(minCenterY, Math.min(maxCenterY, rawCenterY));
+      state.lastGapCenterY = clampedCenterY;
+
+      const topHeight = clampedCenterY - gapHeight * 0.5;
+      const bottomY = clampedCenterY + gapHeight * 0.5;
+
+      // Make all beams gently oscillate up and down while keeping wrecking balls safe
+      const allowMoving = true;
+      const hasWreckingBall = state.obstaclesPassed >= 5 && gapHeight >= 165 && Math.random() < 0.25;
+
+      // Clamp moving amplitude so top & bottom beams always stay inside safe playable bounds
+      const maxSafeAmp = Math.max(14, Math.min(38, clampedCenterY - minCenterY - 4, maxCenterY - clampedCenterY - 4));
+
+      const obs = {
+        x: viewW + 90,
+        width: beamWidth,
+        baseTopHeight: topHeight,
+        topHeight,
+        gapHeight,
+        bottomY,
+        passed: false,
+        moving: allowMoving,
+        movePhase: Math.random() * Math.PI * 2,
+        moveAmp: maxSafeAmp,
+        moveSpeed: 1.55 + Math.random() * 0.65,
+        hasWreckingBall,
+        ballPhase: Math.random() * Math.PI * 2,
+        ballRadius: 11
+      };
+
+      state.obstacles.push(obs);
+      state.spawnDistance = spacingPx;
+
+      // Always spawn a Golden Hardhat bonus safely inside every passable gap (synced to beam movement)
+      const ballClearance = hasWreckingBall ? 36 : 0;
+      const safeZoneTop = topHeight + ballClearance + 20;
+      const safeZoneBot = bottomY - 20;
+      const hardhatY = safeZoneBot > safeZoneTop
+        ? safeZoneTop + (0.25 + Math.random() * 0.5) * (safeZoneBot - safeZoneTop)
+        : (topHeight + ballClearance + bottomY) * 0.5;
+
+      state.collectibles.push({
+        x: obs.x + beamWidth * 0.5,
+        baseY: hardhatY,
+        y: hardhatY,
+        parentObs: obs,
+        radius: 15,
+        bobPhase: Math.random() * Math.PI * 2,
+        collected: false
+      });
+    }
+
+    // =========================================================================
+    // 7. PARTICLES & FLOATING SCORE POPUPS
+    // =========================================================================
+    function spawnExhaustSparks(x, y, count = 8, color = '#fbbf24') {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.PI * 0.5 + (Math.random() - 0.5) * 1.3;
+        const spd = 70 + Math.random() * 140;
+        state.particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * spd - 45,
+          vy: Math.sin(angle) * spd,
+          life: 0.35 + Math.random() * 0.25,
+          maxLife: 0.6,
+          size: 3 + Math.random() * 3.5,
+          color
+        });
+      }
+    }
+
+    function spawnCrashDebris(x, y) {
+      const palette = ['#fbbf24', '#ef4444', '#94a3b8', '#ffffff', '#f97316'];
+      for (let i = 0; i < 28; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = 90 + Math.random() * 290;
+        state.particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd - 60,
+          life: 0.55 + Math.random() * 0.45,
+          maxLife: 1.0,
+          size: 3.5 + Math.random() * 5,
+          color: palette[i % palette.length]
+        });
+      }
+    }
+
+    function spawnFloatingText(x, y, text, color = '#fbbf24') {
+      state.floatingTexts.push({
+        x,
+        y,
+        vy: -55,
+        text,
+        color,
+        life: 0.85,
+        maxLife: 0.85
+      });
+    }
+
+    // =========================================================================
+    // 8. BACKGROUND, BEAMS, COLLECTIBLES & FOREGROUND RENDERING
+    // =========================================================================
+    function drawScene(dt) {
+      const theme = SHIFT_THEMES[state.selectedShift] || SHIFT_THEMES.day;
+      const playH = getPlayableHeight();
+      const groundH = getGroundHeight();
+
+      ctx.save();
+      if (state.shakeTime > 0) {
+        const dx = (Math.random() * 2 - 1) * state.shakeIntensity;
+        const dy = (Math.random() * 2 - 1) * state.shakeIntensity;
+        ctx.translate(dx, dy);
+      }
+
+      // Sky Gradient
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, playH);
+      skyGrad.addColorStop(0, theme.skyTop);
+      skyGrad.addColorStop(1, theme.skyBottom);
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, viewW, playH);
+
+      // Sun / Moon Disc
+      const sunX = viewW * 0.78;
+      const sunY = playH * theme.sunY;
+      ctx.fillStyle = theme.sunColor;
+      ctx.globalAlpha = state.selectedShift === 'night' ? 0.9 : 0.82;
+      ctx.beginPath();
+      ctx.arc(sunX, sunY, Math.min(44, viewW * 0.06), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // Drifting Clouds / Night Mist
+      ctx.fillStyle = state.selectedShift === 'night' ? 'rgba(148,163,184,0.12)' : 'rgba(255,255,255,0.45)';
+      state.clouds.forEach((c) => {
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, 22 * c.scale, 0, Math.PI * 2);
+        ctx.arc(c.x + 18 * c.scale, c.y - 6 * c.scale, 26 * c.scale, 0, Math.PI * 2);
+        ctx.arc(c.x + 38 * c.scale, c.y, 20 * c.scale, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Far City Skyline + Tower Cranes
+      state.skylineFar.forEach((b) => {
+        const bx = b.x;
+        const by = playH - b.h;
+        ctx.fillStyle = theme.farSkyline;
+        ctx.fillRect(bx, by, b.w, b.h);
+
+        if (b.hasCrane) {
+          const mastX = bx + b.w * 0.5;
+          const mastTop = by - 58;
+          ctx.strokeStyle = theme.craneColor;
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(mastX, by);
+          ctx.lineTo(mastX, mastTop);
+          ctx.moveTo(mastX - 18, mastTop + 8);
+          ctx.lineTo(mastX + 46, mastTop + 8);
+          ctx.stroke();
+
+          // Trolley Cable & Hook
+          const hookX = mastX + 32 + Math.sin(b.craneAngle) * 8;
+          ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(hookX, mastTop + 8);
+          ctx.lineTo(hookX, mastTop + 28);
+          ctx.stroke();
+        }
+      });
+
+      // Midground Construction Buildings
+      state.skylineMid.forEach((b) => {
+        const bx = b.x;
+        const by = playH - b.h;
+        ctx.fillStyle = theme.midSkyline;
+        ctx.fillRect(bx, by, b.w, b.h);
+
+        // Exposed Rebar / Steel Frame Top
+        if (b.underConstruction) {
+          ctx.strokeStyle = '#94a3b8';
+          ctx.lineWidth = 2;
+          for (let rx = bx + 8; rx < bx + b.w - 6; rx += 14) {
+            ctx.beginPath();
+            ctx.moveTo(rx, by);
+            ctx.lineTo(rx, by - 12);
+            ctx.stroke();
+          }
+        }
+
+        // Building Windows
+        let idx = 0;
+        for (let r = 0; r < b.rows; r++) {
+          for (let c = 0; c < b.cols; c++) {
+            const lit = b.windows[idx++];
+            ctx.fillStyle = theme.windowLit && lit
+              ? 'rgba(253, 224, 71, 0.72)'
+              : 'rgba(15, 23, 42, 0.35)';
+            ctx.fillRect(bx + 10 + c * 14, by + 12 + r * 18, 8, 10);
+          }
+        }
+      });
+
+      // Steel I-Beam Obstacles & Wrecking Balls
+      state.obstacles.forEach((obs) => {
+        drawSteelIBeam(obs.x, 0, obs.width, obs.topHeight, true, theme);
+        drawSteelIBeam(obs.x, obs.bottomY, obs.width, playH - obs.bottomY, false, theme);
+
+        if (obs.hasWreckingBall) {
+          const swingX = obs.x + obs.width * 0.5 + Math.sin(obs.ballPhase) * 14;
+          const chainTopY = obs.topHeight;
+          const ballY = chainTopY + 24;
+
+          ctx.strokeStyle = '#cbd5e1';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(obs.x + obs.width * 0.5, chainTopY);
+          ctx.lineTo(swingX, ballY);
+          ctx.stroke();
+
+          ctx.fillStyle = '#1e293b';
+          ctx.beginPath();
+          ctx.arc(swingX, ballY, obs.ballRadius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#fbbf24';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+      });
+
+      // Golden Hardhat Collectibles
+      state.collectibles.forEach((item) => {
+        if (item.collected) return;
+        const bobY = item.y + Math.sin(item.bobPhase) * 5;
+        ctx.save();
+        ctx.translate(item.x, bobY);
+
+        // Glow Aura
+        ctx.fillStyle = 'rgba(251, 191, 36, 0.24)';
+        ctx.beginPath();
+        ctx.arc(0, 0, item.radius + 7, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Hardhat Dome
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath();
+        ctx.arc(0, 2, 12, Math.PI, 0);
+        ctx.fill();
+
+        // Center Ridge
+        ctx.fillStyle = '#fef08a';
+        ctx.fillRect(-2.5, -11, 5, 11);
+
+        // Brim
+        ctx.fillStyle = '#d97706';
+        ctx.beginPath();
+        ctx.roundRect(-15, 1, 30, 4.5, 2.5);
+        ctx.fill();
+
+        ctx.restore();
+      });
+
+      // Player Heavy Construction Rig
+      drawConstructionRig(
+        ctx,
+        state.selectedRig,
+        state.player.x,
+        state.player.y,
+        state.player.radius,
+        state.player.rotation,
+        state.player.armAngle,
+        state.player.drumSpin,
+        state.player.flameTimer
+      );
+
+      // Exhaust & Debris Particles
+      state.particles.forEach((p) => {
+        ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+
+      // Floating Score Texts (+1, +2 BONUS!)
+      state.floatingTexts.forEach((ft) => {
+        ctx.globalAlpha = Math.max(0, ft.life / ft.maxLife);
+        ctx.font = '800 18px "Chakra Petch", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#0f172a';
+        ctx.fillText(ft.text, ft.x + 1.5, ft.y + 1.5);
+        ctx.fillStyle = ft.color;
+        ctx.fillText(ft.text, ft.x, ft.y);
+      });
+      ctx.globalAlpha = 1;
+
+      // Construction Site Ground & Scrolling Hazard Curb
+      ctx.fillStyle = theme.groundDirt;
+      ctx.fillRect(0, playH, viewW, groundH);
+
+      ctx.fillStyle = theme.groundTop;
+      ctx.fillRect(0, playH, viewW, 18);
+
+      // Yellow/Black Scrolling Caution Curb
+      const stripeW = 28;
+      const offset = -(state.groundScroll % (stripeW * 2));
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, playH + 4, viewW, 12);
+      ctx.clip();
+      for (let sx = offset - stripeW * 2; sx < viewW + stripeW * 2; sx += stripeW * 2) {
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath();
+        ctx.moveTo(sx, playH + 4);
+        ctx.lineTo(sx + stripeW, playH + 4);
+        ctx.lineTo(sx + stripeW - 10, playH + 16);
+        ctx.lineTo(sx - 10, playH + 16);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // Impact Flash Overlay
+      if (state.flashAlpha > 0) {
+        ctx.fillStyle = `rgba(255, 255, 255, ${state.flashAlpha})`;
+        ctx.fillRect(0, 0, viewW, viewH);
+      }
+
+      ctx.restore();
+    }
+
+    function drawSteelIBeam(x, y, width, height, isTop, theme) {
+      if (height <= 0) return;
+      const flangeH = 18;
+      const webInset = 11;
+
+      // Center Steel Web
+      ctx.fillStyle = theme.beamMain;
+      ctx.fillRect(x + webInset, y, width - webInset * 2, height);
+
+      // Left Specular Highlight & Right Shadow on Web
+      ctx.fillStyle = theme.beamHighlight;
+      ctx.fillRect(x + webInset + 2, y, 5, height);
+      ctx.fillStyle = theme.beamShadow;
+      ctx.fillRect(x + width - webInset - 6, y, 6, height);
+
+      // Structural Rivets along Web
+      ctx.fillStyle = 'rgba(255,255,255,0.28)';
+      for (let ry = y + 24; ry < y + height - 20; ry += 32) {
+        ctx.beginPath();
+        ctx.arc(x + width * 0.5, ry, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Heavy End Cap Flange at Gap Edge
+      const capY = isTop ? Math.max(0, y + height - flangeH) : y;
+      ctx.fillStyle = theme.beamMain;
+      ctx.beginPath();
+      ctx.roundRect(x - 4, capY, width + 8, flangeH, 4);
+      ctx.fill();
+
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Hazard Caution Trim on Gap Flange
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillRect(x - 1, isTop ? capY + flangeH - 5 : capY + 1, width + 2, 4);
+    }
+
+    // =========================================================================
+    // 9. PHYSICS, COLLISIONS & STATE TRANSITIONS
+    // =========================================================================
+    function updateHUD() {
+      const scoreEl = document.getElementById('hud-score');
+      if (scoreEl) scoreEl.textContent = state.score;
+      const bestEl = document.getElementById('hud-best');
+      if (bestEl) bestEl.textContent = state.bestScore;
+      const bonusEl = document.getElementById('hud-bonus');
+      if (bonusEl) bonusEl.textContent = `+${state.bonusPoints}`;
+      const menuBestEl = document.getElementById('menu-best-score');
+      if (menuBestEl) menuBestEl.textContent = state.bestScore;
+    }
+
+    function popScoreAnimation() {
+      const scoreEl = document.getElementById('hud-score');
+      if (!scoreEl) return;
+      scoreEl.classList.add('pop');
+      setTimeout(() => scoreEl.classList.remove('pop'), 140);
+    }
+
+    function prepareReadyShift() {
+      state.phase = 'READY';
+      state.score = 0;
+      state.bonusPoints = 0;
+      state.hardhatsCollected = 0;
+      state.obstacles = [];
+      state.collectibles = [];
+      state.particles = [];
+      state.floatingTexts = [];
+      state.spawnDistance = 120;
+      state.lastGapCenterY = null;
+      state.obstaclesPassed = 0;
+      state.shakeTime = 0;
+      state.flashAlpha = 0;
+
+      state.player.x = getPlayerAnchorX();
+      state.player.y = getPlayableHeight() * 0.45;
+      state.player.vy = 0;
+      state.player.rotation = 0;
+      state.player.flameTimer = 0;
+
+      document.getElementById('start-modal').classList.add('hidden');
+      document.getElementById('pause-modal').classList.add('hidden');
+      document.getElementById('gameover-modal').classList.add('hidden');
+      document.getElementById('hud').classList.remove('hidden');
+      document.getElementById('ready-hint').classList.remove('hidden');
+      updateHUD();
+    }
+
+    function triggerThrust() {
+      if (state.phase === 'READY') {
+        state.phase = 'PLAYING';
+        document.getElementById('ready-hint').classList.add('hidden');
+      }
+      if (state.phase !== 'PLAYING') return;
+
+      const spec = RIG_SPECS[state.selectedRig] || RIG_SPECS.excavator;
+      state.player.vy = spec.flapVel;
+      state.player.flameTimer = 0.16;
+      audio.playHydraulicThrust();
+      spawnExhaustSparks(state.player.x - 6, state.player.y + 12, 7, '#fbbf24');
+    }
+
+    function triggerGameOver(reason) {
+      if (state.phase === 'GAMEOVER') return;
+      state.phase = 'GAMEOVER';
+      state.deathReason = reason;
+      state.shakeTime = 0.32;
+      state.shakeIntensity = 9;
+      state.flashAlpha = 0.55;
+
+      audio.playClangCrash();
+      spawnCrashDebris(state.player.x, state.player.y);
+
+      const isNewRecord = state.score > state.bestScore;
+      if (isNewRecord) {
+        state.bestScore = state.score;
+        persistHighScore(state.bestScore);
+      }
+      updateHUD();
+
+      document.getElementById('ready-hint').classList.add('hidden');
+      document.getElementById('go-reason').textContent = reason;
+      document.getElementById('go-score').textContent = state.score;
+      document.getElementById('go-best').textContent = state.bestScore;
+      document.getElementById('go-hardhats').textContent = state.hardhatsCollected;
+
+      const newRecEl = document.getElementById('go-new-record');
+      if (isNewRecord && state.score > 0) {
+        newRecEl.classList.remove('hidden');
+      } else {
+        newRecEl.classList.add('hidden');
+      }
+
+      // Rank Badge by Score
+      let medal = '🦺';
+      let rank = 'APPRENTICE OPERATOR';
+      if (state.score >= 35) {
+        medal = '🏆';
+        rank = 'MASTER SITE DIRECTOR';
+      } else if (state.score >= 20) {
+        medal = '🏗️';
+        rank = 'CHIEF CRANE ENGINEER';
+      } else if (state.score >= 10) {
+        medal = '⚙️';
+        rank = 'CERTIFIED RIG FOREMAN';
+      }
+      document.getElementById('go-medal-icon').textContent = medal;
+      document.getElementById('go-rank-title').textContent = rank;
+
+      setTimeout(() => {
+        if (state.phase === 'GAMEOVER') {
+          document.getElementById('gameover-modal').classList.remove('hidden');
+        }
+      }, 360);
+    }
+
+    function circleRectOverlap(cx, cy, cr, rx, ry, rw, rh) {
+      const closestX = Math.max(rx, Math.min(cx, rx + rw));
+      const closestY = Math.max(ry, Math.min(cy, ry + rh));
+      const dx = cx - closestX;
+      const dy = cy - closestY;
+      return dx * dx + dy * dy < cr * cr;
+    }
+
+    function updateSimulation(dt) {
+      const playH = getPlayableHeight();
+      const { speed } = getDifficultyParams();
+      const scrollSpeed = state.phase === 'PLAYING' ? speed : (state.phase === 'READY' || state.phase === 'MENU' ? 85 : 0);
+
+      // Ambient Clouds & Parallax City
+      state.clouds.forEach((c) => {
+        c.x -= (c.speed + scrollSpeed * 0.08) * dt;
+        if (c.x < -90) c.x = viewW + 90;
+      });
+
+      if (scrollSpeed > 0) {
+        state.groundScroll += scrollSpeed * dt;
+
+        state.skylineFar.forEach((b) => {
+          b.x -= scrollSpeed * 0.16 * dt;
+          b.craneAngle += dt * 0.9;
+        });
+        if (state.skylineFar.length && state.skylineFar[0].x + state.skylineFar[0].w < -40) {
+          const first = state.skylineFar.shift();
+          const last = state.skylineFar[state.skylineFar.length - 1];
+          first.x = last.x + last.w + 12;
+          state.skylineFar.push(first);
+        }
+
+        state.skylineMid.forEach((b) => {
+          b.x -= scrollSpeed * 0.34 * dt;
+        });
+        if (state.skylineMid.length && state.skylineMid[0].x + state.skylineMid[0].w < -40) {
+          const first = state.skylineMid.shift();
+          const last = state.skylineMid[state.skylineMid.length - 1];
+          first.x = last.x + last.w + 18;
+          state.skylineMid.push(first);
+        }
+      }
+
+      // Screen Shake & Impact Flash Decay
+      if (state.shakeTime > 0) state.shakeTime = Math.max(0, state.shakeTime - dt);
+      if (state.flashAlpha > 0) state.flashAlpha = Math.max(0, state.flashAlpha - dt * 1.8);
+
+      // Particle & Floating Text Updates
+      for (let i = state.particles.length - 1; i >= 0; i--) {
+        const p = state.particles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 320 * dt;
+        p.life -= dt;
+        if (p.life <= 0) state.particles.splice(i, 1);
+      }
+
+      for (let i = state.floatingTexts.length - 1; i >= 0; i--) {
+        const ft = state.floatingTexts[i];
+        ft.y += ft.vy * dt;
+        ft.life -= dt;
+        if (ft.life <= 0) state.floatingTexts.splice(i, 1);
+      }
+
+      // Hover Animation on Menu / Ready Screen
+      if (state.phase === 'MENU' || state.phase === 'READY') {
+        const t = performance.now() * 0.004;
+        state.player.y = playH * 0.45 + Math.sin(t) * 9;
+        state.player.rotation = Math.cos(t) * 0.06;
+        state.player.armAngle += dt * 2.2;
+        state.player.drumSpin += dt * 3.2;
+        return;
+      }
+
+      if (state.phase !== 'PLAYING') return;
+
+      // Active Flight Physics
+      const spec = RIG_SPECS[state.selectedRig] || RIG_SPECS.excavator;
+      state.player.vy = Math.min(spec.maxFall, state.player.vy + spec.gravity * dt);
+      state.player.y += state.player.vy * dt;
+      state.player.armAngle += dt * 4.5;
+      state.player.drumSpin += dt * 6.5;
+      if (state.player.flameTimer > 0) state.player.flameTimer = Math.max(0, state.player.flameTimer - dt);
+
+      // Pitch Tilt synced to vertical velocity
+      const targetRot = Math.max(-0.42, Math.min(0.68, state.player.vy / 650));
+      state.player.rotation += (targetRot - state.player.rotation) * Math.min(1, dt * 12);
+
+      // Ceiling Clamp (generous bounce so tapping high never unfairly kills you)
+      if (state.player.y < state.player.radius + 6) {
+        state.player.y = state.player.radius + 6;
+        if (state.player.vy < 0) state.player.vy = 40;
+      }
+
+      // Ground Impact Check
+      if (state.player.y + state.player.radius >= playH) {
+        state.player.y = playH - state.player.radius;
+        triggerGameOver('GROUND CRASH!');
+        return;
+      }
+
+      // Distance-based Beam Spawning
+      state.spawnDistance -= speed * dt;
+      if (state.spawnDistance <= 0) {
+        spawnBeamPair();
+      }
+
+      // Update Obstacles & Forgiving Hitboxes
+      const hitR = state.player.radius - 3;
+      for (let i = state.obstacles.length - 1; i >= 0; i--) {
+        const obs = state.obstacles[i];
+        obs.x -= speed * dt;
+
+        if (obs.moving) {
+          obs.movePhase += obs.moveSpeed * dt;
+          const deltaY = Math.sin(obs.movePhase) * obs.moveAmp;
+          obs.topHeight = obs.baseTopHeight + deltaY;
+          obs.bottomY = obs.topHeight + obs.gapHeight;
+        }
+
+        if (obs.hasWreckingBall) {
+          obs.ballPhase += 2.6 * dt;
+          const swingX = obs.x + obs.width * 0.5 + Math.sin(obs.ballPhase) * 14;
+          const ballY = obs.topHeight + 24;
+          const dx = state.player.x - swingX;
+          const dy = state.player.y - ballY;
+          if (dx * dx + dy * dy < (hitR + obs.ballRadius - 2) ** 2) {
+            triggerGameOver('WRECKING BALL HIT!');
+            return;
+          }
+        }
+
+        // Top & Bottom Steel I-Beam Collision
+        const hitTop = circleRectOverlap(state.player.x, state.player.y, hitR, obs.x + 3, 0, obs.width - 6, obs.topHeight);
+        const hitBot = circleRectOverlap(state.player.x, state.player.y, hitR, obs.x + 3, obs.bottomY, obs.width - 6, playH - obs.bottomY);
+        if (hitTop || hitBot) {
+          triggerGameOver('STEEL BEAM IMPACT!');
+          return;
+        }
+
+        // Score Point when passing Beam Center
+        if (!obs.passed && obs.x + obs.width * 0.5 < state.player.x) {
+          obs.passed = true;
+          state.obstaclesPassed += 1;
+          state.score += 1;
+          updateHUD();
+          popScoreAnimation();
+          audio.playBeamScore();
+          spawnFloatingText(state.player.x, state.player.y - 26, '+1', '#ffffff');
+        }
+
+        if (obs.x + obs.width < -90) {
+          state.obstacles.splice(i, 1);
+        }
+      }
+
+      // Update Golden Hardhat Collectibles
+      for (let i = state.collectibles.length - 1; i >= 0; i--) {
+        const item = state.collectibles[i];
+        item.x -= speed * dt;
+        item.bobPhase += 4.2 * dt;
+
+        // Keep hardhat aligned vertically with its oscillating beam gap
+        if (item.parentObs) {
+          const beamDeltaY = item.parentObs.topHeight - item.parentObs.baseTopHeight;
+          item.y = item.baseY + beamDeltaY;
+        }
+
+        if (!item.collected) {
+          const dx = state.player.x - item.x;
+          const dy = state.player.y - item.y;
+          if (dx * dx + dy * dy < (state.player.radius + item.radius + 4) ** 2) {
+            item.collected = true;
+            state.hardhatsCollected += 1;
+            state.bonusPoints += 2;
+            state.score += 2;
+            updateHUD();
+            popScoreAnimation();
+            audio.playHardhatPickup();
+            spawnExhaustSparks(item.x, item.y, 12, '#fef08a');
+            spawnFloatingText(item.x, item.y - 18, '+2 HARDHAT!', '#fbbf24');
+          }
+        }
+
+        if (item.x < -60) {
+          state.collectibles.splice(i, 1);
+        }
+      }
+    }
+
+    // =========================================================================
+    // 10. UI EVENT LISTENERS, INPUT HANDLERS & MAIN LOOP
+    // =========================================================================
+    function bindUIControls() {
+      // Rig Selector Cards
+      document.querySelectorAll('#rig-selector .rig-card').forEach((card) => {
+        card.addEventListener('click', () => {
+          audio.playClick();
+          document.querySelectorAll('#rig-selector .rig-card').forEach((c) => c.classList.remove('selected'));
+          card.classList.add('selected');
+          state.selectedRig = card.dataset.rig;
+        });
+      });
+
+      // Site Shift Theme Selector
+      document.querySelectorAll('#shift-selector .shift-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          audio.playClick();
+          document.querySelectorAll('#shift-selector .shift-btn').forEach((b) => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          state.selectedShift = btn.dataset.shift;
+        });
+      });
+
+      // Start Shift Button
+      document.getElementById('btn-start-shift').addEventListener('click', () => {
+        audio.init();
+        audio.playClick();
+        prepareReadyShift();
+      });
+
+      // Manual Sync Latest Version Button
+      const syncBtn = document.getElementById('btn-sync-latest');
+      if (syncBtn) {
+        syncBtn.addEventListener('click', () => {
+          audio.playClick();
+          checkAndApplyLatestBuild(true);
+        });
+      }
+
+      // Sound Toggle Button
+      document.getElementById('btn-sound').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const enabled = audio.toggle();
+        document.getElementById('icon-sound-on').classList.toggle('hidden', !enabled);
+        document.getElementById('icon-sound-off').classList.toggle('hidden', enabled);
+        if (enabled) audio.playClick();
+      });
+
+      // Pause Button
+      document.getElementById('btn-pause').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (state.phase === 'PLAYING' || state.phase === 'READY') {
+          audio.playClick();
+          state.prevPhase = state.phase;
+          state.phase = 'PAUSED';
+          document.getElementById('pause-modal').classList.remove('hidden');
+        }
+      });
+
+      // Resume Shift
+      document.getElementById('btn-resume-shift').addEventListener('click', () => {
+        audio.playClick();
+        document.getElementById('pause-modal').classList.add('hidden');
+        state.phase = state.prevPhase || 'PLAYING';
+      });
+
+      // Return to Garage from Pause or Game Over
+      const returnToGarage = () => {
+        audio.playClick();
+        state.phase = 'MENU';
+        document.getElementById('pause-modal').classList.add('hidden');
+        document.getElementById('gameover-modal').classList.add('hidden');
+        document.getElementById('hud').classList.add('hidden');
+        document.getElementById('ready-hint').classList.add('hidden');
+        document.getElementById('start-modal').classList.remove('hidden');
+        renderGaragePreviews();
+        updateHUD();
+      };
+
+      document.getElementById('btn-pause-garage').addEventListener('click', returnToGarage);
+      document.getElementById('btn-go-garage').addEventListener('click', returnToGarage);
+
+      // Retry Shift from Game Over
+      document.getElementById('btn-retry-shift').addEventListener('click', () => {
+        audio.playClick();
+        prepareReadyShift();
+      });
+
+      // Pointer / Touch / Mouse Flight Controls on Canvas
+      canvas.addEventListener('pointerdown', (e) => {
+        if (e.button !== undefined && e.button !== 0) return;
+        e.preventDefault();
+        if (state.phase === 'READY' || state.phase === 'PLAYING') {
+          triggerThrust();
+        }
+      }, { passive: false });
+
+      // Keyboard Controls (Space, ArrowUp, W, P / Escape)
+      window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+          if (state.phase === 'READY' || state.phase === 'PLAYING') {
+            e.preventDefault();
+            triggerThrust();
+          } else if (state.phase === 'GAMEOVER' && !document.getElementById('gameover-modal').classList.contains('hidden')) {
+            e.preventDefault();
+            prepareReadyShift();
+          }
+        } else if (e.code === 'KeyP' || e.code === 'Escape') {
+          if (state.phase === 'PLAYING' || state.phase === 'READY') {
+            state.prevPhase = state.phase;
+            state.phase = 'PAUSED';
+            document.getElementById('pause-modal').classList.remove('hidden');
+          } else if (state.phase === 'PAUSED') {
+            document.getElementById('pause-modal').classList.add('hidden');
+            state.phase = state.prevPhase || 'PLAYING';
+          }
+        }
+      });
+
+      window.addEventListener('resize', resizeCanvas);
+      window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 80));
+    }
+
+    let lastFrameTime = performance.now();
+    function gameLoop(now) {
+      const dt = Math.min(0.05, Math.max(0.001, (now - lastFrameTime) / 1000));
+      lastFrameTime = now;
+
+      updateSimulation(dt);
+      drawScene(dt);
+      requestAnimationFrame(gameLoop);
+    }
+
+    window.addEventListener('load', () => {
+      resizeCanvas();
+      renderGaragePreviews();
+      bindUIControls();
+      updateHUD();
+      checkAndApplyLatestBuild(false);
+      lastFrameTime = performance.now();
+      requestAnimationFrame(gameLoop);
+    });
+
+    // Automatically check for new GitHub Pages deployment when reopened from Home Screen
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        checkAndApplyLatestBuild(false);
+      }
+    });
+  </script>
+</body>
+</html>
