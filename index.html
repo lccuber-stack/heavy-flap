@@ -33,8 +33,8 @@
       --cat-yellow-bright: #fbbf24;
       --cat-orange: #ea580c;
       --steel-dark: #0f172a;
-      --steel-panel: rgba(15, 23, 42, 0.84);
-      --steel-border: rgba(251, 191, 36, 0.35);
+      --steel-panel: rgba(15, 23, 42, 0.88);
+      --steel-border: rgba(251, 191, 36, 0.38);
       --text-light: #f8fafc;
       --text-muted: #94a3b8;
     }
@@ -51,13 +51,12 @@
     html, body {
       width: 100%;
       height: 100%;
-      min-height: 100vh;
-      min-height: -webkit-fill-available;
+      min-height: 100dvh;
       overflow: hidden;
       background: #0f172a;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       color: var(--text-light);
-      touch-action: none;
+      touch-action: manipulation;
     }
 
     .font-display {
@@ -68,22 +67,22 @@
       display: none !important;
     }
 
-    /* Full-bleed Canvas */
+    /* Full-bleed Canvas across iPhone Safari & Standalone Home Screen */
     #game-canvas {
       position: fixed;
-      top: 0;
-      left: 0;
+      inset: 0;
       width: 100vw;
-      height: calc(100vh + var(--safe-bottom));
-      height: calc(100lvh + var(--safe-bottom));
+      height: 100dvh;
       display: block;
       z-index: 1;
+      touch-action: none;
     }
 
     /* Industrial Hazard Stripe Accent */
     .hazard-bar {
-      height: 8px;
+      height: 6px;
       width: 100%;
+      flex-shrink: 0;
       background: repeating-linear-gradient(
         -45deg,
         #fbbf24,
@@ -102,35 +101,50 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: calc(0.75rem + var(--safe-top)) calc(0.85rem + var(--safe-right)) calc(1rem + var(--safe-bottom)) calc(0.85rem + var(--safe-left));
+      padding: calc(0.55rem + var(--safe-top)) calc(0.65rem + var(--safe-right)) calc(0.85rem + var(--safe-bottom)) calc(0.65rem + var(--safe-left));
     }
 
     .hud-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 0.5rem;
+      gap: 0.4rem;
       width: 100%;
     }
 
     .hud-badge {
-      background: rgba(15, 23, 42, 0.78);
+      background: rgba(15, 23, 42, 0.8);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 14px;
-      padding: 0.42rem 0.65rem;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      border-radius: 13px;
+      padding: 0.35rem 0.55rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.42rem;
       flex-shrink: 1;
       min-width: 0;
     }
 
+    .hud-stat-label {
+      font-size: 0.56rem;
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .hud-stat-val {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 0.96rem;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
     .score-center {
       position: fixed;
-      top: calc(4.35rem + var(--safe-top));
+      top: calc(4.1rem + var(--safe-top));
       left: 50%;
       transform: translateX(-50%);
       text-align: center;
@@ -138,19 +152,19 @@
       z-index: 11;
     }
 
-    @media (min-width: 640px) {
+    @media (min-width: 720px) {
       .score-center {
-        top: calc(1.1rem + var(--safe-top));
+        top: calc(0.85rem + var(--safe-top));
       }
     }
 
     #hud-score {
       font-family: 'Chakra Petch', sans-serif;
-      font-size: clamp(2.85rem, 8vw, 4.5rem);
+      font-size: clamp(2.65rem, 7.5vw, 4.3rem);
       font-weight: 700;
       line-height: 1;
       color: #ffffff;
-      text-shadow: 0 4px 0 #0f172a, 0 8px 24px rgba(0, 0, 0, 0.55);
+      text-shadow: 0 3px 0 #0f172a, 0 8px 22px rgba(0, 0, 0, 0.55);
       transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
@@ -160,11 +174,11 @@
     }
 
     .icon-btn {
-      height: 44px;
-      min-width: 44px;
-      padding: 0 0.7rem;
-      border-radius: 14px;
-      background: rgba(15, 23, 42, 0.82);
+      height: 40px;
+      min-width: 40px;
+      padding: 0 0.58rem;
+      border-radius: 13px;
+      background: rgba(15, 23, 42, 0.84);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1.5px solid rgba(255, 255, 255, 0.18);
@@ -172,11 +186,12 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.35rem;
+      gap: 0.3rem;
       font-family: 'Chakra Petch', sans-serif;
       font-weight: 700;
-      font-size: 0.76rem;
+      font-size: 0.72rem;
       letter-spacing: 0.04em;
+      white-space: nowrap;
       cursor: pointer;
       pointer-events: auto;
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
@@ -189,19 +204,14 @@
     }
 
     .icon-btn.sound-muted {
-      background: rgba(127, 29, 29, 0.85);
+      background: rgba(127, 29, 29, 0.88);
       border-color: #fb7185;
       color: #fecdd3;
     }
 
     .icon-btn:hover {
-      background: rgba(30, 41, 59, 0.92);
+      background: rgba(30, 41, 59, 0.94);
       border-color: var(--cat-yellow);
-    }
-
-    .icon-btn.sound-muted:hover {
-      background: rgba(153, 27, 27, 0.92);
-      border-color: #fda4af;
     }
 
     .icon-btn:active {
@@ -211,7 +221,7 @@
     /* Ready Prompt Overlay */
     #ready-hint {
       position: fixed;
-      bottom: calc(18% + var(--safe-bottom));
+      bottom: calc(17% + var(--safe-bottom));
       left: 50%;
       transform: translateX(-50%);
       z-index: 12;
@@ -222,19 +232,19 @@
     }
 
     .tap-pill {
-      background: rgba(15, 23, 42, 0.86);
+      background: rgba(15, 23, 42, 0.88);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 2px solid var(--cat-yellow);
       border-radius: 999px;
-      padding: 0.65rem 1.2rem;
+      padding: 0.58rem 1.1rem;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.55rem;
+      gap: 0.5rem;
       font-family: 'Chakra Petch', sans-serif;
       font-weight: 700;
-      font-size: clamp(0.88rem, 3.6vw, 1.05rem);
+      font-size: clamp(0.84rem, 3.5vw, 1.02rem);
       letter-spacing: 0.04em;
       color: #ffffff;
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
@@ -252,47 +262,44 @@
       inset: 0;
       z-index: 30;
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: center;
-      padding: calc(0.85rem + var(--safe-top)) calc(0.85rem + var(--safe-right)) calc(1.25rem + var(--safe-bottom)) calc(0.85rem + var(--safe-left));
+      padding: calc(0.45rem + var(--safe-top)) calc(0.65rem + var(--safe-right)) calc(0.55rem + var(--safe-bottom)) calc(0.65rem + var(--safe-left));
       background: radial-gradient(circle at 50% 35%, rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.88));
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      transition: opacity 0.25s ease;
-    }
-
-    @media (min-height: 680px) {
-      .modal-backdrop {
-        align-items: center;
-      }
     }
 
     .industrial-card {
       width: 100%;
-      max-width: 460px;
-      margin: auto 0;
+      max-width: 450px;
+      max-height: calc(100dvh - 1rem - var(--safe-top) - var(--safe-bottom));
+      display: flex;
+      flex-direction: column;
       background: var(--steel-panel);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       border: 1px solid var(--steel-border);
-      border-radius: 24px;
+      border-radius: 22px;
       overflow: hidden;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
-      animation: cardEntrance 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.58);
+      animation: cardEntrance 0.28s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     @keyframes cardEntrance {
-      from { opacity: 0; transform: translateY(16px) scale(0.96); }
+      from { opacity: 0; transform: translateY(14px) scale(0.97); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .card-body {
-      padding: 1.35rem 1.4rem 1.5rem 1.4rem;
+      padding: 0.9rem 1rem 1rem 1rem;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     @media (min-width: 640px) {
       .card-body {
-        padding: 1.75rem 1.85rem 1.85rem 1.85rem;
+        padding: 1.45rem 1.65rem 1.55rem 1.65rem;
       }
     }
 
@@ -300,15 +307,15 @@
     .rig-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 0.6rem;
-      margin-top: 0.65rem;
+      gap: 0.45rem;
+      margin-top: 0.4rem;
     }
 
     .rig-card {
-      background: rgba(30, 41, 59, 0.68);
+      background: rgba(30, 41, 59, 0.72);
       border: 2px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 0.7rem 0.45rem;
+      border-radius: 14px;
+      padding: 0.45rem 0.3rem;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -323,39 +330,38 @@
     }
 
     .rig-card.selected {
-      background: rgba(245, 158, 11, 0.18);
+      background: rgba(245, 158, 11, 0.2);
       border-color: var(--cat-yellow-bright);
-      box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.4), 0 8px 20px rgba(245, 158, 11, 0.22);
-      transform: translateY(-2px);
+      box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.4), 0 6px 16px rgba(245, 158, 11, 0.22);
     }
 
     .rig-preview {
-      width: 56px;
-      height: 44px;
-      margin-bottom: 0.35rem;
+      width: 48px;
+      height: 36px;
+      margin-bottom: 0.2rem;
     }
 
     /* Day/Night Shift Toggle */
     .shift-selector {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 0.45rem;
-      background: rgba(15, 23, 42, 0.65);
-      padding: 0.32rem;
-      border-radius: 14px;
+      gap: 0.35rem;
+      background: rgba(15, 23, 42, 0.68);
+      padding: 0.25rem;
+      border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 0.45rem;
+      margin-top: 0.35rem;
     }
 
     .shift-btn {
-      padding: 0.5rem 0.35rem;
-      border: none;
-      border-radius: 10px;
+      padding: 0.42rem 0.3rem;
+      border: 1px solid transparent;
+      border-radius: 9px;
       background: transparent;
       color: var(--text-muted);
       font-family: 'Chakra Petch', sans-serif;
       font-weight: 700;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       cursor: pointer;
       transition: all 0.15s ease;
     }
@@ -363,29 +369,29 @@
     .shift-btn.selected {
       background: rgba(245, 158, 11, 0.24);
       color: #ffffff;
-      border: 1px solid rgba(251, 191, 36, 0.5);
+      border-color: rgba(251, 191, 36, 0.5);
     }
 
     /* Action Buttons */
     .btn-launch {
       width: 100%;
-      margin-top: 1.25rem;
-      padding: 0.95rem 1.25rem;
+      margin-top: 0.85rem;
+      padding: 0.78rem 1.1rem;
       border: none;
-      border-radius: 16px;
+      border-radius: 14px;
       background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
       color: #0f172a;
       font-family: 'Chakra Petch', sans-serif;
       font-weight: 700;
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       letter-spacing: 0.04em;
       text-transform: uppercase;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.6rem;
-      box-shadow: 0 10px 26px rgba(217, 119, 6, 0.45);
+      gap: 0.5rem;
+      box-shadow: 0 8px 22px rgba(217, 119, 6, 0.45);
       transition: transform 0.14s ease, filter 0.14s ease;
     }
 
@@ -399,14 +405,14 @@
     }
 
     .btn-secondary {
-      padding: 0.85rem 1rem;
+      padding: 0.75rem 0.9rem;
       border-radius: 14px;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.16);
       color: #f8fafc;
       font-family: 'Chakra Petch', sans-serif;
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       cursor: pointer;
       transition: background 0.15s ease, transform 0.14s ease;
     }
@@ -423,15 +429,15 @@
     .stat-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 0.6rem;
-      margin-top: 1rem;
+      gap: 0.5rem;
+      margin-top: 0.8rem;
     }
 
     .stat-box {
-      background: rgba(15, 23, 42, 0.65);
+      background: rgba(15, 23, 42, 0.68);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 14px;
-      padding: 0.7rem 0.5rem;
+      border-radius: 13px;
+      padding: 0.55rem 0.4rem;
       text-align: center;
     }
 
@@ -440,12 +446,12 @@
       background: #10b981;
       color: #064e3b;
       font-weight: 800;
-      font-size: 0.68rem;
-      padding: 0.18rem 0.55rem;
+      font-size: 0.65rem;
+      padding: 0.16rem 0.5rem;
       border-radius: 999px;
       letter-spacing: 0.05em;
       text-transform: uppercase;
-      margin-left: 0.4rem;
+      margin-left: 0.35rem;
       vertical-align: middle;
     }
 
@@ -453,23 +459,23 @@
     .mode-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 0.35rem;
-      background: rgba(15, 23, 42, 0.65);
-      padding: 0.3rem;
-      border-radius: 12px;
+      gap: 0.3rem;
+      background: rgba(15, 23, 42, 0.68);
+      padding: 0.25rem;
+      border-radius: 11px;
       border: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 0.4rem;
+      margin-top: 0.35rem;
     }
 
     .mode-btn {
-      padding: 0.42rem 0.25rem;
+      padding: 0.38rem 0.2rem;
       border: 1px solid transparent;
-      border-radius: 9px;
+      border-radius: 8px;
       background: transparent;
       color: var(--text-muted);
       font-family: 'Chakra Petch', sans-serif;
       font-weight: 700;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       cursor: pointer;
       transition: all 0.15s ease;
     }
@@ -483,32 +489,30 @@
     .roster-list {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 0.4rem;
-      margin-top: 0.55rem;
+      gap: 0.35rem;
+      margin-top: 0.4rem;
     }
 
-    @media (min-width: 440px) {
-      .roster-list.two-col {
-        grid-template-columns: repeat(2, 1fr);
-      }
+    .roster-list.two-col {
+      grid-template-columns: repeat(2, 1fr);
     }
 
     .player-input-row {
       display: flex;
       align-items: center;
-      gap: 0.45rem;
-      background: rgba(15, 23, 42, 0.72);
+      gap: 0.4rem;
+      background: rgba(15, 23, 42, 0.75);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 11px;
-      padding: 0.35rem 0.55rem;
+      border-radius: 10px;
+      padding: 0.3rem 0.5rem;
     }
 
     .player-tag {
       font-family: 'Chakra Petch', sans-serif;
       font-weight: 700;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: #fbbf24;
-      min-width: 22px;
+      min-width: 20px;
     }
 
     .player-name-input {
@@ -519,17 +523,17 @@
       color: #f8fafc;
       font-family: 'Inter', sans-serif;
       font-weight: 600;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       user-select: text;
       -webkit-user-select: text;
     }
 
     .leaderboard-box {
-      margin-top: 0.85rem;
-      background: rgba(15, 23, 42, 0.68);
+      margin-top: 0.7rem;
+      background: rgba(15, 23, 42, 0.7);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 14px;
-      padding: 0.6rem 0.75rem;
+      border-radius: 13px;
+      padding: 0.5rem 0.65rem;
       text-align: left;
     }
 
@@ -537,9 +541,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.28rem 0;
+      padding: 0.26rem 0;
       border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
     }
 
     .lb-row:last-child {
@@ -548,19 +552,19 @@
 
     .record-btn {
       background: rgba(251, 191, 36, 0.14);
-      border: 1px solid rgba(251, 191, 36, 0.38);
-      border-radius: 14px;
-      padding: 0.45rem 0.75rem;
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      border-radius: 13px;
+      padding: 0.38rem 0.65rem;
       text-align: right;
       cursor: pointer;
       color: inherit;
+      flex-shrink: 0;
       transition: transform 0.14s ease, background 0.14s ease, border-color 0.14s ease;
     }
 
     .record-btn:hover {
       background: rgba(251, 191, 36, 0.24);
       border-color: #fbbf24;
-      transform: translateY(-1px);
     }
 
     .record-btn:active {
@@ -576,6 +580,21 @@
       color: inherit;
       pointer-events: auto;
     }
+
+    /* Extra compact spacing for short iPhone viewports (e.g. Safari with bottom bar) */
+    @media (max-height: 740px) {
+      .card-body {
+        padding: 0.72rem 0.88rem 0.82rem 0.88rem;
+      }
+      .rig-preview {
+        width: 42px;
+        height: 30px;
+      }
+      .btn-launch {
+        margin-top: 0.65rem;
+        padding: 0.68rem 1rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -587,30 +606,30 @@
     <div class="hud-top">
       <!-- Active Operator, Best & Streak -->
       <div class="hud-badge">
-        <div id="hud-player-wrap">
-          <div style="font-size:0.62rem; font-weight:700; color:#38bdf8; letter-spacing:0.06em;" id="hud-player-tag">OPERATOR</div>
-          <div class="font-display" style="font-size:0.98rem; font-weight:700; color:#ffffff; max-width:92px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" id="hud-player-name">Player 1</div>
+        <div id="hud-player-wrap" style="min-width:0;">
+          <div class="hud-stat-label" style="color:#38bdf8;" id="hud-player-tag">OPERATOR</div>
+          <div class="hud-stat-val" style="color:#ffffff; max-width:74px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" id="hud-player-name">Player 1</div>
         </div>
-        <div style="width:1px; height:24px; background:rgba(255,255,255,0.14);"></div>
+        <div style="width:1px; height:22px; background:rgba(255,255,255,0.14); flex-shrink:0;"></div>
         <button type="button" class="hud-best-btn" id="btn-hud-leaderboard" title="View Top 10 Leaderboard">
-          <div style="font-size:0.62rem; font-weight:700; color:#94a3b8; letter-spacing:0.06em;">OVERALL BEST ▾</div>
-          <div class="font-display" style="font-size:1.05rem; font-weight:700; color:#fbbf24;" id="hud-best">0</div>
+          <div class="hud-stat-label">BEST ▾</div>
+          <div class="hud-stat-val" style="color:#fbbf24;" id="hud-best">0</div>
         </button>
-        <div style="width:1px; height:24px; background:rgba(255,255,255,0.14);"></div>
+        <div style="width:1px; height:22px; background:rgba(255,255,255,0.14); flex-shrink:0;"></div>
         <div>
-          <div style="font-size:0.62rem; font-weight:700; color:#94a3b8; letter-spacing:0.06em;">STREAK</div>
-          <div class="font-display" style="font-size:1.05rem; font-weight:700; color:#38bdf8;" id="hud-bonus">0x</div>
+          <div class="hud-stat-label">STREAK</div>
+          <div class="hud-stat-val" style="color:#38bdf8;" id="hud-bonus">0x</div>
         </div>
       </div>
 
       <!-- Audio & Pause/Garage Buttons -->
-      <div style="display:flex; gap:0.45rem; flex-shrink:0;">
+      <div style="display:flex; gap:0.35rem; flex-shrink:0;">
         <button type="button" class="icon-btn sound-active" id="btn-sound" aria-label="Toggle Sound" title="Toggle Construction Audio">
-          <svg id="icon-sound-on" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <svg id="icon-sound-on" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
             <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
           </svg>
-          <svg id="icon-sound-off" class="hidden" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <svg id="icon-sound-off" class="hidden" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
             <line x1="23" y1="9" x2="17" y2="15"></line>
             <line x1="17" y1="9" x2="23" y2="15"></line>
@@ -619,7 +638,7 @@
         </button>
 
         <button type="button" class="icon-btn" id="btn-pause" aria-label="Pause Game" title="Pause / Change Rig">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
             <rect x="6" y="4" width="4" height="16" rx="1"></rect>
             <rect x="14" y="4" width="4" height="16" rx="1"></rect>
           </svg>
@@ -630,13 +649,13 @@
     <!-- Giant Center Score -->
     <div class="score-center">
       <div id="hud-score">0</div>
-      <div id="hud-biome-pill" style="margin-top:4px; display:inline-block; background:rgba(15,23,42,0.72); border:1px solid rgba(255,255,255,0.14); border-radius:999px; padding:2px 10px; font-size:0.66rem; font-weight:700; letter-spacing:0.07em; color:#cbd5e1;">🌲 DEEP PINE FOREST</div>
+      <div id="hud-biome-pill" style="margin-top:3px; display:inline-block; background:rgba(15,23,42,0.76); border:1px solid rgba(255,255,255,0.14); border-radius:999px; padding:2px 9px; font-size:0.62rem; font-weight:700; letter-spacing:0.06em; color:#cbd5e1; white-space:nowrap;">🌲 DEEP PINE FOREST</div>
     </div>
 
     <!-- Tap to Thrust Cue -->
     <div id="ready-hint" class="hidden">
       <div class="tap-pill">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 19V5"></path>
           <polyline points="5 12 12 5 19 12"></polyline>
         </svg>
@@ -650,30 +669,30 @@
     <div class="industrial-card">
       <div class="hazard-bar"></div>
       <div class="card-body">
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:0.5rem;">
-          <div>
-            <div style="font-size:0.72rem; font-weight:800; letter-spacing:0.14em; color:#fbbf24;">EARTHMOVER ARCADE</div>
-            <h1 class="font-display" style="font-size:2.15rem; font-weight:700; line-height:1.05; letter-spacing:-0.01em; margin-top:2px;">HEAVY FLAP</h1>
-            <button type="button" id="btn-sync-latest" style="margin-top:6px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.16); color:#cbd5e1; border-radius:999px; padding:0.22rem 0.65rem; font-size:0.68rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.3rem;">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:0.5rem;">
+          <div style="min-width:0;">
+            <div style="font-size:0.66rem; font-weight:800; letter-spacing:0.12em; color:#fbbf24;">EARTHMOVER ARCADE</div>
+            <h1 class="font-display" style="font-size:clamp(1.6rem, 6.8vw, 2.1rem); font-weight:700; line-height:1.05; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
+            <button type="button" id="btn-sync-latest" style="margin-top:4px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.16); color:#cbd5e1; border-radius:999px; padding:0.18rem 0.58rem; font-size:0.64rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.25rem;">
               <span id="sync-status-text">↻ Sync Latest</span>
             </button>
           </div>
           <button type="button" class="record-btn" id="btn-open-leaderboard" title="View Top 10 High Scores">
-            <div style="font-size:0.62rem; font-weight:700; color:#94a3b8;">OVERALL RECORD ▾</div>
-            <div class="font-display" style="font-size:1.25rem; font-weight:700; color:#fbbf24;" id="menu-best-score">0</div>
-            <div style="font-size:0.64rem; font-weight:700; color:#cbd5e1;" id="menu-best-holder">—</div>
+            <div style="font-size:0.58rem; font-weight:700; color:#94a3b8; white-space:nowrap;">TOP 10 RECORD ▾</div>
+            <div class="font-display" style="font-size:1.2rem; font-weight:700; color:#fbbf24; line-height:1.1;" id="menu-best-score">0</div>
+            <div style="font-size:0.62rem; font-weight:700; color:#cbd5e1; max-width:95px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" id="menu-best-holder">—</div>
           </button>
         </div>
 
-        <p style="font-size:0.84rem; color:#cbd5e1; margin-top:0.55rem; line-height:1.42;">
-          Pilot heavy construction rigs across procedurally generated landscapes—from deep pine forests and alpine peaks to bustling city skylines and harbors. Watch out for falling boulders and grab every golden hardhat!
+        <p style="font-size:0.78rem; color:#cbd5e1; margin-top:0.42rem; line-height:1.35;">
+          Fly heavy construction rigs through procedural terrain, dodge falling boulders, and grab golden hardhats to score!
         </p>
 
         <!-- Single / Local Multiplayer Roster -->
-        <div style="margin-top:0.85rem;">
+        <div style="margin-top:0.62rem;">
           <div style="display:flex; align-items:center; justify-content:space-between;">
-            <label style="font-size:0.7rem; font-weight:800; letter-spacing:0.08em; color:#94a3b8;">PLAYERS (LOCAL PASS & PLAY)</label>
-            <span style="font-size:0.68rem; font-weight:700; color:#38bdf8;" id="mode-summary-label">Solo Shift</span>
+            <label style="font-size:0.66rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8;">PLAYERS (PASS &amp; PLAY)</label>
+            <span style="font-size:0.66rem; font-weight:700; color:#38bdf8;" id="mode-summary-label">Solo Shift</span>
           </div>
           <div class="mode-grid" id="player-count-selector">
             <button type="button" class="mode-btn selected" data-count="1">1P Solo</button>
@@ -685,32 +704,32 @@
         </div>
 
         <!-- Choose Heavy Equipment Rig -->
-        <div style="margin-top:0.85rem;">
-          <label style="font-size:0.7rem; font-weight:800; letter-spacing:0.08em; color:#94a3b8; display:block;">SELECT HEAVY MACHINE</label>
+        <div style="margin-top:0.62rem;">
+          <label style="font-size:0.66rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8; display:block;">SELECT HEAVY MACHINE</label>
           <div class="rig-grid" id="rig-selector">
             <button type="button" class="rig-card selected" data-rig="loader">
               <canvas class="rig-preview" id="preview-loader" width="112" height="88"></canvas>
-              <div class="font-display" style="font-size:0.84rem; font-weight:700; color:#fff;">Wheel Loader</div>
-              <div style="font-size:0.66rem; color:#94a3b8; margin-top:2px;">Heavy • Balanced</div>
+              <div class="font-display" style="font-size:0.78rem; font-weight:700; color:#fff; line-height:1.15;">Wheel Loader</div>
+              <div style="font-size:0.6rem; color:#94a3b8; margin-top:1px;">Balanced</div>
             </button>
 
             <button type="button" class="rig-card" data-rig="excavator">
               <canvas class="rig-preview" id="preview-excavator" width="112" height="88"></canvas>
-              <div class="font-display" style="font-size:0.84rem; font-weight:700; color:#fff;">Excavator</div>
-              <div style="font-size:0.66rem; color:#94a3b8; margin-top:2px;">Crawler • Snappy</div>
+              <div class="font-display" style="font-size:0.78rem; font-weight:700; color:#fff; line-height:1.15;">Excavator</div>
+              <div style="font-size:0.6rem; color:#94a3b8; margin-top:1px;">Snappy Lift</div>
             </button>
 
             <button type="button" class="rig-card" data-rig="hauler">
               <canvas class="rig-preview" id="preview-hauler" width="112" height="88"></canvas>
-              <div class="font-display" style="font-size:0.84rem; font-weight:700; color:#fff;">Artic Hauler</div>
-              <div style="font-size:0.66rem; color:#94a3b8; margin-top:2px;">6x6 Dump • Smooth</div>
+              <div class="font-display" style="font-size:0.78rem; font-weight:700; color:#fff; line-height:1.15;">Artic Hauler</div>
+              <div style="font-size:0.6rem; color:#94a3b8; margin-top:1px;">Smooth Glide</div>
             </button>
           </div>
         </div>
 
         <!-- Day / Night Shift Selector -->
-        <div style="margin-top:0.85rem;">
-          <label style="font-size:0.7rem; font-weight:800; letter-spacing:0.08em; color:#94a3b8; display:block;">WORK SHIFT LIGHTING</label>
+        <div style="margin-top:0.62rem;">
+          <label style="font-size:0.66rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8; display:block;">WORK SHIFT LIGHTING</label>
           <div class="shift-selector" id="shift-selector">
             <button type="button" class="shift-btn selected" data-shift="day">☀️ Day Shift</button>
             <button type="button" class="shift-btn" data-shift="night">🌙 Night Shift</button>
@@ -719,7 +738,7 @@
 
         <button type="button" class="btn-launch" id="btn-start-shift">
           <span id="btn-start-label">Start Shift</span>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="5 3 19 12 5 21 5 3"></polygon>
           </svg>
         </button>
@@ -730,17 +749,17 @@
 
   <!-- Pause Overlay -->
   <div id="pause-modal" class="modal-backdrop hidden">
-    <div class="industrial-card" style="max-width:360px;">
+    <div class="industrial-card" style="max-width:350px;">
       <div class="hazard-bar"></div>
       <div class="card-body" style="text-align:center;">
-        <div style="font-size:0.72rem; font-weight:800; letter-spacing:0.14em; color:#fbbf24;">SHIFT ON HOLD</div>
-        <h2 class="font-display" style="font-size:1.85rem; font-weight:700; margin-top:0.2rem;">GAME PAUSED</h2>
-        <p style="font-size:0.85rem; color:#94a3b8; margin-top:0.4rem;">Take a coffee break or switch your heavy machinery in the garage.</p>
+        <div style="font-size:0.68rem; font-weight:800; letter-spacing:0.14em; color:#fbbf24;">SHIFT ON HOLD</div>
+        <h2 class="font-display" style="font-size:1.75rem; font-weight:700; margin-top:0.15rem;">GAME PAUSED</h2>
+        <p style="font-size:0.82rem; color:#94a3b8; margin-top:0.35rem;">Take a coffee break or switch your heavy machinery in the garage.</p>
 
-        <button type="button" class="btn-launch" id="btn-resume-shift" style="margin-top:1.15rem;">
+        <button type="button" class="btn-launch" id="btn-resume-shift" style="margin-top:1rem;">
           Resume Shift
         </button>
-        <button type="button" class="btn-secondary" id="btn-pause-garage" style="width:100%; margin-top:0.6rem;">
+        <button type="button" class="btn-secondary" id="btn-pause-garage" style="width:100%; margin-top:0.55rem;">
           Change Rig / Garage
         </button>
       </div>
@@ -753,48 +772,48 @@
     <div class="industrial-card">
       <div class="hazard-bar"></div>
       <div class="card-body" style="text-align:center;">
-        <div style="font-size:0.74rem; font-weight:800; letter-spacing:0.14em; color:#fb7185;" id="go-reason">BEAM IMPACT!</div>
-        <h2 class="font-display" style="font-size:1.85rem; font-weight:700; margin-top:0.15rem;">
+        <div style="font-size:0.7rem; font-weight:800; letter-spacing:0.14em; color:#fb7185;" id="go-reason">BEAM IMPACT!</div>
+        <h2 class="font-display" style="font-size:1.65rem; font-weight:700; margin-top:0.12rem;">
           <span id="go-player-title">SHIFT OVER</span> <span id="go-new-record" class="new-record-tag hidden">NEW BEST!</span>
         </h2>
 
         <!-- Safety Rank Badge -->
-        <div style="margin-top:0.5rem; display:inline-flex; align-items:center; gap:0.45rem; background:rgba(251,191,36,0.14); border:1px solid rgba(251,191,36,0.35); border-radius:999px; padding:0.3rem 0.85rem;">
-          <span style="font-size:0.95rem;" id="go-medal-icon">🦺</span>
-          <span class="font-display" style="font-size:0.82rem; font-weight:700; color:#fbbf24;" id="go-rank-title">APPRENTICE OPERATOR</span>
+        <div style="margin-top:0.4rem; display:inline-flex; align-items:center; gap:0.4rem; background:rgba(251,191,36,0.14); border:1px solid rgba(251,191,36,0.35); border-radius:999px; padding:0.25rem 0.8rem;">
+          <span style="font-size:0.9rem;" id="go-medal-icon">🦺</span>
+          <span class="font-display" style="font-size:0.78rem; font-weight:700; color:#fbbf24;" id="go-rank-title">APPRENTICE OPERATOR</span>
         </div>
 
         <div class="stat-grid">
           <div class="stat-box">
-            <div style="font-size:0.64rem; font-weight:700; color:#94a3b8;">SHIFT SCORE</div>
-            <div class="font-display" style="font-size:1.55rem; font-weight:700; color:#ffffff; margin-top:2px;" id="go-score">0</div>
+            <div style="font-size:0.6rem; font-weight:700; color:#94a3b8;">SHIFT SCORE</div>
+            <div class="font-display" style="font-size:1.45rem; font-weight:700; color:#ffffff; margin-top:2px;" id="go-score">0</div>
           </div>
           <div class="stat-box">
-            <div style="font-size:0.64rem; font-weight:700; color:#94a3b8;">OVERALL BEST</div>
-            <div class="font-display" style="font-size:1.55rem; font-weight:700; color:#fbbf24; margin-top:2px;" id="go-best">0</div>
+            <div style="font-size:0.6rem; font-weight:700; color:#94a3b8;">OVERALL BEST</div>
+            <div class="font-display" style="font-size:1.45rem; font-weight:700; color:#fbbf24; margin-top:2px;" id="go-best">0</div>
           </div>
           <div class="stat-box">
-            <div style="font-size:0.64rem; font-weight:700; color:#94a3b8;">HARDHATS</div>
-            <div class="font-display" style="font-size:1.55rem; font-weight:700; color:#38bdf8; margin-top:2px;" id="go-hardhats">0</div>
+            <div style="font-size:0.6rem; font-weight:700; color:#94a3b8;">HARDHATS</div>
+            <div class="font-display" style="font-size:1.45rem; font-weight:700; color:#38bdf8; margin-top:2px;" id="go-hardhats">0</div>
           </div>
         </div>
 
         <!-- Device Overall Leaderboard -->
         <div class="leaderboard-box">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
-            <span style="font-size:0.66rem; font-weight:800; letter-spacing:0.08em; color:#94a3b8;">DEVICE OVERALL HIGH SCORES</span>
-            <span style="font-size:0.66rem; font-weight:700; color:#38bdf8;" id="go-next-up-hint"></span>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+            <span style="font-size:0.62rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8;">DEVICE TOP SCORES</span>
+            <span style="font-size:0.64rem; font-weight:700; color:#38bdf8;" id="go-next-up-hint"></span>
           </div>
           <div id="go-leaderboard-list"></div>
         </div>
 
-        <div style="display:flex; gap:0.65rem; margin-top:1.1rem;">
+        <div style="display:flex; gap:0.55rem; margin-top:0.9rem;">
           <button type="button" class="btn-secondary" id="btn-go-garage" style="flex:1;">
             Garage
           </button>
           <button type="button" class="btn-launch" id="btn-retry-shift" style="flex:2; margin-top:0;">
             <span id="btn-retry-label">Retry Shift</span>
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
               <path d="M3 3v5h5"></path>
             </svg>
@@ -812,23 +831,23 @@
       <div class="card-body">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:0.5rem;">
           <div>
-            <div style="font-size:0.7rem; font-weight:800; letter-spacing:0.14em; color:#fbbf24;">SOLO &amp; MULTIPLAYER</div>
-            <h2 class="font-display" style="font-size:1.65rem; font-weight:700; line-height:1.1; margin-top:2px;">TOP 10 HIGH SCORES</h2>
+            <div style="font-size:0.68rem; font-weight:800; letter-spacing:0.14em; color:#fbbf24;">SOLO &amp; MULTIPLAYER</div>
+            <h2 class="font-display" style="font-size:1.55rem; font-weight:700; line-height:1.1; margin-top:2px;">TOP 10 HIGH SCORES</h2>
           </div>
-          <button type="button" class="icon-btn" id="btn-close-leaderboard" aria-label="Close High Score List" style="height:38px; min-width:38px; padding:0 0.6rem;">
+          <button type="button" class="icon-btn" id="btn-close-leaderboard" aria-label="Close High Score List" style="height:36px; min-width:36px; padding:0 0.55rem;">
             ✕
           </button>
         </div>
 
-        <p style="font-size:0.8rem; color:#94a3b8; margin-top:0.35rem;">
+        <p style="font-size:0.78rem; color:#94a3b8; margin-top:0.35rem;">
           All-time best shifts recorded on this device across both Solo and Pass &amp; Play shifts.
         </p>
 
-        <div class="leaderboard-box" style="margin-top:0.8rem; max-height:330px; overflow-y:auto;">
+        <div class="leaderboard-box" style="margin-top:0.75rem; max-height:310px; overflow-y:auto;">
           <div id="top10-leaderboard-list"></div>
         </div>
 
-        <button type="button" class="btn-launch" id="btn-close-leaderboard-bottom" style="margin-top:1rem; padding:0.8rem 1rem; font-size:1rem;">
+        <button type="button" class="btn-launch" id="btn-close-leaderboard-bottom" style="margin-top:0.9rem; padding:0.75rem 1rem; font-size:0.98rem;">
           Close Leaderboard
         </button>
       </div>
@@ -838,12 +857,13 @@
 
   <script>
     // =========================================================================
-    // 1. SYNTHESIZED INDUSTRIAL AUDIO ENGINE (Web Audio API — Zero External URLs)
+    // 1. SYNTHESIZED INDUSTRIAL AUDIO ENGINE (iOS Safari Safe Unlock)
     // =========================================================================
     class ConstructionAudio {
       constructor() {
         this.ctx = null;
         this.enabled = true;
+        this.unlocked = false;
       }
 
       init() {
@@ -852,12 +872,23 @@
           if (AudioCtx) this.ctx = new AudioCtx();
         }
         if (this.ctx && this.ctx.state === 'suspended') {
-          this.ctx.resume();
+          this.ctx.resume().catch(() => {});
+        }
+        if (this.ctx && !this.unlocked) {
+          try {
+            const buffer = this.ctx.createBuffer(1, 1, 22050);
+            const src = this.ctx.createBufferSource();
+            src.buffer = buffer;
+            src.connect(this.ctx.destination);
+            src.start(0);
+            this.unlocked = true;
+          } catch (e) {}
         }
       }
 
       toggle() {
         this.enabled = !this.enabled;
+        if (this.enabled) this.init();
         return this.enabled;
       }
 
@@ -902,7 +933,7 @@
           const gain = this.ctx.createGain();
           osc.type = 'sine';
           osc.frequency.setValueAtTime(freq, now + idx * 0.055);
-          gain.gain.setValueAtTime(0.09, now + idx * 0.055);
+          gain.gain.setValueAtTime(0.08, now + idx * 0.055);
           gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.055 + 0.18);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
@@ -971,6 +1002,17 @@
 
     const audio = new ConstructionAudio();
 
+    // Unlock Web Audio immediately on first iOS touch / pointer / key event
+    function unlockIOSAudioOnce() {
+      audio.init();
+      window.removeEventListener('touchstart', unlockIOSAudioOnce, true);
+      window.removeEventListener('pointerdown', unlockIOSAudioOnce, true);
+      window.removeEventListener('keydown', unlockIOSAudioOnce, true);
+    }
+    window.addEventListener('touchstart', unlockIOSAudioOnce, { capture: true, passive: true });
+    window.addEventListener('pointerdown', unlockIOSAudioOnce, { capture: true, passive: true });
+    window.addEventListener('keydown', unlockIOSAudioOnce, { capture: true, passive: true });
+
     // =========================================================================
     // 1B. CUSTOM HOME SCREEN APP ICON & WEB MANIFEST GENERATOR ("Heavy Flap")
     // =========================================================================
@@ -982,7 +1024,6 @@
         iconCanvas.height = size;
         const ic = iconCanvas.getContext('2d');
 
-        // Rich Industrial Twilight-to-Sky Gradient Background
         const bgGrad = ic.createLinearGradient(0, 0, size, size);
         bgGrad.addColorStop(0, '#0f172a');
         bgGrad.addColorStop(0.55, '#1e3a8a');
@@ -990,7 +1031,6 @@
         ic.fillStyle = bgGrad;
         ic.fillRect(0, 0, size, size);
 
-        // Subtle Radial Sunburst Glow behind Rig
         const glow = ic.createRadialGradient(256, 240, 24, 256, 240, 240);
         glow.addColorStop(0, 'rgba(251, 191, 36, 0.42)');
         glow.addColorStop(0.6, 'rgba(245, 158, 11, 0.12)');
@@ -998,7 +1038,6 @@
         ic.fillStyle = glow;
         ic.fillRect(0, 0, size, size);
 
-        // Blueprint Grid Lines
         ic.strokeStyle = 'rgba(255, 255, 255, 0.06)';
         ic.lineWidth = 2;
         for (let g = 64; g < size; g += 64) {
@@ -1012,7 +1051,6 @@
           ic.stroke();
         }
 
-        // Top & Bottom Diagonal Construction Hazard Trim Bands
         const drawHazardStrip = (yPos, h) => {
           ic.save();
           ic.beginPath();
@@ -1035,7 +1073,6 @@
         drawHazardStrip(0, 28);
         drawHazardStrip(size - 28, 28);
 
-        // Silhouette Tower Crane on Left Background
         ic.strokeStyle = 'rgba(251, 191, 36, 0.32)';
         ic.lineWidth = 7;
         ic.beginPath();
@@ -1045,7 +1082,6 @@
         ic.lineTo(270, 108);
         ic.stroke();
 
-        // Steel I-Beam Framing on Right Edge
         ic.fillStyle = '#334155';
         ic.fillRect(412, 28, 52, 118);
         ic.fillStyle = '#64748b';
@@ -1068,7 +1104,6 @@
         ic.fillStyle = '#fbbf24';
         ic.fillRect(402, 360, 72, 6);
 
-        // Golden Hardhat Floating in Upper-Right Gap
         ic.save();
         ic.translate(344, 178);
         ic.rotate(0.14);
@@ -1088,7 +1123,6 @@
         ic.fill();
         ic.restore();
 
-        // Hero Wheel Loader Soaring Center-Stage
         ic.save();
         ic.translate(226, 276);
         ic.scale(5.2, 5.2);
@@ -1245,7 +1279,7 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const LEADERBOARD_COOKIE = 'crane_flap_lb_v2';
+    const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
 
     function loadLeaderboardData() {
       let records = [];
@@ -1257,7 +1291,7 @@
         }
       } catch (e) {}
       try {
-        if (!records.length && window.name && window.name.startsWith('CRANE_LB:')) {
+        if (!records.length && window.name && window.name.startsWith('HEAVY_LB:')) {
           const parsed = JSON.parse(window.name.slice(9));
           if (Array.isArray(parsed)) records = parsed;
         }
@@ -1278,7 +1312,7 @@
         document.cookie = `${LEADERBOARD_COOKIE}=${encodeURIComponent(JSON.stringify(clean))}; expires=${expires}; path=/; SameSite=Lax`;
       } catch (e) {}
       try {
-        window.name = `CRANE_LB:${JSON.stringify(clean)}`;
+        window.name = `HEAVY_LB:${JSON.stringify(clean)}`;
       } catch (e) {}
       return clean;
     }
@@ -1345,21 +1379,21 @@
       if (!container) return;
       const list = state.leaderboard.slice(0, limit);
       if (!list.length) {
-        container.innerHTML = `<div style="font-size:0.78rem; color:#94a3b8; padding:0.4rem 0;">No shifts recorded yet — grab golden hardhats in Solo or Multiplayer to claim #1!</div>`;
+        container.innerHTML = `<div style="font-size:0.76rem; color:#94a3b8; padding:0.35rem 0;">No shifts recorded yet — grab golden hardhats in Solo or Multiplayer to claim #1!</div>`;
         return;
       }
       container.innerHTML = list.map((entry, idx) => {
         const medal = idx === 0 ? '🏆' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
         const meta = detailed && (entry.rig || entry.mode)
-          ? `<div style="font-size:0.66rem; color:#94a3b8; margin-top:1px;">${entry.rig || 'Heavy Rig'}${entry.mode ? ` • ${entry.mode}` : ''}</div>`
+          ? `<div style="font-size:0.64rem; color:#94a3b8; margin-top:1px;">${entry.rig || 'Heavy Rig'}${entry.mode ? ` • ${entry.mode}` : ''}</div>`
           : '';
         return `
-          <div class="lb-row" style="${detailed ? 'padding:0.45rem 0;' : ''}">
+          <div class="lb-row" style="${detailed ? 'padding:0.42rem 0;' : ''}">
             <div>
               <div style="color:#e2e8f0; font-weight:600;"><strong style="color:#fbbf24; margin-right:6px;">${medal}</strong>${entry.name}</div>
               ${meta}
             </div>
-            <span class="font-display" style="font-weight:700; font-size:${detailed ? '1.05rem' : '0.88rem'}; color:#fbbf24;">${entry.score}</span>
+            <span class="font-display" style="font-weight:700; font-size:${detailed ? '1.05rem' : '0.86rem'}; color:#fbbf24;">${entry.score}</span>
           </div>
         `;
       }).join('');
@@ -1491,11 +1525,10 @@
       canvas.style.height = `${viewH}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      groundHeight = Math.max(66, Math.min(92, Math.round(viewH * 0.11)));
+      groundHeight = Math.max(64, Math.min(90, Math.round(viewH * 0.11)));
 
-      // Responsive horizontal anchor for mobile vs tablet/desktop
       state.player.x = viewW < 600
-        ? Math.max(76, Math.round(viewW * 0.25))
+        ? Math.max(74, Math.round(viewW * 0.25))
         : Math.min(220, Math.round(viewW * 0.23));
 
       if (state.phase === 'MENU' || state.phase === 'READY') {
@@ -1513,7 +1546,6 @@
       targetCtx.rotate(rotation);
       targetCtx.scale(scale, scale);
 
-      // Hydraulic Exhaust Flame / Steam Burst on Flap
       if (thrustAnim > 0.05) {
         targetCtx.save();
         const flameLen = (12 + thrustAnim * 18);
@@ -1532,8 +1564,6 @@
       }
 
       if (rigKey === 'loader') {
-        // --- WHEEL LOADER ---
-        // Rear Engine Hood & Counterweight
         targetCtx.fillStyle = spec.primaryColor;
         targetCtx.beginPath();
         targetCtx.roundRect(-21, -7, 22, 16, 4);
@@ -1542,12 +1572,10 @@
         targetCtx.lineWidth = 1.6;
         targetCtx.stroke();
 
-        // Dark Grille Stripes
         targetCtx.fillStyle = '#0f172a';
         targetCtx.fillRect(-19, -4, 3, 10);
         targetCtx.fillRect(-14, -4, 3, 10);
 
-        // ROPS Operator Cab
         targetCtx.fillStyle = spec.cabColor;
         targetCtx.beginPath();
         targetCtx.roundRect(-7, -17, 15, 12, 3);
@@ -1557,13 +1585,11 @@
         targetCtx.roundRect(-4, -15, 10, 8, 2);
         targetCtx.fill();
 
-        // Roof Beacon
         targetCtx.fillStyle = '#f97316';
         targetCtx.beginPath();
         targetCtx.arc(0, -19, 2.5, 0, Math.PI * 2);
         targetCtx.fill();
 
-        // Hydraulic Lift Arms & Front Bucket
         const armLift = -thrustAnim * 0.35;
         targetCtx.save();
         targetCtx.translate(6, -3);
@@ -1576,7 +1602,6 @@
         targetCtx.lineTo(13, 4);
         targetCtx.stroke();
 
-        // Heavy Steel Loader Bucket
         targetCtx.fillStyle = '#334155';
         targetCtx.beginPath();
         targetCtx.moveTo(11, -4);
@@ -1590,7 +1615,6 @@
         targetCtx.stroke();
         targetCtx.restore();
 
-        // Two Oversized Off-Road Tires with Yellow Rims
         [-11, 6].forEach((wx) => {
           targetCtx.save();
           targetCtx.translate(wx, 11);
@@ -1608,8 +1632,6 @@
           targetCtx.restore();
         });
       } else if (rigKey === 'excavator') {
-        // --- CRAWLER EXCAVATOR ---
-        // Heavy Track Undercarriage
         targetCtx.fillStyle = '#1e293b';
         targetCtx.beginPath();
         targetCtx.roundRect(-18, 7, 32, 9, 4.5);
@@ -1618,7 +1640,6 @@
         targetCtx.lineWidth = 1.4;
         targetCtx.stroke();
 
-        // Track Rollers
         targetCtx.fillStyle = '#eab308';
         [-12, -4, 4, 10].forEach((rx) => {
           targetCtx.beginPath();
@@ -1626,7 +1647,6 @@
           targetCtx.fill();
         });
 
-        // Upper House & Counterweight
         targetCtx.fillStyle = spec.primaryColor;
         targetCtx.beginPath();
         targetCtx.roundRect(-19, -6, 24, 13, 4);
@@ -1635,7 +1655,6 @@
         targetCtx.lineWidth = 1.6;
         targetCtx.stroke();
 
-        // Operator Cab
         targetCtx.fillStyle = spec.cabColor;
         targetCtx.beginPath();
         targetCtx.roundRect(-5, -16, 13, 11, 3);
@@ -1643,7 +1662,6 @@
         targetCtx.fillStyle = '#38bdf8';
         targetCtx.fillRect(-2, -14, 8, 7);
 
-        // Articulated Excavator Boom, Stick & Bucket
         const boomAngle = -0.35 - thrustAnim * 0.35;
         targetCtx.save();
         targetCtx.translate(4, -4);
@@ -1657,15 +1675,12 @@
         targetCtx.lineTo(20, 5);
         targetCtx.stroke();
 
-        // Digging Bucket with Teeth
         targetCtx.fillStyle = '#334155';
         targetCtx.beginPath();
         targetCtx.arc(20, 8, 5.5, 0.2, Math.PI * 1.15);
         targetCtx.fill();
         targetCtx.restore();
       } else {
-        // --- ARTICULATED HAULER (6x6 DUMP TRUCK) ---
-        // Rear Dump Bed (Tilts up slightly on thrust!)
         targetCtx.save();
         targetCtx.translate(-6, 4);
         targetCtx.rotate(-thrustAnim * 0.28);
@@ -1682,7 +1697,6 @@
         targetCtx.stroke();
         targetCtx.restore();
 
-        // Articulated Hitch & Front Tractor Hood
         targetCtx.fillStyle = '#1e293b';
         targetCtx.fillRect(1, -2, 5, 8);
 
@@ -1694,7 +1708,6 @@
         targetCtx.lineWidth = 1.5;
         targetCtx.stroke();
 
-        // Front Cab
         targetCtx.fillStyle = spec.cabColor;
         targetCtx.beginPath();
         targetCtx.roundRect(5, -15, 11, 10, 2.5);
@@ -1702,7 +1715,6 @@
         targetCtx.fillStyle = '#38bdf8';
         targetCtx.fillRect(8, -13, 6, 6);
 
-        // 3 Axles (6x6 Hauler Wheels)
         [-14, -4, 13].forEach((wx) => {
           targetCtx.save();
           targetCtx.translate(wx, 11);
@@ -1746,14 +1758,12 @@
         ctx.translate((Math.random() - 0.5) * mag, (Math.random() - 0.5) * mag);
       }
 
-      // Sky Gradient
       const skyGrad = ctx.createLinearGradient(0, 0, 0, playH);
       skyGrad.addColorStop(0, light.isNight ? light.skyTop : biome.daySkyTop);
       skyGrad.addColorStop(1, light.isNight ? light.skyBottom : biome.daySkyBottom);
       ctx.fillStyle = skyGrad;
       ctx.fillRect(0, 0, viewW, playH);
 
-      // Night Stars
       if (light.isNight) {
         stars.forEach((st) => {
           const sx = (st.x - state.skylineScroll * 0.08) % (viewW + 60);
@@ -1766,7 +1776,6 @@
         });
       }
 
-      // Sun or Crescent Moon
       const sunX = viewW * 0.78;
       const sunY = playH * light.sunY;
       ctx.save();
@@ -1778,7 +1787,6 @@
       ctx.fill();
       ctx.restore();
 
-      // Drifting Clouds
       clouds.forEach((cl) => {
         const cx = ((cl.x - state.cloudScroll * (cl.speed / 20)) % (viewW + 220)) - 110;
         const drawX = cx < -110 ? cx + viewW + 220 : cx;
@@ -1790,7 +1798,6 @@
         ctx.fill();
       });
 
-      // Far Ridge / Distant Horizon Layer
       ctx.fillStyle = light.isNight ? biome.nightFar : biome.dayFar;
       ctx.globalAlpha = 0.55;
       ctx.beginPath();
@@ -1809,7 +1816,6 @@
       ctx.fill();
       ctx.globalAlpha = 1;
 
-      // Midground Biome Silhouettes (Forest Trees, Alpine Peaks, City Skyline, Harbor, or Canyon)
       const midColor = light.isNight ? biome.nightMid : biome.dayMid;
       if (biome.id === 'city' || biome.id === 'harbor') {
         const span = 2200;
@@ -1821,7 +1827,6 @@
           ctx.fillStyle = midColor;
           ctx.fillRect(bx, playH - b.h, b.w, b.h);
 
-          // Lit Windows
           ctx.fillStyle = light.isNight ? 'rgba(251, 191, 36, 0.55)' : 'rgba(255, 255, 255, 0.22)';
           for (let wy = playH - b.h + 12; wy < playH - 16; wy += 16) {
             for (let wx = bx + 8; wx < bx + b.w - 10; wx += 12) {
@@ -1831,7 +1836,6 @@
             }
           }
 
-          // Tower Crane on select rooftops
           if (b.hasCrane) {
             const mastX = bx + b.w * 0.5;
             const mastTop = playH - b.h - 46;
@@ -1846,7 +1850,6 @@
           }
         });
       } else {
-        // Organic Hills, Pine Trees, Snow Caps, or Red Rock Mesas
         ctx.fillStyle = midColor;
         ctx.beginPath();
         ctx.moveTo(0, playH);
@@ -1880,7 +1883,6 @@
         const capH = 22;
         const flangeOver = 7;
 
-        // Top Beam Shaft
         if (obs.topHeight > 0) {
           ctx.fillStyle = light.beamMain;
           ctx.fillRect(obs.x, 0, obs.width, obs.topHeight);
@@ -1889,7 +1891,6 @@
           ctx.fillStyle = light.beamShadow;
           ctx.fillRect(obs.x + obs.width - 8, 0, 8, obs.topHeight);
 
-          // Top Beam Flange Cap with Yellow Hazard Trim
           const capY = Math.max(0, obs.topHeight - capH);
           ctx.fillStyle = '#1e293b';
           ctx.beginPath();
@@ -1899,7 +1900,6 @@
           ctx.fillRect(obs.x - flangeOver + 3, capY + capH - 6, obs.width + flangeOver * 2 - 6, 4);
         }
 
-        // Bottom Beam Shaft
         if (obs.bottomY < playH) {
           const botH = playH - obs.bottomY;
           ctx.fillStyle = light.beamMain;
@@ -1909,7 +1909,6 @@
           ctx.fillStyle = light.beamShadow;
           ctx.fillRect(obs.x + obs.width - 8, obs.bottomY, 8, botH);
 
-          // Bottom Beam Flange Cap with Yellow Hazard Trim
           ctx.fillStyle = '#1e293b';
           ctx.beginPath();
           ctx.roundRect(obs.x - flangeOver, obs.bottomY, obs.width + flangeOver * 2, capH, 4);
@@ -1918,7 +1917,6 @@
           ctx.fillRect(obs.x - flangeOver + 3, obs.bottomY + 2, obs.width + flangeOver * 2 - 6, 4);
         }
 
-        // Swinging Demolition Wrecking Ball (if present on this beam pair)
         if (obs.hasWreckingBall) {
           const pivotX = obs.x + obs.width * 0.5;
           const pivotY = obs.topHeight;
@@ -1950,19 +1948,16 @@
         ctx.save();
         ctx.translate(item.x, bobY);
 
-        // Soft Golden Halo
         ctx.fillStyle = 'rgba(251, 191, 36, 0.24)';
         ctx.beginPath();
         ctx.arc(0, 0, item.radius + 7, 0, Math.PI * 2);
         ctx.fill();
 
-        // Hardhat Dome
         ctx.fillStyle = '#fbbf24';
         ctx.beginPath();
         ctx.arc(0, 2, item.radius * 0.85, Math.PI, 0);
         ctx.fill();
 
-        // Center Ridge & Brim
         ctx.fillStyle = '#fef08a';
         ctx.fillRect(-2, -item.radius * 0.82, 4, item.radius * 0.82);
         ctx.fillStyle = '#d97706';
@@ -2094,7 +2089,6 @@
       ctx.fillStyle = biome.groundTop;
       ctx.fillRect(0, playH, viewW, 14);
 
-      // Scrolling Yellow/Black Curb Stripes
       const stripeW = 28;
       const offset = -(state.groundScroll % (stripeW * 2));
       for (let gx = offset; gx < viewW + stripeW * 2; gx += stripeW) {
@@ -2103,7 +2097,6 @@
         ctx.fillRect(gx, playH + 14, stripeW, 8);
       }
 
-      // Impact Flash Overlay
       if (state.flashAlpha > 0) {
         ctx.fillStyle = `rgba(255, 255, 255, ${state.flashAlpha})`;
         ctx.fillRect(0, 0, viewW, viewH);
@@ -2124,7 +2117,6 @@
       const beamWidth = 64;
       const speed = getCurrentSpeed();
 
-      // Guarantee generous vertical opening scaled to viewport height
       const gapHeight = Math.max(158, Math.min(212, Math.round(playH * 0.285 - Math.min(26, state.obstaclesPassed * 0.75))));
       const margin = 58;
       const minCenter = margin + gapHeight * 0.5;
@@ -2140,7 +2132,6 @@
       gapCenterY = Math.max(minCenter, Math.min(maxCenter, gapCenterY));
       state.lastGapCenterY = gapCenterY;
 
-      // Vertical oscillation amplitude capped so gap stays strictly inside safe margins
       const maxAmp = Math.min(34, Math.max(0, Math.min(gapCenterY - minCenter, maxCenter - gapCenterY) - 6));
       const moveAmp = state.obstaclesPassed >= 1 ? Math.max(12, maxAmp * 0.78) : 0;
       const moveSpeed = 1.45 + Math.random() * 0.75;
@@ -2171,7 +2162,6 @@
       };
       state.obstacles.push(obs);
 
-      // Always place a Golden Safety Hardhat inside the clear flight corridor of every beam gap
       const safeOffsetY = hasWreckingBall ? Math.min(26, gapHeight * 0.16) : (Math.random() - 0.5) * 18;
       state.collectibles.push({
         obsRef: obs,
@@ -2183,7 +2173,6 @@
         collected: false
       });
 
-      // Pace next beam pair by travel time so high speeds never crowd pillars together
       const minReactionSec = viewW < 600 ? 1.54 : 1.62;
       state.spawnDistance = Math.round(speed * minReactionSec);
     }
@@ -2243,27 +2232,8 @@
       setTimeout(() => el.classList.remove('pop'), 140);
     }
 
-    function renderLeaderboardList(containerId) {
-      const container = document.getElementById(containerId);
-      if (!container) return;
-      if (!state.leaderboard.length) {
-        container.innerHTML = `<div style="font-size:0.76rem; color:#94a3b8; padding:0.25rem 0;">No shifts recorded yet — grab golden hardhats to set the record!</div>`;
-        return;
-      }
-      container.innerHTML = state.leaderboard.slice(0, 5).map((entry, idx) => {
-        const medal = idx === 0 ? '🏆' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
-        return `
-          <div class="lb-row">
-            <span style="color:#e2e8f0; font-weight:600;"><strong style="color:#fbbf24; margin-right:6px;">${medal}</strong>${entry.name}</span>
-            <span class="font-display" style="font-weight:700; color:#fbbf24;">${entry.score}</span>
-          </div>
-        `;
-      }).join('');
-    }
-
     function prepareReadyShift() {
       const playH = viewH - groundHeight;
-      // Pick a fresh procedural landscape biome for the entire shift
       const prevId = state.currentBiome ? state.currentBiome.id : '';
       const pool = PROCEDURAL_BIOMES.filter((b) => b.id !== prevId);
       state.currentBiome = pool[Math.floor(Math.random() * pool.length)] || PROCEDURAL_BIOMES[0];
@@ -2293,6 +2263,7 @@
       document.getElementById('start-modal').classList.add('hidden');
       document.getElementById('pause-modal').classList.add('hidden');
       document.getElementById('gameover-modal').classList.add('hidden');
+      document.getElementById('leaderboard-modal').classList.add('hidden');
       document.getElementById('hud').classList.remove('hidden');
 
       const activeName = state.playerNames[state.activePlayerIdx] || `Player ${state.activePlayerIdx + 1}`;
@@ -2344,7 +2315,6 @@
       if (isNewBest) newRecEl.classList.remove('hidden');
       else newRecEl.classList.add('hidden');
 
-      // Rank Badge
       let rank = 'APPRENTICE OPERATOR';
       let medal = '🦺';
       if (state.score >= 30) { rank = 'LEGENDARY SITE MASTER'; medal = '👑'; }
@@ -2353,9 +2323,8 @@
       document.getElementById('go-rank-title').textContent = rank;
       document.getElementById('go-medal-icon').textContent = medal;
 
-      renderLeaderboardList('go-leaderboard-list');
+      renderLeaderboardList('go-leaderboard-list', 5, false);
 
-      // Advance turn in local Pass & Play multiplayer
       if (state.playerCount > 1) {
         state.activePlayerIdx = (state.activePlayerIdx + 1) % state.playerCount;
         const nextName = state.playerNames[state.activePlayerIdx] || `Player ${state.activePlayerIdx + 1}`;
@@ -2377,7 +2346,6 @@
       if (state.shakeTime > 0) state.shakeTime = Math.max(0, state.shakeTime - dt);
       if (state.flashAlpha > 0) state.flashAlpha = Math.max(0, state.flashAlpha - dt * 2.2);
 
-      // Update particles & floating callouts
       for (let i = state.particles.length - 1; i >= 0; i--) {
         const pt = state.particles[i];
         pt.x += pt.vx * dt;
@@ -2411,7 +2379,6 @@
       state.skylineScroll += speed * dt;
       state.cloudScroll += speed * 0.25 * dt;
 
-      // Player Vertical Physics
       state.player.vy = Math.min(spec.maxFall, state.player.vy + spec.gravity * dt);
       state.player.y += state.player.vy * dt;
       state.player.thrustAnim = Math.max(0, state.player.thrustAnim - dt * 4.5);
@@ -2422,7 +2389,6 @@
 
       const hitR = state.player.radius - 3.5;
 
-      // Ceiling Clamp & Ground Crash Check
       if (state.player.y - hitR < 4) {
         state.player.y = hitR + 4;
         if (state.player.vy < 0) state.player.vy = 0;
@@ -2433,13 +2399,11 @@
         return;
       }
 
-      // Distance-based Beam Spawning
       state.spawnDistance -= speed * dt;
       if (state.spawnDistance <= 0) {
         spawnBeamPair();
       }
 
-      // Dynamic Sky Hazards (Falling Boulders / Dropped Crane Girders)
       state.hazardTimer -= dt;
       if (state.hazardTimer <= 0 && state.obstaclesPassed >= 2) {
         state.hazardTimer = Math.max(3.2, 5.8 - Math.min(2.2, state.obstaclesPassed * 0.08)) + Math.random() * 2.4;
@@ -2492,7 +2456,6 @@
         }
       }
 
-      // Update Obstacles & Forgiving Hitboxes
       for (let i = state.obstacles.length - 1; i >= 0; i--) {
         const obs = state.obstacles[i];
         obs.x -= speed * dt;
@@ -2535,7 +2498,6 @@
         }
       }
 
-      // Update Golden Safety Hardhat Collectibles
       for (let i = state.collectibles.length - 1; i >= 0; i--) {
         const item = state.collectibles[i];
         if (item.obsRef) {
@@ -2629,6 +2591,7 @@
       document.getElementById('ready-hint').classList.add('hidden');
       document.getElementById('pause-modal').classList.add('hidden');
       document.getElementById('gameover-modal').classList.add('hidden');
+      document.getElementById('leaderboard-modal').classList.add('hidden');
       document.getElementById('start-modal').classList.remove('hidden');
     }
 
@@ -2642,7 +2605,6 @@
       }
     }
 
-    // Player Count Buttons
     document.querySelectorAll('#player-count-selector .mode-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         audio.playClick();
@@ -2654,7 +2616,6 @@
       });
     });
 
-    // Rig Selection Cards
     document.querySelectorAll('#rig-selector .rig-card').forEach((card) => {
       card.addEventListener('click', () => {
         audio.playClick();
@@ -2664,7 +2625,6 @@
       });
     });
 
-    // Day / Night Shift Buttons
     document.querySelectorAll('#shift-selector .shift-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         audio.playClick();
@@ -2674,7 +2634,6 @@
       });
     });
 
-    // Action Buttons
     document.getElementById('btn-start-shift').addEventListener('click', () => {
       audio.playClick();
       state.activePlayerIdx = 0;
@@ -2746,7 +2705,6 @@
       if (e.target.id === 'leaderboard-modal') closeTop10Leaderboard();
     });
 
-    // Canvas Touch & Mouse Input
     canvas.addEventListener('pointerdown', (e) => {
       if (e.button !== undefined && e.button !== 0) return;
       if (state.phase === 'READY' || state.phase === 'PLAYING') {
@@ -2755,7 +2713,6 @@
       }
     }, { passive: false });
 
-    // Keyboard Controls (Space, ArrowUp, W, P, Escape)
     window.addEventListener('keydown', (e) => {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
 
@@ -2783,7 +2740,6 @@
       }
     });
 
-    // Main Animation Loop
     let lastTimestamp = 0;
     function gameLoop(timestamp) {
       if (!lastTimestamp) lastTimestamp = timestamp;
@@ -2795,7 +2751,6 @@
       requestAnimationFrame(gameLoop);
     }
 
-    // Boot Application
     window.addEventListener('load', () => {
       generateHomeScreenAppIcon();
       initScenery();
