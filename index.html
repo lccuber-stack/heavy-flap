@@ -104,12 +104,12 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: calc(1.1rem + var(--safe-top)) calc(0.75rem + var(--safe-right)) calc(0.85rem + var(--safe-bottom)) calc(0.75rem + var(--safe-left));
+      padding: calc(1.35rem + var(--safe-top)) calc(0.85rem + var(--safe-right)) calc(0.85rem + var(--safe-bottom)) calc(0.85rem + var(--safe-left));
     }
 
     @media (display-mode: standalone) {
       #hud {
-        padding-top: max(1.75rem, calc(1.15rem + var(--safe-top)));
+        padding-top: max(2.35rem, calc(1.5rem + var(--safe-top)));
       }
     }
 
@@ -122,17 +122,16 @@
     }
 
     .hud-badge {
-      background: rgba(15, 23, 42, 0.92);
-      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      background: #0f172a;
+      border: 1.5px solid rgba(251, 191, 36, 0.42);
       border-radius: 13px;
-      padding: 0.38rem 0.6rem;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.36);
+      padding: 0.4rem 0.65rem;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
       display: flex;
       align-items: center;
       gap: 0.44rem;
       flex-shrink: 1;
       min-width: 0;
-      transform: translateZ(0);
     }
 
     .hud-stat-label {
@@ -152,7 +151,7 @@
 
     .score-center {
       position: fixed;
-      top: calc(4.85rem + var(--safe-top));
+      top: calc(5.2rem + var(--safe-top));
       left: 50%;
       transform: translateX(-50%);
       text-align: center;
@@ -162,17 +161,17 @@
 
     @media (display-mode: standalone) {
       .score-center {
-        top: max(5.45rem, calc(4.85rem + var(--safe-top)));
+        top: max(6.15rem, calc(5.2rem + var(--safe-top)));
       }
     }
 
     @media (min-width: 720px) {
       .score-center {
-        top: calc(1.2rem + var(--safe-top));
+        top: calc(1.45rem + var(--safe-top));
       }
       @media (display-mode: standalone) {
         .score-center {
-          top: max(1.85rem, calc(1.2rem + var(--safe-top)));
+          top: max(2.45rem, calc(1.45rem + var(--safe-top)));
         }
       }
     }
@@ -195,10 +194,10 @@
     .icon-btn {
       height: 40px;
       min-width: 40px;
-      padding: 0 0.62rem;
+      padding: 0 0.65rem;
       border-radius: 13px;
-      background: rgba(15, 23, 42, 0.92);
-      border: 1.5px solid rgba(255, 255, 255, 0.22);
+      background: #0f172a;
+      border: 1.5px solid rgba(255, 255, 255, 0.28);
       color: #f8fafc;
       display: inline-flex;
       align-items: center;
@@ -211,8 +210,7 @@
       white-space: nowrap;
       cursor: pointer;
       pointer-events: auto;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.34);
-      transform: translateZ(0);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
       transition: transform 0.14s ease, background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
     }
 
@@ -282,8 +280,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: calc(0.45rem + var(--safe-top)) calc(0.65rem + var(--safe-right)) calc(0.55rem + var(--safe-bottom)) calc(0.65rem + var(--safe-left));
-      background: radial-gradient(circle at 50% 35%, rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.88));
+      padding: calc(0.5rem + var(--safe-top)) calc(0.65rem + var(--safe-right)) calc(0.55rem + var(--safe-bottom)) calc(0.65rem + var(--safe-left));
+      background: rgba(15, 23, 42, 0.42);
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
@@ -294,13 +292,11 @@
       max-height: calc(100dvh - 1rem - var(--safe-top) - var(--safe-bottom));
       display: flex;
       flex-direction: column;
-      background: var(--steel-panel);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid var(--steel-border);
+      background: rgba(15, 23, 42, 0.96);
+      border: 1.5px solid var(--steel-border);
       border-radius: 22px;
       overflow: hidden;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.58);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.68);
       animation: cardEntrance 0.28s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
@@ -793,18 +789,23 @@
 
   <!-- Game Over Modal -->
   <div id="gameover-modal" class="modal-backdrop hidden">
-    <div class="industrial-card">
+    <div class="industrial-card" style="max-width:410px;">
       <div class="hazard-bar"></div>
       <div class="card-body" style="text-align:center;">
-        <div style="font-size:0.7rem; font-weight:800; letter-spacing:0.14em; color:#fb7185;" id="go-reason">BEAM IMPACT!</div>
-        <h2 class="font-display" style="font-size:1.65rem; font-weight:700; margin-top:0.12rem;">
-          <span id="go-player-title">SHIFT OVER</span> <span id="go-new-record" class="new-record-tag hidden">NEW BEST!</span>
+        <div style="font-size:0.68rem; font-weight:800; letter-spacing:0.14em; color:#fb7185;" id="go-reason">BEAM IMPACT!</div>
+        <h2 class="font-display" style="font-size:1.55rem; font-weight:700; margin-top:0.15rem;">
+          <span id="go-player-title">SHIFT OVER</span><span id="go-new-record" class="new-record-tag hidden">NEW BEST!</span>
         </h2>
 
-        <!-- Safety Rank Badge -->
-        <div style="margin-top:0.4rem; display:inline-flex; align-items:center; gap:0.4rem; background:rgba(251,191,36,0.14); border:1px solid rgba(251,191,36,0.35); border-radius:999px; padding:0.25rem 0.8rem;">
-          <span style="font-size:0.9rem;" id="go-medal-icon">🦺</span>
-          <span class="font-display" style="font-size:0.78rem; font-weight:700; color:#fbbf24;" id="go-rank-title">APPRENTICE OPERATOR</span>
+        <!-- Safety Rank & Leaderboard Placement Badge -->
+        <div style="margin-top:0.4rem; display:flex; align-items:center; justify-content:center; gap:0.4rem; flex-wrap:wrap;">
+          <div style="display:inline-flex; align-items:center; gap:0.35rem; background:rgba(251,191,36,0.14); border:1px solid rgba(251,191,36,0.38); border-radius:999px; padding:0.24rem 0.72rem;">
+            <span style="font-size:0.88rem;" id="go-medal-icon">🦺</span>
+            <span class="font-display" style="font-size:0.75rem; font-weight:700; color:#fbbf24;" id="go-rank-title">APPRENTICE OPERATOR</span>
+          </div>
+          <div id="go-placement-badge" style="display:inline-flex; align-items:center; gap:0.3rem; background:rgba(56,189,248,0.16); border:1px solid rgba(56,189,248,0.45); border-radius:999px; padding:0.24rem 0.72rem;">
+            <span class="font-display" style="font-size:0.75rem; font-weight:700; color:#7dd3fc;" id="go-placement-text">RANK #1 OF 10</span>
+          </div>
         </div>
 
         <div class="stat-grid">
@@ -824,9 +825,14 @@
 
         <!-- Device Overall Leaderboard -->
         <div class="leaderboard-box">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem; gap:0.4rem;">
             <span style="font-size:0.62rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8;">DEVICE TOP SCORES</span>
-            <span style="font-size:0.64rem; font-weight:700; color:#38bdf8;" id="go-next-up-hint"></span>
+            <div style="display:flex; align-items:center; gap:0.45rem;">
+              <span style="font-size:0.64rem; font-weight:700; color:#38bdf8;" id="go-next-up-hint"></span>
+              <button type="button" id="btn-go-top10" style="background:rgba(251,191,36,0.16); border:1px solid rgba(251,191,36,0.45); color:#fbbf24; border-radius:999px; padding:2px 8px; font-family:'Chakra Petch',sans-serif; font-size:0.64rem; font-weight:700; cursor:pointer;">
+                Full Top 10 ▾
+              </button>
+            </div>
           </div>
           <div id="go-leaderboard-list"></div>
         </div>
@@ -1303,7 +1309,7 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v2.4';
+    const APP_VERSION = 'v2.5';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
 
     function getRankDetails(score) {
@@ -1353,37 +1359,43 @@
       const trimmed = (playerName || 'Player 1').trim().slice(0, 18) || 'Player 1';
       const rigName = (RIG_SPECS[rigKey] && RIG_SPECS[rigKey].name) || 'Wheel Loader';
       let records = loadLeaderboardData();
-      const existing = records.find((r) => r.name.toLowerCase() === trimmed.toLowerCase());
-      if (existing) {
-        if (score >= existing.score) {
-          existing.score = score;
-          existing.name = trimmed;
-          existing.rig = rigName;
-          existing.mode = modeLabel;
-        }
-      } else if (score > 0 || records.length === 0) {
-        records.push({ name: trimmed, score, rig: rigName, mode: modeLabel });
+      const entryId = `${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+
+      if (score > 0 || records.length === 0) {
+        records.push({
+          id: entryId,
+          name: trimmed,
+          score,
+          rig: rigName,
+          mode: modeLabel
+        });
       }
+
       records = saveLeaderboardData(records);
       state.leaderboard = records;
       state.bestScore = records.length ? records[0].score : 0;
       state.bestHolder = records.length && records[0].score > 0 ? records[0].name : '—';
+      state.lastRunEntryId = entryId;
+
+      const rankIndex = records.findIndex((r) => r.id === entryId);
+      return rankIndex >= 0 ? rankIndex + 1 : null;
     }
 
     let initialSignature = null;
-    function setSyncButtonFeedback(text, stateType = 'default') {
+
+    function setSyncButtonFeedback(text, tone = 'default') {
       const btn = document.getElementById('btn-sync-latest');
-      const statusEl = document.getElementById('sync-status-text');
-      if (statusEl) statusEl.textContent = text;
-      if (!btn) return;
-      if (stateType === 'latest') {
-        btn.style.background = 'rgba(16, 185, 129, 0.24)';
+      const label = document.getElementById('sync-status-text');
+      if (!btn || !label) return;
+      label.textContent = text;
+      if (tone === 'latest') {
+        btn.style.background = 'rgba(16, 185, 129, 0.22)';
         btn.style.borderColor = '#34d399';
-        btn.style.color = '#a7f3d0';
-      } else if (stateType === 'checking') {
+        btn.style.color = '#6ee7b7';
+      } else if (tone === 'checking') {
         btn.style.background = 'rgba(251, 191, 36, 0.2)';
         btn.style.borderColor = '#fbbf24';
-        btn.style.color = '#fef08a';
+        btn.style.color = '#fde68a';
       } else {
         btn.style.background = 'rgba(56, 189, 248, 0.14)';
         btn.style.borderColor = 'rgba(56, 189, 248, 0.38)';
@@ -1395,28 +1407,25 @@
       if (manual) {
         setSyncButtonFeedback('↻ Checking GitHub...', 'checking');
       }
-
-      if (window.location.protocol === 'file:' || window.location.protocol === 'about:' || window.location.protocol === 'blob:') {
-        if (manual) {
-          setSyncButtonFeedback(`✅ Up to date (${APP_VERSION})`, 'latest');
-        }
-        return;
-      }
-
       try {
         const cleanUrl = window.location.href.split('?')[0].split('#')[0];
-        const res = await fetch(`${cleanUrl}?cb=${Date.now()}`, { cache: 'no-store' });
+        if (!cleanUrl.startsWith('http')) {
+          if (manual) setSyncButtonFeedback(`✅ You have the latest (${APP_VERSION})`, 'latest');
+          return;
+        }
+        const res = await fetch(`${cleanUrl}?_cb=${Date.now()}`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache' }
+        });
         if (!res.ok) {
           if (manual) setSyncButtonFeedback(`✅ Up to date (${APP_VERSION})`, 'latest');
           return;
         }
         const html = await res.text();
-        const sig = `${html.length}:${html.slice(0, 120)}:${html.slice(-120)}`;
+        const sig = `${html.length}_${html.slice(0, 180)}_${html.slice(-180)}`;
         if (initialSignature === null) {
           initialSignature = sig;
-          if (manual) {
-            setSyncButtonFeedback(`✅ You have the latest (${APP_VERSION})`, 'latest');
-          }
+          if (manual) setSyncButtonFeedback(`✅ You have the latest (${APP_VERSION})`, 'latest');
         } else if (sig !== initialSignature) {
           if (manual) setSyncButtonFeedback('⬇ New version found! Reloading...', 'checking');
           window.location.replace(`${cleanUrl}?v=${Date.now()}`);
@@ -1424,13 +1433,11 @@
           setSyncButtonFeedback(`✅ You have the latest (${APP_VERSION})`, 'latest');
         }
       } catch (e) {
-        if (manual) {
-          setSyncButtonFeedback(`✅ Latest cached (${APP_VERSION})`, 'latest');
-        }
+        if (manual) setSyncButtonFeedback(`✅ Up to date (${APP_VERSION})`, 'latest');
       }
     }
 
-    function renderLeaderboardList(containerId, limit = 5, detailed = false) {
+    function renderLeaderboardList(containerId, limit = 5, detailed = false, highlightId = null) {
       const container = document.getElementById(containerId);
       if (!container) return;
       const list = state.leaderboard.slice(0, limit);
@@ -1441,11 +1448,18 @@
       container.innerHTML = list.map((entry, idx) => {
         const medal = idx === 0 ? '🏆' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
         const rankInfo = getRankDetails(entry.score);
+        const isCurrentRun = highlightId && entry.id === highlightId;
+        const rowHighlightStyle = isCurrentRun
+          ? 'background:rgba(56,189,248,0.16); border:1px solid rgba(56,189,248,0.45); border-radius:9px; padding:0.34rem 0.45rem; margin:2px -0.25rem;'
+          : (detailed ? 'padding:0.42rem 0;' : 'padding:0.3rem 0;');
+        const youBadge = isCurrentRun
+          ? `<span style="background:#38bdf8; color:#0f172a; font-size:0.56rem; font-weight:800; padding:1px 5px; border-radius:999px; margin-left:6px; vertical-align:middle;">THIS SHIFT</span>`
+          : '';
         const rankSubtitle = `<div style="font-size:0.62rem; font-weight:700; color:#38bdf8; margin-top:1px;">${rankInfo.icon} ${rankInfo.title}${detailed && entry.rig ? ` • ${entry.rig}` : ''}${detailed && entry.mode ? ` (${entry.mode})` : ''}</div>`;
         return `
-          <div class="lb-row" style="${detailed ? 'padding:0.42rem 0;' : 'padding:0.3rem 0;'}">
+          <div class="lb-row" style="${rowHighlightStyle}">
             <div style="min-width:0; padding-right:0.5rem;">
-              <div style="color:#e2e8f0; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><strong style="color:#fbbf24; margin-right:6px;">${medal}</strong>${entry.name}</div>
+              <div style="color:#e2e8f0; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><strong style="color:#fbbf24; margin-right:6px;">${medal}</strong>${entry.name}${youBadge}</div>
               ${rankSubtitle}
             </div>
             <span class="font-display" style="font-weight:700; font-size:${detailed ? '1.05rem' : '0.88rem'}; color:#fbbf24; flex-shrink:0;">${entry.score}</span>
@@ -1459,7 +1473,7 @@
       if (state.phase === 'PLAYING') {
         state.phase = 'PAUSED';
       }
-      renderLeaderboardList('top10-leaderboard-list', 10, true);
+      renderLeaderboardList('top10-leaderboard-list', 10, true, state.lastRunEntryId || null);
       document.getElementById('leaderboard-modal').classList.remove('hidden');
     }
 
@@ -2558,7 +2572,7 @@
       const prevOverallBest = state.bestScore;
       const currentName = state.playerNames[state.activePlayerIdx] || `Player ${state.activePlayerIdx + 1}`;
       const modeTag = state.playerCount > 1 ? `${state.playerCount}P Pass & Play` : 'Solo';
-      recordPlayerScore(currentName, state.score, state.selectedRig, modeTag);
+      const placedRank = recordPlayerScore(currentName, state.score, state.selectedRig, modeTag);
       const isNewBest = state.score > 0 && state.score >= state.bestScore && state.score > prevOverallBest;
 
       document.getElementById('go-reason').textContent = reason;
@@ -2575,16 +2589,27 @@
       document.getElementById('go-rank-title').textContent = rankDetails.title;
       document.getElementById('go-medal-icon').textContent = rankDetails.icon;
 
-      renderLeaderboardList('go-leaderboard-list', 5, false);
+      const placementTextEl = document.getElementById('go-placement-text');
+      if (placedRank !== null && state.score > 0) {
+        placementTextEl.textContent = `TOP 10: #${placedRank}`;
+        placementTextEl.style.color = placedRank === 1 ? '#fbbf24' : '#7dd3fc';
+      } else {
+        placementTextEl.textContent = 'UNRANKED (0 PTS)';
+        placementTextEl.style.color = '#94a3b8';
+      }
 
+      renderLeaderboardList('go-leaderboard-list', 4, false, state.lastRunEntryId);
+
+      const nextHintEl = document.getElementById('go-next-up-hint');
+      const retryLabelEl = document.getElementById('btn-retry-label');
       if (state.playerCount > 1) {
         state.activePlayerIdx = (state.activePlayerIdx + 1) % state.playerCount;
         const nextName = state.playerNames[state.activePlayerIdx] || `Player ${state.activePlayerIdx + 1}`;
-        document.getElementById('go-next-up-hint').textContent = `Next: ${nextName}`;
-        document.getElementById('btn-retry-label').textContent = `Next: ${nextName}`;
+        nextHintEl.textContent = `Next: ${nextName}`;
+        retryLabelEl.textContent = `Next: ${nextName}`;
       } else {
-        document.getElementById('go-next-up-hint').textContent = '';
-        document.getElementById('btn-retry-label').textContent = 'Retry Shift';
+        nextHintEl.textContent = '';
+        retryLabelEl.textContent = 'Retry Shift';
       }
 
       document.getElementById('ready-hint').classList.add('hidden');
@@ -3019,6 +3044,7 @@
     });
 
     document.getElementById('btn-open-leaderboard').addEventListener('click', openTop10Leaderboard);
+    document.getElementById('btn-go-top10').addEventListener('click', openTop10Leaderboard);
     document.getElementById('btn-hud-leaderboard').addEventListener('click', (e) => {
       e.stopPropagation();
       openTop10Leaderboard();
