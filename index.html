@@ -354,15 +354,15 @@
     .rig-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 0.4rem;
-      margin-top: 0.38rem;
+      gap: 0.36rem;
+      margin-top: 0.34rem;
     }
 
     .rig-card {
       background: rgba(30, 41, 59, 0.72);
       border: 2px solid rgba(255, 255, 255, 0.1);
-      border-radius: 13px;
-      padding: 0.36rem 0.25rem;
+      border-radius: 12px;
+      padding: 0.28rem 0.2rem;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -389,9 +389,9 @@
     }
 
     .rig-preview {
-      width: 64px;
-      height: 42px;
-      margin-bottom: 0.15rem;
+      width: 56px;
+      height: 36px;
+      margin-bottom: 0.12rem;
     }
 
     .shop-tabs {
@@ -817,17 +817,24 @@
     }
 
     /* Extra compact spacing for short iPhone viewports (e.g. Safari with bottom bar) */
-    @media (max-height: 740px) {
+    @media (max-height: 760px) {
       .card-body {
-        padding: 0.68rem 0.85rem 0.78rem 0.85rem;
+        padding: 0.62rem 0.8rem 0.72rem 0.8rem;
+      }
+      .rig-grid {
+        gap: 0.28rem;
+      }
+      .rig-card {
+        padding: 0.22rem 0.15rem;
       }
       .rig-preview {
-        width: 56px;
-        height: 36px;
+        width: 48px;
+        height: 31px;
+        margin-bottom: 0.08rem;
       }
       .btn-launch {
-        margin-top: 0.6rem;
-        padding: 0.65rem 1rem;
+        margin-top: 0.52rem;
+        padding: 0.62rem 0.95rem;
       }
     }
   </style>
@@ -986,6 +993,24 @@
               <canvas class="rig-preview" id="preview-jetrig" width="136" height="92"></canvas>
               <div class="font-display" style="font-size:0.76rem; font-weight:700; color:#fff; line-height:1.1;">Jet-Pack Rig</div>
               <div style="font-size:0.58rem; color:#fbbf24; margin-top:1px;" id="rig-sub-jetrig">🔒 450</div>
+            </button>
+
+            <button type="button" class="rig-card" data-rig="flappylong">
+              <canvas class="rig-preview" id="preview-flappylong" width="136" height="92"></canvas>
+              <div class="font-display" style="font-size:0.74rem; font-weight:700; color:#fde047; line-height:1.1;">Flappy Long</div>
+              <div style="font-size:0.56rem; color:#fbbf24; margin-top:1px;" id="rig-sub-flappylong">🔒 1000</div>
+            </button>
+
+            <button type="button" class="rig-card" data-rig="flappyemmy">
+              <canvas class="rig-preview" id="preview-flappyemmy" width="136" height="92"></canvas>
+              <div class="font-display" style="font-size:0.74rem; font-weight:700; color:#f9a8d4; line-height:1.1;">Flappy Emmy</div>
+              <div style="font-size:0.56rem; color:#fbbf24; margin-top:1px;" id="rig-sub-flappyemmy">🔒 1000</div>
+            </button>
+
+            <button type="button" class="rig-card" data-rig="flappyemma">
+              <canvas class="rig-preview" id="preview-flappyemma" width="136" height="92"></canvas>
+              <div class="font-display" style="font-size:0.74rem; font-weight:700; color:#c4b5fd; line-height:1.1;">Flappy Emma</div>
+              <div style="font-size:0.56rem; color:#fbbf24; margin-top:1px;" id="rig-sub-flappyemma">🔒 1000</div>
             </button>
           </div>
           <div id="menu-active-boosts" class="active-boosts-bar hidden"></div>
@@ -1603,6 +1628,39 @@
         primaryColor: '#eab308',
         secondaryColor: '#ca8a04',
         cabColor: '#1e293b'
+      },
+      flappylong: {
+        name: 'Flappy Long',
+        subtitle: '2014 Legend',
+        cost: 1000,
+        gravity: 1320,
+        flapVel: -445,
+        maxFall: 595,
+        primaryColor: '#fef08a',
+        secondaryColor: '#38bdf8',
+        cabColor: '#0f172a'
+      },
+      flappyemmy: {
+        name: 'Flappy Emmy',
+        subtitle: 'Junior Ace',
+        cost: 1000,
+        gravity: 1290,
+        flapVel: -438,
+        maxFall: 585,
+        primaryColor: '#fef08a',
+        secondaryColor: '#f472b6',
+        cabColor: '#0f172a'
+      },
+      flappyemma: {
+        name: 'Flappy Emma',
+        subtitle: 'Shop Creator',
+        cost: 1000,
+        gravity: 1305,
+        flapVel: -442,
+        maxFall: 590,
+        primaryColor: '#fef08a',
+        secondaryColor: '#a78bfa',
+        cabColor: '#0f172a'
       }
     };
 
@@ -1855,7 +1913,7 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v4.2';
+    const APP_VERSION = 'v4.4';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -2765,6 +2823,467 @@
           context.arc(wx, r * 0.44, r * 0.18, 0, Math.PI * 2);
           context.fill();
         });
+      } else if (rigType === 'flappylong') {
+        // --- FLAPPY LONG (2014 APP STORE TRIBUTE CHARACTER HEAD) ---
+        context.save();
+        context.scale(1.06, 1.06);
+
+        // Teal turtleneck collar at bottom
+        context.fillStyle = '#5ec4c6';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 2.1;
+        context.beginPath();
+        context.roundRect(-r * 0.48, r * 0.56, r * 0.88, r * 0.32, 6);
+        context.fill();
+        context.stroke();
+        context.beginPath();
+        context.moveTo(-r * 0.44, r * 0.72);
+        context.lineTo(r * 0.36, r * 0.72);
+        context.stroke();
+
+        // Back / side spiky black hair silhouette
+        context.fillStyle = '#111111';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 2;
+        context.beginPath();
+        context.moveTo(-r * 0.62, r * 0.55);
+        context.lineTo(-r * 0.76, r * 0.32);
+        context.lineTo(-r * 0.66, r * 0.15);
+        context.lineTo(-r * 0.88, r * 0.02);
+        context.lineTo(-r * 0.72, -r * 0.18);
+        context.lineTo(-r * 0.94, -r * 0.34);
+        context.lineTo(-r * 0.72, -r * 0.48);
+        context.quadraticCurveTo(-r * 0.62, -r * 1.04, r * 0.02, -r * 1.06);
+        context.quadraticCurveTo(r * 0.52, -r * 1.02, r * 0.54, -r * 0.54);
+        context.lineTo(r * 0.36, -r * 0.44);
+        context.lineTo(-r * 0.42, r * 0.58);
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        // Yellow face & neck contour
+        context.fillStyle = '#fef08a';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 2.1;
+        context.beginPath();
+        context.moveTo(-r * 0.42, r * 0.58);
+        context.lineTo(-r * 0.46, -r * 0.42);
+        context.quadraticCurveTo(-r * 0.1, -r * 0.68, r * 0.42, -r * 0.48);
+        context.lineTo(r * 0.46, r * 0.24);
+        context.quadraticCurveTo(r * 0.46, r * 0.45, r * 0.22, r * 0.46);
+        context.lineTo(r * 0.16, r * 0.6);
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        // Ear on left side
+        context.fillStyle = '#fef08a';
+        context.beginPath();
+        context.arc(-r * 0.48, -r * 0.02, r * 0.2, Math.PI * 0.45, Math.PI * 1.55);
+        context.fill();
+        context.stroke();
+
+        // Spiky black bangs over forehead
+        context.fillStyle = '#111111';
+        context.beginPath();
+        context.moveTo(-r * 0.54, -r * 0.35);
+        context.lineTo(-r * 0.34, -r * 0.64);
+        context.lineTo(-r * 0.22, -r * 0.45);
+        context.lineTo(-r * 0.08, -r * 0.66);
+        context.lineTo(r * 0.04, -r * 0.44);
+        context.lineTo(r * 0.18, -r * 0.64);
+        context.lineTo(r * 0.28, -r * 0.44);
+        context.lineTo(r * 0.44, -r * 0.6);
+        context.lineTo(r * 0.5, -r * 0.42);
+        context.quadraticCurveTo(r * 0.38, -r * 0.96, -r * 0.12, -r * 0.94);
+        context.quadraticCurveTo(-r * 0.52, -r * 0.88, -r * 0.58, -r * 0.38);
+        context.closePath();
+        context.fill();
+
+        // Eyebrows
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 2.4;
+        context.lineCap = 'round';
+        context.beginPath();
+        context.moveTo(r * 0.02, -r * 0.36);
+        context.lineTo(r * 0.2, -r * 0.38);
+        context.moveTo(r * 0.32, -r * 0.36);
+        context.lineTo(r * 0.48, -r * 0.34);
+        context.stroke();
+
+        // Big round Simpsons-style eyes
+        const eyeRadius = r * 0.17;
+        [
+          { ex: r * 0.14, ey: -r * 0.18 },
+          { ex: r * 0.42, ey: -r * 0.17 }
+        ].forEach((eye) => {
+          context.fillStyle = '#ffffff';
+          context.strokeStyle = '#0f172a';
+          context.lineWidth = 1.8;
+          context.beginPath();
+          context.arc(eye.ex, eye.ey, eyeRadius, 0, Math.PI * 2);
+          context.fill();
+          context.stroke();
+
+          context.fillStyle = '#0f172a';
+          context.beginPath();
+          context.arc(eye.ex + r * 0.03, eye.ey, r * 0.045, 0, Math.PI * 2);
+          context.fill();
+        });
+
+        // Iconic nose
+        context.fillStyle = '#fef08a';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 1.9;
+        context.beginPath();
+        context.moveTo(r * 0.34, -r * 0.04);
+        context.quadraticCurveTo(r * 0.66, -r * 0.04, r * 0.62, r * 0.11);
+        context.quadraticCurveTo(r * 0.54, r * 0.19, r * 0.36, r * 0.14);
+        context.fill();
+        context.stroke();
+
+        // Rectangular glasses frames & temple arm
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 1.9;
+        context.beginPath();
+        context.moveTo(-r * 0.36, -r * 0.14);
+        context.lineTo(r * 0.02, -r * 0.12);
+        context.stroke();
+
+        context.fillStyle = 'rgba(255, 255, 255, 0.28)';
+        context.fillRect(r * 0.02, -r * 0.14, r * 0.26, r * 0.16);
+        context.strokeRect(r * 0.02, -r * 0.14, r * 0.26, r * 0.16);
+
+        context.fillRect(r * 0.34, -r * 0.13, r * 0.25, r * 0.16);
+        context.strokeRect(r * 0.34, -r * 0.13, r * 0.25, r * 0.16);
+
+        // Big white toothy grin
+        context.fillStyle = '#ffffff';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 1.8;
+        context.beginPath();
+        context.moveTo(r * 0.04, r * 0.21);
+        context.quadraticCurveTo(r * 0.28, r * 0.25, r * 0.44, r * 0.22);
+        context.quadraticCurveTo(r * 0.4, r * 0.37, r * 0.14, r * 0.36);
+        context.quadraticCurveTo(r * 0.03, r * 0.33, r * 0.04, r * 0.21);
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.beginPath();
+        context.moveTo(r * 0.15, r * 0.23);
+        context.lineTo(r * 0.15, r * 0.35);
+        context.moveTo(r * 0.27, r * 0.24);
+        context.lineTo(r * 0.27, r * 0.35);
+        context.stroke();
+
+        // Chin beauty mark / mole
+        context.fillStyle = '#0f172a';
+        context.beginPath();
+        context.arc(r * 0.06, r * 0.44, r * 0.042, 0, Math.PI * 2);
+        context.fill();
+
+        context.restore();
+      } else if (rigType === 'flappyemmy') {
+        // --- FLAPPY EMMY (~10 YRS, SIMPSONS-STYLE PORTRAIT WITH TWIN PONYTAILS) ---
+        context.save();
+        context.scale(0.98, 0.98);
+
+        // Coral-pink sweater collar
+        context.fillStyle = '#f472b6';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 2.1;
+        context.beginPath();
+        context.roundRect(-r * 0.42, r * 0.56, r * 0.78, r * 0.3, 6);
+        context.fill();
+        context.stroke();
+        context.beginPath();
+        context.moveTo(-r * 0.38, r * 0.71);
+        context.lineTo(r * 0.32, r * 0.71);
+        context.stroke();
+
+        // High playful back ponytail (left) & top ponytail (right)
+        context.fillStyle = '#3b2314';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 2;
+        // Left swept ponytail
+        context.beginPath();
+        context.moveTo(-r * 0.45, -r * 0.55);
+        context.quadraticCurveTo(-r * 1.05, -r * 0.78, -r * 0.92, -r * 0.12);
+        context.quadraticCurveTo(-r * 0.74, -r * 0.28, -r * 0.45, -r * 0.35);
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        // Top-right perky ponytail
+        context.beginPath();
+        context.moveTo(r * 0.05, -r * 0.85);
+        context.quadraticCurveTo(r * 0.48, -r * 1.24, r * 0.58, -r * 0.76);
+        context.quadraticCurveTo(r * 0.34, -r * 0.82, r * 0.16, -r * 0.74);
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        // Pink hair scrunchies / ties
+        context.fillStyle = '#fb7185';
+        context.beginPath();
+        context.arc(-r * 0.48, -r * 0.48, r * 0.11, 0, Math.PI * 2);
+        context.arc(r * 0.1, -r * 0.82, r * 0.11, 0, Math.PI * 2);
+        context.fill();
+        context.stroke();
+
+        // Hair cap & back neck hair
+        context.fillStyle = '#3b2314';
+        context.beginPath();
+        context.moveTo(-r * 0.46, r * 0.34);
+        context.lineTo(-r * 0.58, -r * 0.34);
+        context.quadraticCurveTo(-r * 0.48, -r * 0.96, r * 0.04, -r * 0.92);
+        context.quadraticCurveTo(r * 0.44, -r * 0.86, r * 0.44, -r * 0.42);
+        context.lineTo(-r * 0.34, r * 0.36);
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        // Youthful yellow face & neck
+        context.fillStyle = '#fef08a';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 2.1;
+        context.beginPath();
+        context.moveTo(-r * 0.36, r * 0.58);
+        context.lineTo(-r * 0.42, -r * 0.36);
+        context.quadraticCurveTo(-r * 0.05, -r * 0.56, r * 0.38, -r * 0.4);
+        context.lineTo(r * 0.42, r * 0.22);
+        context.quadraticCurveTo(r * 0.42, r * 0.44, r * 0.18, r * 0.45);
+        context.lineTo(r * 0.14, r * 0.58);
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        // Ear
+        context.fillStyle = '#fef08a';
+        context.beginPath();
+        context.arc(-r * 0.44, 0, r * 0.17, Math.PI * 0.45, Math.PI * 1.55);
+        context.fill();
+        context.stroke();
+
+        // Cute feathered bangs
+        context.fillStyle = '#3b2314';
+        context.beginPath();
+        context.moveTo(-r * 0.46, -r * 0.3);
+        context.lineTo(-r * 0.28, -r * 0.54);
+        context.lineTo(-r * 0.16, -r * 0.36);
+        context.lineTo(-r * 0.02, -r * 0.56);
+        context.lineTo(r * 0.1, -r * 0.36);
+        context.lineTo(r * 0.24, -r * 0.54);
+        context.lineTo(r * 0.36, -r * 0.34);
+        context.lineTo(r * 0.42, -r * 0.46);
+        context.quadraticCurveTo(r * 0.24, -r * 0.88, -r * 0.14, -r * 0.86);
+        context.quadraticCurveTo(-r * 0.46, -r * 0.8, -r * 0.48, -r * 0.32);
+        context.closePath();
+        context.fill();
+
+        // Big expressive eyes with eyelashes
+        const eyeR = r * 0.165;
+        [
+          { ex: r * 0.12, ey: -r * 0.15 },
+          { ex: r * 0.38, ey: -r * 0.14 }
+        ].forEach((eye) => {
+          context.strokeStyle = '#0f172a';
+          context.lineWidth = 1.7;
+          context.beginPath();
+          context.moveTo(eye.ex - eyeR * 0.7, eye.ey - eyeR * 0.8);
+          context.lineTo(eye.ex - eyeR * 1.15, eye.ey - eyeR * 1.15);
+          context.moveTo(eye.ex, eye.ey - eyeR * 0.95);
+          context.lineTo(eye.ex, eye.ey - eyeR * 1.35);
+          context.stroke();
+
+          context.fillStyle = '#ffffff';
+          context.beginPath();
+          context.arc(eye.ex, eye.ey, eyeR, 0, Math.PI * 2);
+          context.fill();
+          context.stroke();
+
+          context.fillStyle = '#0f172a';
+          context.beginPath();
+          context.arc(eye.ex + r * 0.03, eye.ey, r * 0.044, 0, Math.PI * 2);
+          context.fill();
+        });
+
+        // Small cute upturned nose
+        context.fillStyle = '#fef08a';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 1.8;
+        context.beginPath();
+        context.moveTo(r * 0.32, -r * 0.02);
+        context.quadraticCurveTo(r * 0.56, -r * 0.03, r * 0.52, r * 0.09);
+        context.quadraticCurveTo(r * 0.46, r * 0.15, r * 0.33, r * 0.11);
+        context.fill();
+        context.stroke();
+
+        // Cute freckles on cheek
+        context.fillStyle = '#d97706';
+        context.beginPath();
+        context.arc(r * 0.02, r * 0.08, r * 0.024, 0, Math.PI * 2);
+        context.arc(r * 0.1, r * 0.11, r * 0.024, 0, Math.PI * 2);
+        context.arc(r * 0.05, r * 0.15, r * 0.024, 0, Math.PI * 2);
+        context.fill();
+
+        // Happy big smile
+        context.fillStyle = '#ffffff';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 1.8;
+        context.beginPath();
+        context.moveTo(r * 0.05, r * 0.21);
+        context.quadraticCurveTo(r * 0.26, r * 0.24, r * 0.4, r * 0.21);
+        context.quadraticCurveTo(r * 0.36, r * 0.35, r * 0.13, r * 0.34);
+        context.quadraticCurveTo(r * 0.04, r * 0.31, r * 0.05, r * 0.21);
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.restore();
+      } else if (rigType === 'flappyemma') {
+        // --- FLAPPY EMMA (~12 YRS, SIMPSONS-STYLE PORTRAIT WITH HEADBAND & SHOULDER HAIR) ---
+        context.save();
+        context.scale(1.03, 1.03);
+
+        // Lavender/purple turtleneck sweater collar
+        context.fillStyle = '#a78bfa';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 2.1;
+        context.beginPath();
+        context.roundRect(-r * 0.44, r * 0.56, r * 0.82, r * 0.31, 6);
+        context.fill();
+        context.stroke();
+        context.beginPath();
+        context.moveTo(-r * 0.4, r * 0.72);
+        context.lineTo(r * 0.34, r * 0.72);
+        context.stroke();
+
+        // Flowing shoulder-length chestnut-brown hair silhouette
+        context.fillStyle = '#29170e';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 2;
+        context.beginPath();
+        context.moveTo(-r * 0.66, r * 0.62);
+        context.quadraticCurveTo(-r * 0.78, r * 0.15, -r * 0.68, -r * 0.38);
+        context.quadraticCurveTo(-r * 0.56, -r * 1.0, r * 0.04, -r * 0.98);
+        context.quadraticCurveTo(r * 0.48, -r * 0.94, r * 0.48, -r * 0.44);
+        context.lineTo(r * 0.3, -r * 0.38);
+        context.lineTo(-r * 0.34, r * 0.64);
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        // Yellow face & neck contour
+        context.fillStyle = '#fef08a';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 2.1;
+        context.beginPath();
+        context.moveTo(-r * 0.38, r * 0.58);
+        context.lineTo(-r * 0.44, -r * 0.38);
+        context.quadraticCurveTo(-r * 0.06, -r * 0.6, r * 0.4, -r * 0.42);
+        context.lineTo(r * 0.44, r * 0.23);
+        context.quadraticCurveTo(r * 0.44, r * 0.45, r * 0.2, r * 0.46);
+        context.lineTo(r * 0.15, r * 0.59);
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        // Ear peeking through hair
+        context.fillStyle = '#fef08a';
+        context.beginPath();
+        context.arc(-r * 0.45, 0, r * 0.18, Math.PI * 0.45, Math.PI * 1.55);
+        context.fill();
+        context.stroke();
+
+        // Side-swept bangs & hair over crown
+        context.fillStyle = '#29170e';
+        context.beginPath();
+        context.moveTo(-r * 0.5, -r * 0.32);
+        context.quadraticCurveTo(-r * 0.15, -r * 0.54, r * 0.12, -r * 0.36);
+        context.quadraticCurveTo(r * 0.28, -r * 0.52, r * 0.44, -r * 0.38);
+        context.quadraticCurveTo(r * 0.34, -r * 0.92, -r * 0.12, -r * 0.9);
+        context.quadraticCurveTo(-r * 0.5, -r * 0.84, -r * 0.54, -r * 0.34);
+        context.closePath();
+        context.fill();
+
+        // Stylish teal/lavender headband arc
+        context.strokeStyle = '#38bdf8';
+        context.lineWidth = 4.2;
+        context.lineCap = 'round';
+        context.beginPath();
+        context.moveTo(-r * 0.44, -r * 0.38);
+        context.quadraticCurveTo(-r * 0.28, -r * 0.78, r * 0.04, -r * 0.86);
+        context.stroke();
+
+        // Eyebrows
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 2;
+        context.beginPath();
+        context.moveTo(r * 0.03, -r * 0.34);
+        context.lineTo(r * 0.2, -r * 0.36);
+        context.moveTo(r * 0.31, -r * 0.34);
+        context.lineTo(r * 0.45, -r * 0.32);
+        context.stroke();
+
+        // Big expressive Simpsons eyes with subtle lashes
+        const eyeR = r * 0.165;
+        [
+          { ex: r * 0.13, ey: -r * 0.16 },
+          { ex: r * 0.4, ey: -r * 0.15 }
+        ].forEach((eye) => {
+          context.strokeStyle = '#0f172a';
+          context.lineWidth = 1.7;
+          context.beginPath();
+          context.moveTo(eye.ex - eyeR * 0.75, eye.ey - eyeR * 0.75);
+          context.lineTo(eye.ex - eyeR * 1.15, eye.ey - eyeR * 1.1);
+          context.stroke();
+
+          context.fillStyle = '#ffffff';
+          context.beginPath();
+          context.arc(eye.ex, eye.ey, eyeR, 0, Math.PI * 2);
+          context.fill();
+          context.stroke();
+
+          context.fillStyle = '#0f172a';
+          context.beginPath();
+          context.arc(eye.ex + r * 0.03, eye.ey, r * 0.044, 0, Math.PI * 2);
+          context.fill();
+        });
+
+        // Cute nose
+        context.fillStyle = '#fef08a';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 1.8;
+        context.beginPath();
+        context.moveTo(r * 0.33, -r * 0.03);
+        context.quadraticCurveTo(r * 0.6, -r * 0.03, r * 0.56, r * 0.1);
+        context.quadraticCurveTo(r * 0.49, r * 0.17, r * 0.34, r * 0.12);
+        context.fill();
+        context.stroke();
+
+        // Confident cheerful toothy smile
+        context.fillStyle = '#ffffff';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 1.8;
+        context.beginPath();
+        context.moveTo(r * 0.04, r * 0.21);
+        context.quadraticCurveTo(r * 0.27, r * 0.25, r * 0.42, r * 0.21);
+        context.quadraticCurveTo(r * 0.38, r * 0.36, r * 0.13, r * 0.35);
+        context.quadraticCurveTo(r * 0.03, r * 0.32, r * 0.04, r * 0.21);
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        context.beginPath();
+        context.moveTo(r * 0.16, r * 0.23);
+        context.lineTo(r * 0.16, r * 0.34);
+        context.moveTo(r * 0.28, r * 0.23);
+        context.lineTo(r * 0.28, r * 0.34);
+        context.stroke();
+
+        context.restore();
       } else {
         // --- ARTICULATED HAULER (6x6 Dump Truck) ---
         context.fillStyle = '#0f172a';
