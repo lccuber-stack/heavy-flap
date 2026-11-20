@@ -13,8 +13,8 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Heavy Flap</title>
-  <link id="apple-touch-icon" rel="apple-touch-icon" sizes="512x512" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230f172a'/%3E%3Crect y='0' width='512' height='32' fill='%23fbbf24'/%3E%3Crect y='480' width='512' height='32' fill='%23fbbf24'/%3E%3Crect x='118' y='210' width='220' height='98' rx='22' fill='%23eab308'/%3E%3Crect x='186' y='136' width='106' height='82' rx='14' fill='%2338bdf8'/%3E%3Ccircle cx='182' cy='334' r='48' fill='%231e293b' stroke='%23eab308' stroke-width='16'/%3E%3Ccircle cx='294' cy='334' r='48' fill='%231e293b' stroke='%23eab308' stroke-width='16'/%3E%3C/svg%3E" />
-  <link id="app-favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230f172a'/%3E%3Crect y='0' width='512' height='32' fill='%23fbbf24'/%3E%3Crect y='480' width='512' height='32' fill='%23fbbf24'/%3E%3Crect x='118' y='210' width='220' height='98' rx='22' fill='%23eab308'/%3E%3Crect x='186' y='136' width='106' height='82' rx='14' fill='%2338bdf8'/%3E%3Ccircle cx='182' cy='334' r='48' fill='%231e293b' stroke='%23eab308' stroke-width='16'/%3E%3Ccircle cx='294' cy='334' r='48' fill='%231e293b' stroke='%23eab308' stroke-width='16'/%3E%3C/svg%3E" />
+  <link id="apple-touch-icon" rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPj/HwADBwIAMCbHYQAAAABJRU5ErkJggg==" />
+  <link id="app-favicon" rel="icon" type="image/png" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPj/HwADBwIAMCbHYQAAAABJRU5ErkJggg==" />
   <link id="app-manifest" rel="manifest" href="" />
 
   <!-- Typography: Chakra Petch (Industrial Display) & Inter (Clean UI) -->
@@ -919,12 +919,12 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.66rem; font-weight:800; letter-spacing:0.12em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v4.9</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.0</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.6rem, 6.8vw, 2.1rem); font-weight:700; line-height:1.05; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.35rem; flex-wrap:wrap;">
               <button type="button" id="btn-sync-latest" style="background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.38); color:#e0f2fe; border-radius:999px; padding:0.2rem 0.6rem; font-size:0.64rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.25rem;">
-                <span id="sync-status-text">↻ Get Latest (v4.9)</span>
+                <span id="sync-status-text">↻ Get Latest (v5.0)</span>
               </button>
               <button type="button" class="bank-pill" id="btn-open-shop" title="Unlock Machines, Boosts, Trails & Skins">
                 <span style="display:inline-flex; align-items:center; gap:0.32rem;">
@@ -1441,7 +1441,7 @@
     window.addEventListener('keydown', unlockIOSAudioOnce, { capture: true, passive: true });
 
     // =========================================================================
-    // 1B. CUSTOM HOME SCREEN & MACOS DOCK APP ICON GENERATOR ("Heavy Flap")
+    // 1B. CUSTOM HOME SCREEN APP ICON & WEB MANIFEST GENERATOR ("Heavy Flap")
     // =========================================================================
     function generateHomeScreenAppIcon() {
       try {
@@ -1560,25 +1560,17 @@
         const touchLink = document.getElementById('apple-touch-icon');
         const favLink = document.getElementById('app-favicon');
         if (touchLink) touchLink.href = dataUrl;
-        if (favLink) {
-          favLink.type = 'image/png';
-          favLink.href = dataUrl;
-        }
+        if (favLink) favLink.href = dataUrl;
 
+        const cleanBase = window.location.href.split('?')[0].split('#')[0];
         const manifest = {
           name: 'Heavy Flap',
           short_name: 'Heavy Flap',
-          start_url: window.location.href.split('?')[0].split('#')[0],
+          start_url: cleanBase,
           display: 'standalone',
           background_color: '#0f172a',
           theme_color: '#0f172a',
           icons: [
-            {
-              src: dataUrl,
-              sizes: '192x192',
-              type: 'image/png',
-              purpose: 'any'
-            },
             {
               src: dataUrl,
               sizes: '512x512',
@@ -1589,7 +1581,7 @@
         };
         const manifestLink = document.getElementById('app-manifest');
         if (manifestLink) {
-          manifestLink.href = `data:application/manifest+json;charset=utf-8,${encodeURIComponent(JSON.stringify(manifest))}`;
+          manifestLink.href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
         }
       } catch (e) {}
     }
@@ -1948,7 +1940,7 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v4.9';
+    const APP_VERSION = 'v5.0';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -2079,8 +2071,7 @@
         }
         if (signature !== initialSignature) {
           if (manual) setSyncButtonFeedback('🔄 Installing update...', 'default');
-          const cleanUrl = `${baseUrl}?updated=${Date.now()}`;
-          window.location.replace(cleanUrl);
+          window.location.replace(baseUrl);
         } else if (manual) {
           setSyncButtonFeedback(`✅ You have the latest (${APP_VERSION})`, 'latest');
         }
@@ -2190,6 +2181,17 @@
       const bytes = new Uint8Array(bin.length);
       for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
       return JSON.parse(new TextDecoder().decode(bytes));
+    }
+
+    function cleanTransientQueryParams() {
+      try {
+        const url = new URL(window.location.href);
+        if (url.searchParams.has('updated') || url.searchParams.has('v')) {
+          url.searchParams.delete('updated');
+          url.searchParams.delete('v');
+          window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+        }
+      } catch (e) {}
     }
 
     function importSharedChallengeFromUrl() {
@@ -2493,11 +2495,9 @@
 
       const r = radius;
 
-      // Exhaust puff pipe (hidden on cartoon heads)
-      if (!rigType.startsWith('flappy')) {
-        context.fillStyle = '#0f172a';
-        context.fillRect(-r * 0.68, -r * 0.98, r * 0.18, r * 0.48);
-      }
+      // Exhaust puff pipe
+      context.fillStyle = '#0f172a';
+      context.fillRect(-r * 0.68, -r * 0.98, r * 0.18, r * 0.48);
 
       if (rigType === 'loader') {
         // --- WHEEL LOADER ---
@@ -2861,7 +2861,7 @@
           context.fill();
         });
       } else if (rigType === 'flappylong') {
-        // --- FLAPPY LONG (CHIEF CREATOR CARTOON HEAD) ---
+        // --- FLAPPY LONG (CHIEF CREATOR PORTRAIT) ---
         context.save();
         context.scale(1.06, 1.06);
 
@@ -3011,7 +3011,7 @@
 
         context.restore();
       } else if (rigType === 'flappyemmy') {
-        // --- FLAPPY EMMY (BLAST CREATOR CARTOON HEAD) ---
+        // --- FLAPPY EMMY (BLAST CREATOR PORTRAIT) ---
         context.save();
         context.scale(0.98, 0.98);
 
@@ -3156,7 +3156,7 @@
 
         context.restore();
       } else if (rigType === 'flappyemma') {
-        // --- FLAPPY EMMA (SHOP CREATOR CARTOON HEAD) ---
+        // --- FLAPPY EMMA (SHOP CREATOR PORTRAIT) ---
         context.save();
         context.scale(1.03, 1.03);
 
@@ -4168,23 +4168,15 @@
         });
       }
 
-      const partTypes = state.rig.startsWith('flappy')
-        ? [
-            { shape: 'plate', size: 6.0, color: '#fef08a' },
-            { shape: 'plate', size: 5.5, color: '#fef08a' },
-            { shape: 'plate', size: 5.5, color: state.rig === 'flappylong' ? '#5ec4c6' : state.rig === 'flappyemmy' ? '#f472b6' : '#a78bfa' },
-            { shape: 'plate', size: 5.0, color: '#111111' },
-            { shape: 'plate', size: 4.5, color: '#ffffff' }
-          ]
-        : [
-            { shape: 'tire', size: 6.5, color: '#0f172a' },
-            { shape: 'tire', size: 6.5, color: '#0f172a' },
-            { shape: 'plate', size: 6.0, color: skin.body },
-            { shape: 'plate', size: 5.5, color: skin.accent },
-            { shape: 'plate', size: 5.0, color: skin.window },
-            { shape: 'plate', size: 5.5, color: '#334155' },
-            { shape: 'plate', size: 4.5, color: skin.shade }
-          ];
+      const partTypes = [
+        { shape: 'tire', size: 6.5, color: '#0f172a' },
+        { shape: 'tire', size: 6.5, color: '#0f172a' },
+        { shape: 'plate', size: 6.0, color: skin.body },
+        { shape: 'plate', size: 5.5, color: skin.accent },
+        { shape: 'plate', size: 5.0, color: skin.window },
+        { shape: 'plate', size: 5.5, color: '#334155' },
+        { shape: 'plate', size: 4.5, color: skin.shade }
+      ];
       partTypes.forEach((pt, idx) => {
         const ang = -Math.PI * 0.85 + (idx / (partTypes.length - 1)) * Math.PI * 0.75 + (Math.random() - 0.5) * 0.25;
         const spd = 150 + Math.random() * 190;
@@ -4321,7 +4313,6 @@
         return;
       }
 
-      // Ambient scenery scroll when not paused/gameover
       if (state.mode !== 'paused' && state.mode !== 'gameover') {
         state.bgScrollFar += activeSpeed * 0.14 * dt;
         state.bgScrollMid += activeSpeed * 0.34 * dt;
@@ -4334,7 +4325,6 @@
         });
       }
 
-      // Gentle hover bobbing in menu or ready states
       if (state.mode === 'menu' || state.mode === 'ready') {
         const baseHoverY = horizonY * 0.46;
         state.player.y = baseHoverY + Math.sin(state.time * 4.2) * 10;
@@ -4352,7 +4342,6 @@
         state.player.vy = 0;
         state.player.rotation = 0;
       } else {
-        // 1. Player Vertical Physics
         state.player.vy = Math.min(spec.maxFall, state.player.vy + spec.gravity * dt);
         state.player.y += state.player.vy * dt;
 
@@ -4361,7 +4350,6 @@
         state.player.bucketAngle += (0 - state.player.bucketAngle) * Math.min(1, dt * 7);
       }
 
-      // 2. Ceiling & Ground Bounds
       if (state.player.y - state.player.radius < 6) {
         state.player.y = 6 + state.player.radius;
         state.player.vy = 0;
@@ -4384,7 +4372,6 @@
         }
       }
 
-      // 3. Obstacle Spawning & Movement (Exact uniform spacing on all screen sizes)
       const spacing = state.width < 600 ? 275 : 315;
       if (state.obstacles.length === 0) {
         spawnObstaclePair(state.width + 40);
@@ -4395,7 +4382,6 @@
         }
       }
 
-      // 3B. Falling Boulders & Crane Loads (Disabled during first 15 pts warm-up)
       if (tier.canFallHazards) {
         state.hazardTimer -= dt;
         if (state.hazardTimer <= 0) {
@@ -4428,7 +4414,7 @@
               state.fallingHazards.splice(i, 1);
               state.screenShake = 0.55;
               audio.playHardhatPickup();
-              spawnDust(hz.x, hz.y, 14, '#38bdf8');
+              spawnDust(state.player.x, state.player.y, 14, '#38bdf8');
               spawnFloatingText(state.player.x + 20, state.player.y - 26, '🛡️ SHIELD BLOCK!', '#38bdf8');
               updateHUD();
               continue;
@@ -4508,7 +4494,6 @@
         }
       }
 
-      // 4. Hardhat Collectibles
       for (let i = state.collectibles.length - 1; i >= 0; i--) {
         const hat = state.collectibles[i];
         hat.x -= activeSpeed * dt;
@@ -4562,7 +4547,6 @@
         }
       }
 
-      // 5. Particles & Floating Text
       for (let i = state.particles.length - 1; i >= 0; i--) {
         const p = state.particles[i];
         p.x += p.vx * dt;
@@ -5239,7 +5223,6 @@
       }
     });
 
-    // Player Count Selector
     document.querySelectorAll('#player-count-selector .mode-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         audio.playClick();
@@ -5251,7 +5234,6 @@
       });
     });
 
-    // Rig Selector Buttons
     document.querySelectorAll('#rig-selector .rig-card').forEach((card) => {
       card.addEventListener('click', () => {
         const rigKey = card.dataset.rig;
@@ -5281,7 +5263,6 @@
       });
     });
 
-    // Day / Night Shift Selector Buttons
     document.querySelectorAll('#shift-selector .shift-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         audio.playClick();
@@ -5291,7 +5272,6 @@
       });
     });
 
-    // Menu, Pause & Game Over Action Buttons
     document.getElementById('btn-start-shift').addEventListener('click', () => {
       audio.init();
       audio.playClick();
@@ -5492,6 +5472,7 @@
     }
 
     // Boot Sequence
+    cleanTransientQueryParams();
     document.getElementById('app-version-badge').textContent = APP_VERSION;
     setSyncButtonFeedback(`↻ Get Latest (${APP_VERSION})`, 'default');
     document.querySelectorAll('#player-count-selector .mode-btn').forEach((b) => {
