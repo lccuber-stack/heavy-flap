@@ -76,6 +76,12 @@
       display: none !important;
     }
 
+    .hardhat-svg {
+      display: inline-block;
+      vertical-align: -0.18em;
+      flex-shrink: 0;
+    }
+
     /* Full-bleed Canvas extending under iPhone home indicator safe area */
     #game-canvas {
       position: fixed;
@@ -242,6 +248,25 @@
       transform: scale(0.92);
     }
 
+    .fps-pill {
+      height: 40px;
+      padding: 0 0.52rem;
+      border-radius: 13px;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1.5px solid rgba(52, 211, 153, 0.42);
+      color: #6ee7b7;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 0.68rem;
+      letter-spacing: 0.03em;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+    }
+
     /* Ready Prompt Overlay */
     #ready-hint {
       position: fixed;
@@ -296,7 +321,7 @@
 
     .industrial-card {
       width: 100%;
-      max-width: 450px;
+      max-width: 455px;
       max-height: calc(100dvh - 1rem - var(--safe-top) - var(--safe-bottom));
       display: flex;
       flex-direction: column;
@@ -314,14 +339,14 @@
     }
 
     .card-body {
-      padding: 0.9rem 1rem 1rem 1rem;
+      padding: 0.85rem 0.95rem 0.95rem 0.95rem;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
 
     @media (min-width: 640px) {
       .card-body {
-        padding: 1.45rem 1.65rem 1.55rem 1.65rem;
+        padding: 1.25rem 1.45rem 1.35rem 1.45rem;
       }
     }
 
@@ -329,21 +354,27 @@
     .rig-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 0.45rem;
-      margin-top: 0.4rem;
+      gap: 0.4rem;
+      margin-top: 0.38rem;
     }
 
     .rig-card {
       background: rgba(30, 41, 59, 0.72);
       border: 2px solid rgba(255, 255, 255, 0.1);
-      border-radius: 14px;
-      padding: 0.45rem 0.3rem;
+      border-radius: 13px;
+      padding: 0.36rem 0.25rem;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
       cursor: pointer;
+      position: relative;
       transition: all 0.16s ease;
+    }
+
+    .rig-card.locked-rig {
+      opacity: 0.78;
+      border-color: rgba(148, 163, 184, 0.25);
     }
 
     .rig-card:hover {
@@ -358,9 +389,136 @@
     }
 
     .rig-preview {
-      width: 78px;
-      height: 54px;
-      margin-bottom: 0.25rem;
+      width: 64px;
+      height: 42px;
+      margin-bottom: 0.15rem;
+    }
+
+    .shop-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.28rem;
+      background: rgba(15, 23, 42, 0.75);
+      padding: 0.24rem;
+      border-radius: 11px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 0.55rem;
+    }
+
+    .shop-tab-btn {
+      padding: 0.36rem 0.2rem;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.14s ease;
+    }
+
+    .shop-tab-btn.active {
+      background: rgba(251, 191, 36, 0.22);
+      color: #fde047;
+      border-color: rgba(251, 191, 36, 0.45);
+    }
+
+    .active-boosts-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.32rem;
+      flex-wrap: wrap;
+      margin-top: 0.42rem;
+    }
+
+    .boost-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(52, 211, 153, 0.48);
+      color: #6ee7b7;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 0.64rem;
+      font-weight: 700;
+    }
+
+    /* Garage Shop & Hardhat Bank */
+    .bank-pill {
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.22), rgba(217, 119, 6, 0.18));
+      border: 1px solid rgba(251, 191, 36, 0.55);
+      border-radius: 999px;
+      padding: 0.2rem 0.65rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.32rem;
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 0.66rem;
+      font-weight: 700;
+      color: #fde047;
+      cursor: pointer;
+      transition: transform 0.14s ease, filter 0.14s ease;
+    }
+
+    .bank-pill:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .bank-pill:active {
+      transform: scale(0.95);
+    }
+
+    .skin-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+      margin-top: 0.55rem;
+    }
+
+    .skin-card {
+      background: rgba(30, 41, 59, 0.78);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 0.55rem 0.45rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+    }
+
+    .skin-card:hover {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: rgba(251, 191, 36, 0.5);
+    }
+
+    .skin-card.equipped {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: #34d399;
+      box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.35);
+    }
+
+    .skin-card.affordable {
+      border-color: rgba(251, 191, 36, 0.62);
+    }
+
+    .skin-card.locked {
+      opacity: 0.78;
+    }
+
+    .skin-badge {
+      margin-top: 0.3rem;
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 999px;
     }
 
     /* Day/Night Shift Toggle */
@@ -372,11 +530,11 @@
       padding: 0.25rem;
       border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 0.35rem;
+      margin-top: 0.32rem;
     }
 
     .shift-btn {
-      padding: 0.42rem 0.3rem;
+      padding: 0.4rem 0.3rem;
       border: 1px solid transparent;
       border-radius: 9px;
       background: transparent;
@@ -397,15 +555,15 @@
     /* Action Buttons */
     .btn-launch {
       width: 100%;
-      margin-top: 0.85rem;
-      padding: 0.78rem 1.1rem;
+      margin-top: 0.75rem;
+      padding: 0.74rem 1.1rem;
       border: none;
       border-radius: 14px;
       background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
       color: #0f172a;
       font-family: 'Chakra Petch', sans-serif;
       font-weight: 700;
-      font-size: 1.05rem;
+      font-size: 1.02rem;
       letter-spacing: 0.04em;
       text-transform: uppercase;
       cursor: pointer;
@@ -486,11 +644,11 @@
       padding: 0.25rem;
       border-radius: 11px;
       border: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 0.35rem;
+      margin-top: 0.32rem;
     }
 
     .mode-btn {
-      padding: 0.38rem 0.2rem;
+      padding: 0.36rem 0.2rem;
       border: 1px solid transparent;
       border-radius: 8px;
       background: transparent;
@@ -511,8 +669,8 @@
     .roster-list {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 0.35rem;
-      margin-top: 0.4rem;
+      gap: 0.32rem;
+      margin-top: 0.36rem;
     }
 
     .roster-list.two-col {
@@ -526,7 +684,7 @@
       background: rgba(15, 23, 42, 0.75);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 10px;
-      padding: 0.3rem 0.5rem;
+      padding: 0.28rem 0.5rem;
     }
 
     .player-tag {
@@ -606,15 +764,15 @@
     /* Extra compact spacing for short iPhone viewports (e.g. Safari with bottom bar) */
     @media (max-height: 740px) {
       .card-body {
-        padding: 0.72rem 0.88rem 0.82rem 0.88rem;
+        padding: 0.68rem 0.85rem 0.78rem 0.85rem;
       }
       .rig-preview {
-        width: 68px;
-        height: 46px;
+        width: 56px;
+        height: 36px;
       }
       .btn-launch {
-        margin-top: 0.65rem;
-        padding: 0.68rem 1rem;
+        margin-top: 0.6rem;
+        padding: 0.65rem 1rem;
       }
     }
   </style>
@@ -642,13 +800,12 @@
           <div class="hud-stat-label" id="hud-bonus-label">3-HAT BONUS</div>
           <div class="hud-stat-val" style="color:#38bdf8; white-space:nowrap;" id="hud-bonus">0/3</div>
         </div>
+        <div id="hud-boosts-wrap" class="hidden" style="display:flex; align-items:center; gap:0.25rem; margin-left:0.15rem;"></div>
       </div>
 
-      <!-- Single Audio Button & Live FPS Counter (Right-aligned) -->
+      <!-- FPS Meter & Audio Button (Right-aligned) -->
       <div style="display:flex; align-items:center; justify-content:flex-end; gap:0.4rem; flex-shrink:0;">
-        <div id="hud-fps" class="hud-badge" style="padding:0.35rem 0.55rem; border-color:rgba(52,211,153,0.45); pointer-events:none;" title="Frames Per Second">
-          <span class="font-display" id="hud-fps-val" style="font-size:0.74rem; font-weight:700; color:#34d399; letter-spacing:0.04em; font-variant-numeric:tabular-nums; white-space:nowrap;">60 FPS</span>
-        </div>
+        <div class="fps-pill" id="hud-fps" title="Live Frame Rate">60 FPS</div>
         <button type="button" class="icon-btn sound-active" id="btn-sound" aria-label="Toggle Sound" title="Toggle Construction Audio">
           <svg id="icon-sound-on" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -694,12 +851,18 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.66rem; font-weight:800; letter-spacing:0.12em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v3.5</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v4.0</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.6rem, 6.8vw, 2.1rem); font-weight:700; line-height:1.05; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
-            <button type="button" id="btn-sync-latest" style="margin-top:4px; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.38); color:#e0f2fe; border-radius:999px; padding:0.2rem 0.65rem; font-size:0.65rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.28rem;">
-              <span id="sync-status-text">↻ Get Latest (v3.5)</span>
-            </button>
+            <div style="margin-top:4px; display:flex; align-items:center; gap:0.35rem; flex-wrap:wrap;">
+              <button type="button" id="btn-sync-latest" style="background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.38); color:#e0f2fe; border-radius:999px; padding:0.2rem 0.6rem; font-size:0.64rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.25rem;">
+                <span id="sync-status-text">↻ Get Latest (v4.0)</span>
+              </button>
+              <button type="button" class="bank-pill" id="btn-open-shop" title="Unlock Machines, Boosts, Trails & Skins">
+                <span>🛒 Garage Shop</span>
+                <span style="background:rgba(15,23,42,0.7); padding:1px 6px; border-radius:999px; color:#fbbf24; display:inline-flex; align-items:center; gap:3px;" id="menu-wallet-balance">0 <svg class="hardhat-svg" width="14" height="14" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#0f172a" stroke="#fef08a" stroke-width="2"/><path d="M7 18a9 9 0 0 1 18 0Z" fill="#facc15" stroke="#0f172a" stroke-width="1.8"/><rect x="14.2" y="9" width="3.6" height="8" rx="1" fill="#ffffff"/><rect x="5" y="17.2" width="22" height="4.2" rx="2" fill="#eab308" stroke="#0f172a" stroke-width="1.6"/></svg></span>
+              </button>
+            </div>
           </div>
           <button type="button" class="record-btn" id="btn-open-leaderboard" title="View Top 10 High Scores">
             <div style="font-size:0.58rem; font-weight:800; letter-spacing:0.06em; color:#94a3b8; white-space:nowrap;">TOP 10 RECORD ▾</div>
@@ -708,12 +871,12 @@
           </button>
         </div>
 
-        <p style="font-size:0.78rem; color:#cbd5e1; margin-top:0.42rem; line-height:1.35;">
-          Fly heavy construction rigs through procedural terrain, dodge falling boulders, and grab golden hardhats to score!
+        <p style="font-size:0.76rem; color:#cbd5e1; margin-top:0.38rem; line-height:1.32;">
+          Fly heavy construction rigs, dodge falling boulders, and bank hardhats to unlock new machines, boosts, trails &amp; skins!
         </p>
 
         <!-- Single / Local Multiplayer Roster -->
-        <div style="margin-top:0.62rem;">
+        <div style="margin-top:0.55rem;">
           <div style="display:flex; align-items:center; justify-content:space-between;">
             <label style="font-size:0.66rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8;">PLAYERS (PASS &amp; PLAY)</label>
             <span style="font-size:0.66rem; font-weight:700; color:#38bdf8;" id="mode-summary-label">Solo Shift</span>
@@ -728,31 +891,53 @@
         </div>
 
         <!-- Choose Heavy Equipment Rig -->
-        <div style="margin-top:0.62rem;">
-          <label style="font-size:0.66rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8; display:block;">SELECT HEAVY MACHINE</label>
+        <div style="margin-top:0.55rem;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:0.4rem;">
+            <label style="font-size:0.66rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8;">SELECT HEAVY MACHINE</label>
+            <span style="font-size:0.64rem; font-weight:700; color:#34d399;" id="menu-active-skin-label">🎨 Classic Yellow</span>
+          </div>
           <div class="rig-grid" id="rig-selector">
             <button type="button" class="rig-card selected" data-rig="loader">
-              <canvas class="rig-preview" id="preview-loader" width="156" height="108"></canvas>
-              <div class="font-display" style="font-size:0.8rem; font-weight:700; color:#fff; line-height:1.15;">Wheel Loader</div>
-              <div style="font-size:0.6rem; color:#94a3b8; margin-top:1px;">Balanced</div>
+              <canvas class="rig-preview" id="preview-loader" width="136" height="92"></canvas>
+              <div class="font-display" style="font-size:0.76rem; font-weight:700; color:#fff; line-height:1.1;">Wheel Loader</div>
+              <div style="font-size:0.58rem; color:#94a3b8; margin-top:1px;" id="rig-sub-loader">Balanced</div>
             </button>
 
             <button type="button" class="rig-card" data-rig="excavator">
-              <canvas class="rig-preview" id="preview-excavator" width="156" height="108"></canvas>
-              <div class="font-display" style="font-size:0.8rem; font-weight:700; color:#fff; line-height:1.15;">Excavator</div>
-              <div style="font-size:0.6rem; color:#94a3b8; margin-top:1px;">Snappy Lift</div>
+              <canvas class="rig-preview" id="preview-excavator" width="136" height="92"></canvas>
+              <div class="font-display" style="font-size:0.76rem; font-weight:700; color:#fff; line-height:1.1;">Excavator</div>
+              <div style="font-size:0.58rem; color:#94a3b8; margin-top:1px;" id="rig-sub-excavator">Snappy Lift</div>
             </button>
 
             <button type="button" class="rig-card" data-rig="hauler">
-              <canvas class="rig-preview" id="preview-hauler" width="156" height="108"></canvas>
-              <div class="font-display" style="font-size:0.8rem; font-weight:700; color:#fff; line-height:1.15;">Artic Hauler</div>
-              <div style="font-size:0.6rem; color:#94a3b8; margin-top:1px;">Smooth Glide</div>
+              <canvas class="rig-preview" id="preview-hauler" width="136" height="92"></canvas>
+              <div class="font-display" style="font-size:0.76rem; font-weight:700; color:#fff; line-height:1.1;">Artic Hauler</div>
+              <div style="font-size:0.58rem; color:#94a3b8; margin-top:1px;" id="rig-sub-hauler">Smooth Glide</div>
+            </button>
+
+            <button type="button" class="rig-card" data-rig="bulldozer">
+              <canvas class="rig-preview" id="preview-bulldozer" width="136" height="92"></canvas>
+              <div class="font-display" style="font-size:0.76rem; font-weight:700; color:#fff; line-height:1.1;">Bulldozer</div>
+              <div style="font-size:0.58rem; color:#fbbf24; margin-top:1px;" id="rig-sub-bulldozer">🔒 120</div>
+            </button>
+
+            <button type="button" class="rig-card" data-rig="skycrane">
+              <canvas class="rig-preview" id="preview-skycrane" width="136" height="92"></canvas>
+              <div class="font-display" style="font-size:0.76rem; font-weight:700; color:#fff; line-height:1.1;">Skycrane</div>
+              <div style="font-size:0.58rem; color:#fbbf24; margin-top:1px;" id="rig-sub-skycrane">🔒 260</div>
+            </button>
+
+            <button type="button" class="rig-card" data-rig="jetrig">
+              <canvas class="rig-preview" id="preview-jetrig" width="136" height="92"></canvas>
+              <div class="font-display" style="font-size:0.76rem; font-weight:700; color:#fff; line-height:1.1;">Jet-Pack Rig</div>
+              <div style="font-size:0.58rem; color:#fbbf24; margin-top:1px;" id="rig-sub-jetrig">🔒 450</div>
             </button>
           </div>
+          <div id="menu-active-boosts" class="active-boosts-bar hidden"></div>
         </div>
 
         <!-- Day / Night Shift Selector -->
-        <div style="margin-top:0.62rem;">
+        <div style="margin-top:0.55rem;">
           <label style="font-size:0.66rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8; display:block;">WORK SHIFT LIGHTING</label>
           <div class="shift-selector" id="shift-selector">
             <button type="button" class="shift-btn selected" data-shift="day">☀️ Day Shift</button>
@@ -808,7 +993,7 @@
             <span class="font-display" style="font-size:0.75rem; font-weight:700; color:#fbbf24;" id="go-rank-title">APPRENTICE OPERATOR</span>
           </div>
           <div id="go-placement-badge" style="display:inline-flex; align-items:center; gap:0.3rem; background:rgba(56,189,248,0.16); border:1px solid rgba(56,189,248,0.45); border-radius:999px; padding:0.24rem 0.72rem;">
-            <span class="font-display" style="font-size:0.75rem; font-weight:700; color:#7dd3fc;" id="go-placement-text">RANK #1 OF 10</span>
+            <span class="font-display" style="font-size:0.75rem; font-weight:700; color:#7dd3fc;" id="go-placement-text">TOP 10: #1</span>
           </div>
         </div>
 
@@ -821,16 +1006,16 @@
             <div style="font-size:0.6rem; font-weight:700; color:#94a3b8;">OVERALL BEST</div>
             <div class="font-display" style="font-size:1.45rem; font-weight:700; color:#fbbf24; margin-top:2px;" id="go-best">0</div>
           </div>
-          <div class="stat-box">
-            <div style="font-size:0.6rem; font-weight:700; color:#94a3b8;">HARDHATS</div>
-            <div class="font-display" style="font-size:1.45rem; font-weight:700; color:#38bdf8; margin-top:2px;" id="go-hardhats">0</div>
+          <div class="stat-box" id="btn-go-bank-box" style="cursor:pointer; border-color:rgba(52,211,153,0.42);" title="Open Garage Shop">
+            <div style="font-size:0.6rem; font-weight:700; color:#34d399;" id="go-earned-label">BANKED +0</div>
+            <div class="font-display" style="font-size:1.35rem; font-weight:700; color:#fde047; margin-top:2px; display:inline-flex; align-items:center; justify-content:center; gap:4px;" id="go-bank-total">0 <svg class="hardhat-svg" width="16" height="16" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#0f172a" stroke="#fef08a" stroke-width="2"/><path d="M7 18a9 9 0 0 1 18 0Z" fill="#facc15" stroke="#0f172a" stroke-width="1.8"/><rect x="14.2" y="9" width="3.6" height="8" rx="1" fill="#ffffff"/><rect x="5" y="17.2" width="22" height="4.2" rx="2" fill="#eab308" stroke="#0f172a" stroke-width="1.6"/></svg></div>
           </div>
         </div>
 
         <!-- Device Overall Leaderboard -->
         <div class="leaderboard-box">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; gap:0.4rem;">
-            <span style="font-size:0.62rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8;">DEVICE TOP SCORES (SCROLL)</span>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem; gap:0.4rem;">
+            <span style="font-size:0.62rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8;">DEVICE TOP SCORES</span>
             <div style="display:flex; align-items:center; gap:0.45rem;">
               <span style="font-size:0.64rem; font-weight:700; color:#38bdf8;" id="go-next-up-hint"></span>
               <button type="button" id="btn-go-top10" style="background:rgba(251,191,36,0.16); border:1px solid rgba(251,191,36,0.45); color:#fbbf24; border-radius:999px; padding:2px 8px; font-family:'Chakra Petch',sans-serif; font-size:0.64rem; font-weight:700; cursor:pointer;">
@@ -841,21 +1026,66 @@
           <div id="go-leaderboard-list" style="max-height:158px; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-right:2px;"></div>
         </div>
 
-        <div style="display:flex; align-items:stretch; gap:0.45rem; margin-top:0.85rem;">
-          <button type="button" class="btn-secondary" id="btn-go-garage" style="flex:0.9; padding:0.7rem 0.5rem; font-size:0.86rem; white-space:nowrap;">
+        <div style="display:flex; align-items:stretch; gap:0.4rem; margin-top:0.85rem;">
+          <button type="button" class="btn-secondary" id="btn-go-garage" style="flex:0.85; padding:0.7rem 0.45rem; font-size:0.84rem; white-space:nowrap;">
             Garage
           </button>
-          <button type="button" class="btn-secondary" id="btn-share-score" style="flex:1.15; padding:0.7rem 0.55rem; font-size:0.84rem; border-color:rgba(56,189,248,0.45); color:#7dd3fc; white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:0.3rem;">
+          <button type="button" class="btn-secondary" id="btn-go-shop" style="flex:0.95; padding:0.7rem 0.45rem; font-size:0.84rem; border-color:rgba(52,211,153,0.45); color:#6ee7b7; white-space:nowrap;">
+            🛒 Shop
+          </button>
+          <button type="button" class="btn-secondary" id="btn-share-score" style="flex:0.95; padding:0.7rem 0.45rem; font-size:0.84rem; border-color:rgba(56,189,248,0.45); color:#7dd3fc; white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:0.25rem;">
             <span>📤</span><span>Share</span>
           </button>
-          <button type="button" class="btn-launch" id="btn-retry-shift" style="flex:1.65; margin-top:0; padding:0.7rem 0.75rem; font-size:0.92rem; white-space:nowrap;">
+          <button type="button" class="btn-launch" id="btn-retry-shift" style="flex:1.45; margin-top:0; padding:0.7rem 0.65rem; font-size:0.9rem; white-space:nowrap;">
             <span id="btn-retry-label">Retry Shift</span>
-            <svg width="19" height="19" style="flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="18" height="18" style="flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
               <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
               <path d="M3 3v5h5"></path>
             </svg>
           </button>
         </div>
+      </div>
+      <div class="hazard-bar"></div>
+    </div>
+  </div>
+
+  <!-- Garage Shop Modal (Rigs, Boosts, Trails & Skins) -->
+  <div id="shop-modal" class="modal-backdrop hidden" style="z-index: 42;">
+    <div class="industrial-card" style="max-width:440px;">
+      <div class="hazard-bar"></div>
+      <div class="card-body">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:0.5rem;">
+          <div>
+            <div style="font-size:0.66rem; font-weight:800; letter-spacing:0.14em; color:#34d399;">FLEET, BOOSTS &amp; LIVERIES</div>
+            <h2 class="font-display" style="font-size:1.48rem; font-weight:700; line-height:1.1; margin-top:2px;">🛒 GARAGE SHOP</h2>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.4rem;">
+            <div style="background:rgba(251,191,36,0.16); border:1px solid rgba(251,191,36,0.45); border-radius:12px; padding:0.32rem 0.65rem; text-align:right;">
+              <div style="font-size:0.55rem; font-weight:800; color:#94a3b8; letter-spacing:0.05em;">HARDHAT BANK</div>
+              <div class="font-display" style="font-size:1.05rem; font-weight:700; color:#fde047; line-height:1.05; display:inline-flex; align-items:center; justify-content:flex-end; gap:4px;" id="shop-wallet-balance">0 <svg class="hardhat-svg" width="16" height="16" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#0f172a" stroke="#fef08a" stroke-width="2"/><path d="M7 18a9 9 0 0 1 18 0Z" fill="#facc15" stroke="#0f172a" stroke-width="1.8"/><rect x="14.2" y="9" width="3.6" height="8" rx="1" fill="#ffffff"/><rect x="5" y="17.2" width="22" height="4.2" rx="2" fill="#eab308" stroke="#0f172a" stroke-width="1.6"/></svg></div>
+            </div>
+            <button type="button" class="icon-btn" id="btn-close-shop" aria-label="Close Garage Shop" style="height:36px; min-width:36px; padding:0 0.55rem;">
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <div class="shop-tabs" id="shop-tabs">
+          <button type="button" class="shop-tab-btn active" data-tab="rigs">🚜 Fleet</button>
+          <button type="button" class="shop-tab-btn" data-tab="boosts">⚡ Boosts</button>
+          <button type="button" class="shop-tab-btn" data-tab="trails">🔥 Trails</button>
+          <button type="button" class="shop-tab-btn" data-tab="skins">🎨 Skins</button>
+        </div>
+
+        <div id="shop-feedback-banner" class="hidden" style="margin-top:0.45rem; padding:0.38rem 0.65rem; border-radius:10px; font-size:0.74rem; font-weight:700; text-align:center;"></div>
+
+        <div style="max-height:min(380px, calc(100dvh - 16.5rem - var(--safe-top) - var(--safe-bottom))); overflow-y:auto; -webkit-overflow-scrolling:touch; margin-top:0.2rem;">
+          <div class="skin-grid" id="shop-skin-grid"></div>
+        </div>
+
+        <button type="button" class="btn-launch" id="btn-close-shop-bottom" style="margin-top:0.75rem; padding:0.72rem 1rem; font-size:0.96rem;">
+          Back to Garage
+        </button>
       </div>
       <div class="hazard-bar"></div>
     </div>
@@ -884,7 +1114,7 @@
           <div id="top10-leaderboard-list"></div>
         </div>
 
-        <button type="button" class="btn-launch" id="btn-close-leaderboard-bottom" style="margin-top:0.75rem; padding:0.72rem 1rem; font-size:0.96rem;">
+        <button type="button" class="btn-launch" id="btn-close-leaderboard-bottom" style="margin-top:0.8rem; padding:0.72rem 1rem; font-size:0.96rem;">
           Close Leaderboard
         </button>
       </div>
@@ -1004,56 +1234,52 @@
         if (!this.ctx) return;
         const now = this.ctx.currentTime;
 
-        // Deep sub-bass explosion boom
-        const boomOsc = this.ctx.createOscillator();
+        const boom = this.ctx.createOscillator();
         const boomGain = this.ctx.createGain();
-        boomOsc.type = 'sine';
-        boomOsc.frequency.setValueAtTime(110, now);
-        boomOsc.frequency.exponentialRampToValueAtTime(24, now + 0.55);
-        boomGain.gain.setValueAtTime(0.32, now);
-        boomGain.gain.exponentialRampToValueAtTime(0.001, now + 0.58);
-        boomOsc.connect(boomGain);
+        boom.type = 'sine';
+        boom.frequency.setValueAtTime(115, now);
+        boom.frequency.exponentialRampToValueAtTime(24, now + 0.52);
+        boomGain.gain.setValueAtTime(0.28, now);
+        boomGain.gain.exponentialRampToValueAtTime(0.001, now + 0.54);
+        boom.connect(boomGain);
         boomGain.connect(this.ctx.destination);
-        boomOsc.start(now);
-        boomOsc.stop(now + 0.58);
+        boom.start(now);
+        boom.stop(now + 0.55);
 
-        // Filtered white-noise blast crackle
         try {
-          const bufferSize = Math.floor(this.ctx.sampleRate * 0.5);
+          const bufferSize = Math.floor(this.ctx.sampleRate * 0.45);
           const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-          const output = noiseBuffer.getChannelData(0);
+          const data = noiseBuffer.getChannelData(0);
           for (let i = 0; i < bufferSize; i++) {
-            output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.35));
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.35));
           }
-          const whiteNoise = this.ctx.createBufferSource();
-          whiteNoise.buffer = noiseBuffer;
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = noiseBuffer;
           const filter = this.ctx.createBiquadFilter();
           filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(950, now);
-          filter.frequency.exponentialRampToValueAtTime(160, now + 0.5);
-          const noiseGain = this.ctx.createGain();
-          noiseGain.gain.setValueAtTime(0.28, now);
-          noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-          whiteNoise.connect(filter);
-          filter.connect(noiseGain);
-          noiseGain.connect(this.ctx.destination);
-          whiteNoise.start(now);
-          whiteNoise.stop(now + 0.5);
+          filter.frequency.setValueAtTime(680, now);
+          filter.frequency.exponentialRampToValueAtTime(110, now + 0.45);
+          const nGain = this.ctx.createGain();
+          nGain.gain.setValueAtTime(0.24, now);
+          nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+          noise.connect(filter);
+          filter.connect(nGain);
+          nGain.connect(this.ctx.destination);
+          noise.start(now);
         } catch (e) {}
 
-        // Metallic crunch harmonics
-        [140, 96, 62].forEach((freq) => {
+        [150, 98, 64].forEach((freq) => {
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
           osc.type = 'square';
           osc.frequency.setValueAtTime(freq, now);
-          osc.frequency.exponentialRampToValueAtTime(34, now + 0.34);
+          osc.frequency.exponentialRampToValueAtTime(32, now + 0.36);
           gain.gain.setValueAtTime(0.11, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
           osc.start(now);
-          osc.stop(now + 0.35);
+          osc.stop(now + 0.38);
         });
       }
 
@@ -1073,6 +1299,25 @@
         gain.connect(this.ctx.destination);
         osc.start(now);
         osc.stop(now + 0.05);
+      }
+
+      playSkinUnlock() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+          gain.gain.setValueAtTime(0.12, now + idx * 0.06);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.25);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.06);
+          osc.stop(now + idx * 0.06 + 0.25);
+        });
       }
     }
 
@@ -1233,11 +1478,13 @@
     }
 
     // =========================================================================
-    // 2. HEAVY RIG CONFIGURATIONS, DAY/NIGHT SHIFTS & PROCEDURAL BIOMES
+    // 2. HEAVY RIG CONFIGURATIONS, SKINS, SHIFT LIGHTING & PROCEDURAL BIOMES
     // =========================================================================
     const RIG_SPECS = {
       loader: {
         name: 'Wheel Loader',
+        subtitle: 'Balanced',
+        cost: 0,
         gravity: 1360,
         flapVel: -442,
         maxFall: 615,
@@ -1246,7 +1493,9 @@
         cabColor: '#1e293b'
       },
       excavator: {
-        name: 'Crawler Excavator',
+        name: 'Excavator',
+        subtitle: 'Snappy Lift',
+        cost: 0,
         gravity: 1470,
         flapVel: -465,
         maxFall: 645,
@@ -1255,15 +1504,210 @@
         cabColor: '#0f172a'
       },
       hauler: {
-        name: 'Articulated Hauler',
+        name: 'Artic Hauler',
+        subtitle: 'Smooth Glide',
+        cost: 0,
         gravity: 1265,
         flapVel: -424,
         maxFall: 580,
         primaryColor: '#eab308',
         secondaryColor: '#a16207',
         cabColor: '#1e293b'
+      },
+      bulldozer: {
+        name: 'Bulldozer',
+        subtitle: 'Heavy Dozer',
+        cost: 120,
+        gravity: 1310,
+        flapVel: -435,
+        maxFall: 590,
+        primaryColor: '#eab308',
+        secondaryColor: '#ca8a04',
+        cabColor: '#1e293b'
+      },
+      skycrane: {
+        name: 'Skycrane',
+        subtitle: 'Twin Rotor',
+        cost: 260,
+        gravity: 1210,
+        flapVel: -412,
+        maxFall: 555,
+        primaryColor: '#eab308',
+        secondaryColor: '#ca8a04',
+        cabColor: '#1e293b'
+      },
+      jetrig: {
+        name: 'Jet-Pack Rig',
+        subtitle: 'Plasma Boost',
+        cost: 450,
+        gravity: 1380,
+        flapVel: -458,
+        maxFall: 610,
+        primaryColor: '#eab308',
+        secondaryColor: '#ca8a04',
+        cabColor: '#1e293b'
       }
     };
+
+    const EXHAUST_TRAILS = [
+      { id: 'classic', name: 'Diesel Smoke', cost: 0, colors: ['rgba(255, 255, 255, 0.65)'] },
+      { id: 'fire', name: 'Blazing Fire', cost: 45, colors: ['rgba(254, 240, 138, 0.65)', 'rgba(251, 146, 60, 0.65)', 'rgba(239, 68, 68, 0.65)'] },
+      { id: 'electric', name: 'Electric Sparks', cost: 80, colors: ['rgba(56, 189, 248, 0.65)', 'rgba(125, 211, 252, 0.65)', 'rgba(255, 255, 255, 0.65)'] },
+      { id: 'rainbow', name: 'Rainbow Smoke', cost: 130, colors: ['rgba(244, 63, 94, 0.65)', 'rgba(251, 191, 36, 0.65)', 'rgba(52, 211, 153, 0.65)', 'rgba(56, 189, 248, 0.65)', 'rgba(168, 85, 247, 0.65)'] },
+      { id: 'goldstar', name: 'Gold Stardust', cost: 190, colors: ['rgba(253, 224, 71, 0.65)', 'rgba(251, 191, 36, 0.65)', 'rgba(255, 255, 255, 0.65)'] }
+    ];
+
+    const SHIFT_BOOSTS = [
+      { id: 'shield', name: 'Safety Shield', icon: '🛡️', cost: 25, desc: 'Survive 1 crash' },
+      { id: 'magnet', name: 'Hardhat Magnet', icon: '🧲', cost: 30, desc: 'Auto-pull hardhats' },
+      { id: 'turbo', name: 'Turbo Start', icon: '⚡', cost: 40, desc: 'Blast past 8 beams' }
+    ];
+
+    function getTrailById(trailId) {
+      return EXHAUST_TRAILS.find((t) => t.id === trailId) || EXHAUST_TRAILS[0];
+    }
+
+    const MACHINE_SKINS = [
+      {
+        id: 'classic',
+        name: 'Classic Yellow',
+        cost: 0,
+        body: '#eab308',
+        shade: '#ca8a04',
+        accent: '#fbbf24',
+        rim: '#eab308',
+        cab: '#1e293b',
+        window: '#38bdf8',
+        exhaust: 'rgba(255, 255, 255, 0.65)'
+      },
+      {
+        id: 'arctic',
+        name: 'Arctic Rescue',
+        cost: 15,
+        body: '#f8fafc',
+        shade: '#cbd5e1',
+        accent: '#ef4444',
+        rim: '#ef4444',
+        cab: '#0f172a',
+        window: '#38bdf8',
+        exhaust: 'rgba(186, 230, 253, 0.65)'
+      },
+      {
+        id: 'forest',
+        name: 'Forest Camo',
+        cost: 30,
+        body: '#4d7c0f',
+        shade: '#365314',
+        accent: '#a3e635',
+        rim: '#84cc16',
+        cab: '#1a2e05',
+        window: '#bef264',
+        exhaust: 'rgba(190, 242, 100, 0.65)'
+      },
+      {
+        id: 'lava',
+        name: 'Lava Blaze',
+        cost: 50,
+        body: '#ea580c',
+        shade: '#9a3412',
+        accent: '#fde047',
+        rim: '#f97316',
+        cab: '#1c1917',
+        window: '#fdba74',
+        exhaust: 'rgba(251, 146, 60, 0.65)'
+      },
+      {
+        id: 'cyber',
+        name: 'Cyber Neon',
+        cost: 75,
+        body: '#06b6d4',
+        shade: '#0e7490',
+        accent: '#f472b6',
+        rim: '#22d3ee',
+        cab: '#090d16',
+        window: '#f0abfc',
+        exhaust: 'rgba(34, 211, 238, 0.65)'
+      },
+      {
+        id: 'stealth',
+        name: 'Stealth Ops',
+        cost: 100,
+        body: '#334155',
+        shade: '#1e293b',
+        accent: '#f59e0b',
+        rim: '#64748b',
+        cab: '#020617',
+        window: '#fbbf24',
+        exhaust: 'rgba(148, 163, 184, 0.65)'
+      },
+      {
+        id: 'royal',
+        name: 'Royal Amethyst',
+        cost: 140,
+        body: '#7c3aed',
+        shade: '#5b21b6',
+        accent: '#fde047',
+        rim: '#a78bfa',
+        cab: '#1e1b4b',
+        window: '#e9d5ff',
+        exhaust: 'rgba(216, 180, 254, 0.65)'
+      },
+      {
+        id: 'gold',
+        name: 'Solid 24K Gold',
+        cost: 220,
+        body: '#fde047',
+        shade: '#d97706',
+        accent: '#ffffff',
+        rim: '#fef08a',
+        cab: '#451a03',
+        window: '#fef9c3',
+        exhaust: 'rgba(253, 224, 71, 0.65)'
+      },
+      {
+        id: 'diamond',
+        name: 'Diamond Chrome',
+        cost: 350,
+        body: '#e0f2fe',
+        shade: '#7dd3fc',
+        accent: '#ffffff',
+        rim: '#38bdf8',
+        cab: '#0c4a6e',
+        window: '#f0f9ff',
+        exhaust: 'rgba(186, 230, 253, 0.65)'
+      },
+      {
+        id: 'prism',
+        name: 'Rainbow Prism',
+        cost: 550,
+        body: '#f43f5e',
+        shade: '#8b5cf6',
+        accent: '#34d399',
+        rim: '#fbbf24',
+        cab: '#0f172a',
+        window: '#38bdf8',
+        exhaust: 'rgba(244, 114, 182, 0.65)'
+      }
+    ];
+
+    function getSkinById(skinId) {
+      return MACHINE_SKINS.find((s) => s.id === skinId) || MACHINE_SKINS[0];
+    }
+
+    function getHardhatSvg(size = 15) {
+      return `<svg class="hardhat-svg" width="${size}" height="${size}" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="#0f172a" stroke="#fef08a" stroke-width="2"/><path d="M7 18a9 9 0 0 1 18 0Z" fill="#facc15" stroke="#0f172a" stroke-width="1.8"/><rect x="14.2" y="9" width="3.6" height="8" rx="1" fill="#ffffff"/><rect x="5" y="17.2" width="22" height="4.2" rx="2" fill="#eab308" stroke="#0f172a" stroke-width="1.6"/></svg>`;
+    }
+
+    function getRankDetails(score) {
+      if (score >= 100) return { icon: '👑', title: 'LEGENDARY SITE MASTER' };
+      if (score >= 75) return { icon: '💎', title: 'CHIEF INFRASTRUCTURE TITAN' };
+      if (score >= 55) return { icon: '🏛️', title: 'GRAND EARTHMOVING DIRECTOR' };
+      if (score >= 40) return { icon: '🏆', title: 'MASTER EARTHMOVER' };
+      if (score >= 26) return { icon: '🎖️', title: 'HEAVY FLEET COMMANDER' };
+      if (score >= 15) return { icon: '⭐', title: 'SENIOR SITE FOREMAN' };
+      if (score >= 6) return { icon: '🚧', title: 'CERTIFIED RIG OPERATOR' };
+      return { icon: '🦺', title: 'APPRENTICE OPERATOR' };
+    }
 
     const PROCEDURAL_BIOMES = [
       {
@@ -1354,20 +1798,84 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v3.7';
+    const APP_VERSION = 'v4.0';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
+    const SHOP_COOKIE = 'heavy_flap_shop_v1';
     const MAX_LEADERBOARD_ENTRIES = 10;
 
-    function getRankDetails(score) {
-      if (score >= 100) return { icon: '👑', title: 'LEGENDARY SITE MASTER' };
-      if (score >= 75) return { icon: '💎', title: 'CHIEF INFRASTRUCTURE TITAN' };
-      if (score >= 55) return { icon: '🏛️', title: 'GRAND EARTHMOVING DIRECTOR' };
-      if (score >= 40) return { icon: '🏆', title: 'MASTER EARTHMOVER' };
-      if (score >= 26) return { icon: '🎖️', title: 'HEAVY FLEET COMMANDER' };
-      if (score >= 15) return { icon: '⭐', title: 'SENIOR SITE FOREMAN' };
-      if (score >= 6) return { icon: '🚧', title: 'CERTIFIED RIG OPERATOR' };
-      return { icon: '🦺', title: 'APPRENTICE OPERATOR' };
+    function loadShopData() {
+      let data = null;
+      try {
+        const match = document.cookie.split('; ').find((row) => row.startsWith(`${SHOP_COOKIE}=`));
+        if (match) {
+          data = JSON.parse(decodeURIComponent(match.split('=')[1]));
+        }
+      } catch (e) {}
+
+      if (!data && window.name && window.name.startsWith('{')) {
+        try {
+          const parsed = JSON.parse(window.name);
+          if (parsed && parsed.shop) data = parsed.shop;
+        } catch (e) {}
+      }
+
+      const validIds = new Set(MACHINE_SKINS.map((s) => s.id));
+      const validRigs = new Set(Object.keys(RIG_SPECS));
+      const validTrails = new Set(EXHAUST_TRAILS.map((t) => t.id));
+      if (data && typeof data.coins === 'number' && Array.isArray(data.unlocked)) {
+        const unlocked = Array.from(new Set(['classic', ...data.unlocked.filter((id) => validIds.has(id))]));
+        const equipped = unlocked.includes(data.equipped) ? data.equipped : 'classic';
+        const unlockedRigs = Array.from(new Set(['loader', 'excavator', 'hauler', ...(Array.isArray(data.unlockedRigs) ? data.unlockedRigs.filter((r) => validRigs.has(r)) : [])]));
+        const unlockedTrails = Array.from(new Set(['classic', ...(Array.isArray(data.unlockedTrails) ? data.unlockedTrails.filter((t) => validTrails.has(t)) : [])]));
+        const equippedTrail = unlockedTrails.includes(data.equippedTrail) ? data.equippedTrail : 'classic';
+        const equippedRig = unlockedRigs.includes(data.equippedRig) ? data.equippedRig : 'loader';
+        const ownedBoosts = {
+          shield: Math.max(0, Math.floor((data.boosts && data.boosts.shield) || 0)),
+          magnet: Math.max(0, Math.floor((data.boosts && data.boosts.magnet) || 0)),
+          turbo: Math.max(0, Math.floor((data.boosts && data.boosts.turbo) || 0))
+        };
+        return {
+          coins: Math.max(0, Math.floor(data.coins)),
+          unlocked,
+          equipped,
+          equippedRig,
+          unlockedRigs,
+          unlockedTrails,
+          equippedTrail,
+          ownedBoosts
+        };
+      }
+      return {
+        coins: 0,
+        unlocked: ['classic'],
+        equipped: 'classic',
+        equippedRig: 'loader',
+        unlockedRigs: ['loader', 'excavator', 'hauler'],
+        unlockedTrails: ['classic'],
+        equippedTrail: 'classic',
+        ownedBoosts: { shield: 0, magnet: 0, turbo: 0 }
+      };
+    }
+
+    function saveShopData() {
+      const payload = {
+        coins: state.coins,
+        unlocked: state.unlockedSkins,
+        equipped: state.equippedSkin,
+        equippedRig: state.rig,
+        unlockedRigs: state.unlockedRigs,
+        unlockedTrails: state.unlockedTrails,
+        equippedTrail: state.equippedTrail,
+        boosts: state.ownedBoosts
+      };
+      try {
+        document.cookie = `${SHOP_COOKIE}=${encodeURIComponent(JSON.stringify(payload))}; max-age=31536000; path=/; SameSite=Lax`;
+      } catch (e) {}
+      try {
+        const existing = window.name && window.name.startsWith('{') ? JSON.parse(window.name) : {};
+        window.name = JSON.stringify({ ...existing, shop: payload });
+      } catch (e) {}
     }
 
     let initialSignature = null;
@@ -1547,7 +2055,7 @@
         if (!data || typeof data.n !== 'string' || typeof data.s !== 'number') return null;
         const cleanName = data.n.trim().slice(0, 14) || 'Friend';
         const cleanScore = Math.max(0, Math.min(9999, Math.floor(data.s)));
-        const validRig = ['loader', 'excavator', 'hauler'].includes(data.r) ? data.r : 'loader';
+        const validRig = Object.keys(RIG_SPECS).includes(data.r) ? data.r : 'loader';
         const ts = typeof data.t === 'number' ? data.t : Date.now();
         const entryId = `shared_${cleanName}_${cleanScore}_${ts}`;
 
@@ -1595,10 +2103,23 @@
 
     const initialLeaderboard = loadLeaderboard();
     const initialRoster = loadSavedRoster();
+    const initialShop = loadShopData();
 
     const state = {
-      mode: 'menu', // 'menu' | 'ready' | 'playing' | 'paused' | 'gameover'
-      rig: 'loader',
+      mode: 'menu', // 'menu' | 'ready' | 'playing' | 'paused' | 'exploding' | 'gameover'
+      rig: initialShop.equippedRig,
+      equippedSkin: initialShop.equipped,
+      unlockedSkins: initialShop.unlocked,
+      unlockedRigs: initialShop.unlockedRigs,
+      unlockedTrails: initialShop.unlockedTrails,
+      equippedTrail: initialShop.equippedTrail,
+      ownedBoosts: initialShop.ownedBoosts,
+      shopTab: 'rigs',
+      activeShield: false,
+      activeMagnet: false,
+      turboTimer: 0,
+      boostsCommitted: false,
+      coins: initialShop.coins,
       shift: 'day',
       biome: PROCEDURAL_BIOMES[0],
       biomeSeed: Math.random() * 1000,
@@ -1632,11 +2153,12 @@
       collectibles: [],
       fallingHazards: [],
       particles: [],
-      explosionDebris: [],
-      explosionFlash: null,
-      screenShake: 0,
-      gameOverTimeout: null,
+      debris: [],
+      shockwaves: [],
       floatingTexts: [],
+      screenShake: 0,
+      explodeTimer: 0,
+      pendingGameOverReason: '',
       clouds: [],
       stars: [],
       spawnTimer: 0,
@@ -1651,17 +2173,16 @@
           tier: 5,
           label: 'PHASE 5 • OVERDRIVE',
           color: '#fb7185',
-          speedMult: 1.28,
-          gapScale: 0.86,
-          movingChance: 0.68,
-          movingSpeedMult: 1.48,
-          ballChance: 0.4,
-          wireChance: 0.3,
-          fallingEnabled: true,
-          maxFalling: 2,
-          hazardIntervalMin: 3.1,
-          hazardIntervalRange: 2.2,
-          hazardMult: 1.26
+          speedMult: 1.3,
+          gapScale: 0.85,
+          movingChance: 0.7,
+          movingSpeedMult: 1.5,
+          ballChance: 0.42,
+          wireChance: 0.32,
+          canFallHazards: true,
+          hazardIntervalMin: 2.8,
+          hazardIntervalRange: 2.0,
+          hazardMult: 1.28
         };
       }
       if (s >= 24) {
@@ -1669,17 +2190,16 @@
           tier: 4,
           label: 'PHASE 4 • HEAVY SURGE',
           color: '#fb923c',
-          speedMult: 1.2,
+          speedMult: 1.22,
           gapScale: 0.9,
-          movingChance: 0.52,
+          movingChance: 0.55,
           movingSpeedMult: 1.32,
-          ballChance: 0.32,
-          wireChance: 0.24,
-          fallingEnabled: true,
-          maxFalling: 2,
-          hazardIntervalMin: 3.6,
-          hazardIntervalRange: 2.5,
-          hazardMult: 1.16
+          ballChance: 0.34,
+          wireChance: 0.25,
+          canFallHazards: true,
+          hazardIntervalMin: 3.4,
+          hazardIntervalRange: 2.3,
+          hazardMult: 1.18
         };
       }
       if (s >= 16) {
@@ -1687,17 +2207,16 @@
           tier: 3,
           label: 'PHASE 3 • RUSH HOUR',
           color: '#fbbf24',
-          speedMult: 1.12,
+          speedMult: 1.13,
           gapScale: 0.95,
-          movingChance: 0.36,
+          movingChance: 0.38,
           movingSpeedMult: 1.16,
           ballChance: 0.22,
           wireChance: 0.18,
-          fallingEnabled: true,
-          maxFalling: 1,
-          hazardIntervalMin: 4.3,
-          hazardIntervalRange: 2.8,
-          hazardMult: 1.04
+          canFallHazards: true,
+          hazardIntervalMin: 4.2,
+          hazardIntervalRange: 2.6,
+          hazardMult: 1.06
         };
       }
       if (s >= 10) {
@@ -1705,16 +2224,15 @@
           tier: 2,
           label: 'PHASE 2 • DOUBLE SHIFT',
           color: '#34d399',
-          speedMult: 1.04,
+          speedMult: 1.05,
           gapScale: 1.0,
-          movingChance: 0.2,
+          movingChance: 0.18,
           movingSpeedMult: 1.0,
-          ballChance: 0.14,
-          wireChance: 0.1,
-          fallingEnabled: false,
-          maxFalling: 0,
-          hazardIntervalMin: 5.5,
-          hazardIntervalRange: 3.0,
+          ballChance: 0.1,
+          wireChance: 0,
+          canFallHazards: false,
+          hazardIntervalMin: 99,
+          hazardIntervalRange: 99,
           hazardMult: 1.0
         };
       }
@@ -1728,10 +2246,9 @@
         movingSpeedMult: 1.0,
         ballChance: 0,
         wireChance: 0,
-        fallingEnabled: false,
-        maxFalling: 0,
-        hazardIntervalMin: 6.0,
-        hazardIntervalRange: 3.0,
+        canFallHazards: false,
+        hazardIntervalMin: 99,
+        hazardIntervalRange: 99,
         hazardMult: 1.0
       };
     }
@@ -1817,8 +2334,8 @@
     // =========================================================================
     // 5. PROCEDURAL VECTOR DRAWING (Rigs, Beams, Wrecking Balls, Hardhats)
     // =========================================================================
-    function drawConstructionRig(context, rigType, x, y, radius, rotation, bucketAngle, wheelSpin, dir = 1) {
-      const spec = RIG_SPECS[rigType] || RIG_SPECS.loader;
+    function drawConstructionRig(context, rigType, x, y, radius, rotation, bucketAngle, wheelSpin, dir = 1, skinOverride = null) {
+      const skin = skinOverride || getSkinById(state.equippedSkin);
       context.save();
       context.translate(x, y);
       context.rotate(rotation);
@@ -1836,24 +2353,24 @@
         context.beginPath();
         context.roundRect(-r * 0.92, -r * 0.42, r * 1.65, r * 0.72, 6);
         context.fill();
-        context.fillStyle = spec.primaryColor;
+        context.fillStyle = skin.body;
         context.beginPath();
         context.roundRect(-r * 0.87, -r * 0.37, r * 1.55, r * 0.62, 5);
         context.fill();
 
         context.fillStyle = '#0f172a';
         context.fillRect(-r * 0.82, -r * 0.3, r * 0.48, r * 0.42);
-        context.fillStyle = spec.secondaryColor;
+        context.fillStyle = skin.shade;
         context.fillRect(-r * 0.78, -r * 0.26, r * 0.4, r * 0.34);
         context.fillStyle = '#1e293b';
         context.fillRect(-r * 0.72, -r * 0.2, r * 0.28, r * 0.06);
         context.fillRect(-r * 0.72, -r * 0.08, r * 0.28, r * 0.06);
 
-        context.fillStyle = spec.cabColor;
+        context.fillStyle = skin.cab;
         context.beginPath();
         context.roundRect(-r * 0.32, -r * 0.96, r * 0.74, r * 0.58, 5);
         context.fill();
-        context.fillStyle = '#38bdf8';
+        context.fillStyle = skin.window;
         context.beginPath();
         context.roundRect(-r * 0.24, -r * 0.86, r * 0.58, r * 0.4, 3);
         context.fill();
@@ -1874,7 +2391,7 @@
         context.lineTo(r * 0.86, r * 0.12);
         context.stroke();
 
-        context.strokeStyle = '#fbbf24';
+        context.strokeStyle = skin.accent;
         context.lineWidth = r * 0.18;
         context.beginPath();
         context.moveTo(0, 0);
@@ -1906,7 +2423,7 @@
           context.beginPath();
           context.arc(0, 0, r * 0.42, 0, Math.PI * 2);
           context.fill();
-          context.fillStyle = '#eab308';
+          context.fillStyle = skin.rim;
           context.beginPath();
           context.arc(0, 0, r * 0.22, 0, Math.PI * 2);
           context.fill();
@@ -1927,7 +2444,7 @@
         context.roundRect(-r * 0.82, r * 0.31, r * 1.46, r * 0.32, 6);
         context.fill();
         [-r * 0.56, -r * 0.18, r * 0.2, r * 0.54].forEach((rx) => {
-          context.fillStyle = '#eab308';
+          context.fillStyle = skin.rim;
           context.beginPath();
           context.arc(rx, r * 0.47, r * 0.11, 0, Math.PI * 2);
           context.fill();
@@ -1937,7 +2454,7 @@
         context.beginPath();
         context.roundRect(-r * 0.9, -r * 0.44, r * 1.44, r * 0.68, 7);
         context.fill();
-        context.fillStyle = spec.primaryColor;
+        context.fillStyle = skin.body;
         context.beginPath();
         context.roundRect(-r * 0.85, -r * 0.39, r * 1.34, r * 0.58, 5);
         context.fill();
@@ -1949,11 +2466,11 @@
         context.fillStyle = '#f8fafc';
         context.fillRect(-r * 0.84, -r * 0.16, r * 0.22, r * 0.08);
 
-        context.fillStyle = spec.cabColor;
+        context.fillStyle = skin.cab;
         context.beginPath();
         context.roundRect(-r * 0.36, -r * 0.96, r * 0.68, r * 0.56, 5);
         context.fill();
-        context.fillStyle = '#38bdf8';
+        context.fillStyle = skin.window;
         context.beginPath();
         context.roundRect(-r * 0.28, -r * 0.86, r * 0.52, r * 0.38, 3);
         context.fill();
@@ -1970,7 +2487,7 @@
         context.lineTo(r * 0.84, -r * 0.36);
         context.stroke();
 
-        context.strokeStyle = '#fde047';
+        context.strokeStyle = skin.accent;
         context.lineWidth = r * 0.22;
         context.beginPath();
         context.moveTo(0, 0);
@@ -1999,7 +2516,7 @@
         context.lineTo(r * 0.72, r * 0.28);
         context.stroke();
 
-        context.strokeStyle = '#facc15';
+        context.strokeStyle = skin.body;
         context.lineWidth = r * 0.16;
         context.beginPath();
         context.moveTo(0, 0);
@@ -2016,8 +2533,183 @@
         context.fill();
         context.stroke();
         context.restore();
+      } else if (rigType === 'bulldozer') {
+        // --- TRACK BULLDOZER ---
+        context.fillStyle = '#0f172a';
+        context.beginPath();
+        context.roundRect(-r * 0.94, r * 0.2, r * 1.62, r * 0.52, 9);
+        context.fill();
+        context.fillStyle = '#475569';
+        context.beginPath();
+        context.roundRect(-r * 0.84, r * 0.3, r * 1.42, r * 0.32, 6);
+        context.fill();
+        [-r * 0.56, -r * 0.16, r * 0.24].forEach((rx) => {
+          context.fillStyle = skin.rim;
+          context.beginPath();
+          context.arc(rx, r * 0.46, r * 0.12, 0, Math.PI * 2);
+          context.fill();
+        });
+
+        context.fillStyle = '#0f172a';
+        context.beginPath();
+        context.roundRect(-r * 0.82, -r * 0.42, r * 1.42, r * 0.66, 6);
+        context.fill();
+        context.fillStyle = skin.body;
+        context.beginPath();
+        context.roundRect(-r * 0.77, -r * 0.37, r * 1.32, r * 0.56, 5);
+        context.fill();
+
+        context.fillStyle = skin.cab;
+        context.beginPath();
+        context.roundRect(-r * 0.54, -r * 0.96, r * 0.72, r * 0.58, 5);
+        context.fill();
+        context.fillStyle = skin.window;
+        context.beginPath();
+        context.roundRect(-r * 0.45, -r * 0.86, r * 0.54, r * 0.4, 3);
+        context.fill();
+
+        context.save();
+        context.translate(r * 0.64, r * 0.08);
+        context.rotate(bucketAngle * 0.3);
+        context.strokeStyle = skin.accent;
+        context.lineWidth = r * 0.2;
+        context.beginPath();
+        context.moveTo(-r * 0.35, r * 0.12);
+        context.lineTo(r * 0.28, r * 0.18);
+        context.stroke();
+
+        context.fillStyle = skin.shade;
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 2.2;
+        context.beginPath();
+        context.moveTo(r * 0.14, -r * 0.52);
+        context.quadraticCurveTo(r * 0.56, -r * 0.05, r * 0.44, r * 0.52);
+        context.lineTo(r * 0.18, r * 0.52);
+        context.closePath();
+        context.fill();
+        context.stroke();
+        context.restore();
+      } else if (rigType === 'skycrane') {
+        // --- SKYCRANE CONSTRUCTION HELICOPTER ---
+        context.fillStyle = '#0f172a';
+        context.beginPath();
+        context.moveTo(-r * 0.2, -r * 0.26);
+        context.lineTo(-r * 1.28, -r * 0.42);
+        context.lineTo(-r * 1.28, -r * 0.16);
+        context.lineTo(-r * 0.2, r * 0.1);
+        context.closePath();
+        context.fill();
+        context.fillStyle = skin.body;
+        context.beginPath();
+        context.moveTo(-r * 0.22, -r * 0.21);
+        context.lineTo(-r * 1.22, -r * 0.36);
+        context.lineTo(-r * 1.22, -r * 0.2);
+        context.lineTo(-r * 0.22, r * 0.05);
+        context.closePath();
+        context.fill();
+
+        context.save();
+        context.translate(-r * 1.22, -r * 0.3);
+        context.rotate(wheelSpin * 2.5);
+        context.strokeStyle = skin.accent;
+        context.lineWidth = 3;
+        context.beginPath();
+        context.moveTo(0, -r * 0.34);
+        context.lineTo(0, r * 0.34);
+        context.stroke();
+        context.restore();
+
+        context.strokeStyle = '#334155';
+        context.lineWidth = 3;
+        context.beginPath();
+        context.moveTo(-r * 0.55, r * 0.56);
+        context.lineTo(r * 0.65, r * 0.56);
+        context.moveTo(-r * 0.28, r * 0.24);
+        context.lineTo(-r * 0.35, r * 0.56);
+        context.moveTo(r * 0.32, r * 0.24);
+        context.lineTo(r * 0.38, r * 0.56);
+        context.stroke();
+
+        context.fillStyle = '#0f172a';
+        context.beginPath();
+        context.roundRect(-r * 0.45, -r * 0.48, r * 1.24, r * 0.78, 12);
+        context.fill();
+        context.fillStyle = skin.body;
+        context.beginPath();
+        context.roundRect(-r * 0.4, -r * 0.43, r * 1.14, r * 0.68, 10);
+        context.fill();
+
+        context.fillStyle = skin.window;
+        context.beginPath();
+        context.roundRect(r * 0.14, -r * 0.34, r * 0.52, r * 0.44, 8);
+        context.fill();
+
+        context.fillStyle = '#0f172a';
+        context.fillRect(r * 0.04, -r * 0.74, r * 0.16, r * 0.28);
+        const bladeSpan = r * (0.45 + Math.abs(Math.cos(wheelSpin * 2.4)) * 0.95);
+        context.strokeStyle = skin.accent;
+        context.lineWidth = 4;
+        context.beginPath();
+        context.moveTo(r * 0.12 - bladeSpan, -r * 0.74);
+        context.lineTo(r * 0.12 + bladeSpan, -r * 0.74);
+        context.stroke();
+      } else if (rigType === 'jetrig') {
+        // --- JET-PACK EXPERIMENTAL RIG ---
+        context.fillStyle = '#1e293b';
+        context.strokeStyle = '#0f172a';
+        context.lineWidth = 2;
+        context.beginPath();
+        context.roundRect(-r * 1.05, -r * 0.45, r * 0.48, r * 0.68, 6);
+        context.fill();
+        context.stroke();
+
+        const flameLen = r * (0.55 + Math.abs(Math.sin(wheelSpin * 1.8)) * 0.45);
+        context.fillStyle = '#38bdf8';
+        context.beginPath();
+        context.moveTo(-r * 1.05, -r * 0.32);
+        context.lineTo(-r * 1.05 - flameLen, -r * 0.11);
+        context.lineTo(-r * 1.05, r * 0.1);
+        context.closePath();
+        context.fill();
+
+        context.fillStyle = '#0f172a';
+        context.beginPath();
+        context.roundRect(-r * 0.72, -r * 0.44, r * 1.54, r * 0.72, 9);
+        context.fill();
+        context.fillStyle = skin.body;
+        context.beginPath();
+        context.roundRect(-r * 0.67, -r * 0.39, r * 1.44, r * 0.62, 8);
+        context.fill();
+
+        context.fillStyle = skin.cab;
+        context.beginPath();
+        context.roundRect(-r * 0.18, -r * 0.92, r * 0.76, r * 0.56, 8);
+        context.fill();
+        context.fillStyle = skin.window;
+        context.beginPath();
+        context.roundRect(-r * 0.08, -r * 0.82, r * 0.58, r * 0.38, 6);
+        context.fill();
+
+        context.fillStyle = skin.accent;
+        context.beginPath();
+        context.moveTo(r * 0.74, -r * 0.25);
+        context.lineTo(r * 1.15, r * 0.05);
+        context.lineTo(r * 0.74, r * 0.28);
+        context.closePath();
+        context.fill();
+
+        [-r * 0.34, r * 0.38].forEach((wx) => {
+          context.fillStyle = '#0f172a';
+          context.beginPath();
+          context.arc(wx, r * 0.44, r * 0.34, 0, Math.PI * 2);
+          context.fill();
+          context.fillStyle = skin.rim;
+          context.beginPath();
+          context.arc(wx, r * 0.44, r * 0.18, 0, Math.PI * 2);
+          context.fill();
+        });
       } else {
-        // --- ARTICULATED HAULER ---
+        // --- ARTICULATED HAULER (6x6 Dump Truck) ---
         context.fillStyle = '#0f172a';
         context.beginPath();
         context.roundRect(-r * 0.96, r * 0.06, r * 1.72, r * 0.32, 4);
@@ -2035,7 +2727,7 @@
         context.closePath();
         context.fill();
 
-        context.fillStyle = '#facc15';
+        context.fillStyle = skin.body;
         context.beginPath();
         context.moveTo(-r * 0.82, -r * 0.62);
         context.lineTo(r * 0.11, -r * 0.62);
@@ -2058,15 +2750,15 @@
         context.beginPath();
         context.roundRect(r * 0.16, -r * 0.9, r * 0.62, r * 1.0, 6);
         context.fill();
-        context.fillStyle = spec.cabColor;
+        context.fillStyle = skin.cab;
         context.beginPath();
         context.roundRect(r * 0.2, -r * 0.85, r * 0.54, r * 0.58, 5);
         context.fill();
-        context.fillStyle = '#38bdf8';
+        context.fillStyle = skin.window;
         context.beginPath();
         context.roundRect(r * 0.3, -r * 0.76, r * 0.38, r * 0.38, 3);
         context.fill();
-        context.fillStyle = '#facc15';
+        context.fillStyle = skin.accent;
         context.beginPath();
         context.roundRect(r * 0.2, -r * 0.28, r * 0.6, r * 0.36, 4);
         context.fill();
@@ -2079,7 +2771,7 @@
           context.beginPath();
           context.arc(0, 0, r * 0.34, 0, Math.PI * 2);
           context.fill();
-          context.fillStyle = '#eab308';
+          context.fillStyle = skin.rim;
           context.beginPath();
           context.arc(0, 0, r * 0.17, 0, Math.PI * 2);
           context.fill();
@@ -2091,13 +2783,55 @@
     }
 
     function renderRigPreviews() {
-      ['loader', 'excavator', 'hauler'].forEach((rigKey) => {
+      const activeSkin = getSkinById(state.equippedSkin);
+      Object.keys(RIG_SPECS).forEach((rigKey) => {
         const pCanvas = document.getElementById(`preview-${rigKey}`);
         if (!pCanvas) return;
         const pCtx = pCanvas.getContext('2d');
         pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
-        drawConstructionRig(pCtx, rigKey, 76, 58, 32, -0.04, 0.2, 0.4, 1);
+        drawConstructionRig(pCtx, rigKey, 66, 50, 27, -0.04, 0.2, 0.4, 1, activeSkin);
+
+        const card = document.querySelector(`#rig-selector .rig-card[data-rig="${rigKey}"]`);
+        const isUnlocked = state.unlockedRigs.includes(rigKey);
+        if (card) {
+          card.classList.toggle('locked-rig', !isUnlocked);
+          card.classList.toggle('selected', state.rig === rigKey && isUnlocked);
+        }
+        const subEl = document.getElementById(`rig-sub-${rigKey}`);
+        if (subEl) {
+          if (isUnlocked) {
+            subEl.textContent = RIG_SPECS[rigKey].subtitle;
+            subEl.style.color = '#94a3b8';
+          } else {
+            subEl.innerHTML = `🔒 ${RIG_SPECS[rigKey].cost} ${getHardhatSvg(11)}`;
+            subEl.style.color = '#fbbf24';
+          }
+        }
       });
+      const skinLabel = document.getElementById('menu-active-skin-label');
+      if (skinLabel) {
+        skinLabel.textContent = `🎨 ${activeSkin.name}`;
+      }
+      renderActiveBoostChips();
+    }
+
+    function renderActiveBoostChips() {
+      const bar = document.getElementById('menu-active-boosts');
+      if (!bar) return;
+      const chips = [];
+      SHIFT_BOOSTS.forEach((b) => {
+        const qty = state.ownedBoosts[b.id] || 0;
+        if (qty > 0) {
+          chips.push(`<span class="boost-chip">${b.icon} ${b.name} ×${qty}</span>`);
+        }
+      });
+      if (chips.length > 0) {
+        bar.innerHTML = chips.join('');
+        bar.classList.remove('hidden');
+      } else {
+        bar.innerHTML = '';
+        bar.classList.add('hidden');
+      }
     }
 
     function drawProceduralBackdrop(biome, lighting, horizonY) {
@@ -2278,7 +3012,7 @@
 
       ctx.save();
       if (state.screenShake > 0) {
-        const mag = state.screenShake * 11;
+        const mag = state.screenShake * 14;
         ctx.translate((Math.random() - 0.5) * mag, (Math.random() - 0.5) * mag);
       }
 
@@ -2531,58 +3265,7 @@
         ctx.fill();
       });
 
-      // 7B. Explosion Shockwave, Fireball & Flying Machine Debris
-      if (state.explosionFlash && state.explosionFlash.life > 0) {
-        const ef = state.explosionFlash;
-        const progress = 1 - ef.life / ef.maxLife;
-        const radius = 18 + progress * 92;
-        const alpha = Math.max(0, ef.life / ef.maxLife);
-
-        ctx.save();
-        ctx.strokeStyle = `rgba(251, 191, 36, ${(alpha * 0.9).toFixed(2)})`;
-        ctx.lineWidth = 6 * alpha;
-        ctx.beginPath();
-        ctx.arc(ef.x, ef.y, radius, 0, Math.PI * 2);
-        ctx.stroke();
-
-        const fireGrad = ctx.createRadialGradient(ef.x, ef.y, 2, ef.x, ef.y, radius * 0.85);
-        fireGrad.addColorStop(0, `rgba(255, 255, 255, ${alpha.toFixed(2)})`);
-        fireGrad.addColorStop(0.35, `rgba(251, 191, 36, ${(alpha * 0.95).toFixed(2)})`);
-        fireGrad.addColorStop(0.7, `rgba(234, 88, 12, ${(alpha * 0.8).toFixed(2)})`);
-        fireGrad.addColorStop(1, 'rgba(15, 23, 42, 0)');
-        ctx.fillStyle = fireGrad;
-        ctx.beginPath();
-        ctx.arc(ef.x, ef.y, radius * 0.85, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-
-      state.explosionDebris.forEach((d) => {
-        const alpha = Math.min(1, Math.max(0, d.life / 0.3));
-        ctx.save();
-        ctx.globalAlpha = alpha;
-        ctx.translate(d.x, d.y);
-        ctx.rotate(d.rotation);
-        if (d.shape === 'wheel') {
-          ctx.fillStyle = '#0f172a';
-          ctx.beginPath();
-          ctx.arc(0, 0, d.w * 0.5, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = '#eab308';
-          ctx.beginPath();
-          ctx.arc(0, 0, d.w * 0.24, 0, Math.PI * 2);
-          ctx.fill();
-        } else {
-          ctx.fillStyle = d.color;
-          ctx.strokeStyle = '#0f172a';
-          ctx.lineWidth = 1.8;
-          ctx.fillRect(-d.w * 0.5, -d.h * 0.5, d.w, d.h);
-          ctx.strokeRect(-d.w * 0.5, -d.h * 0.5, d.w, d.h);
-        }
-        ctx.restore();
-      });
-
-      // 8. Lightweight Falling Boulders & Crane Loads (Clear lowered warning badge)
+      // 8. Falling Boulders & Crane Loads (Positioned cleanly below top HUD)
       state.fallingHazards.forEach((hz) => {
         if (hz.warnTimer > 0) {
           const blink = Math.sin(state.time * 24) > 0;
@@ -2590,25 +3273,33 @@
           ctx.save();
           ctx.translate(hz.x, warnY);
 
-          ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
-          ctx.strokeStyle = blink ? '#ef4444' : '#fbbf24';
-          ctx.lineWidth = 2.4;
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+          ctx.strokeStyle = blink ? '#fbbf24' : '#ef4444';
+          ctx.lineWidth = 2.5;
           ctx.beginPath();
-          ctx.roundRect(-24, -14, 48, 28, 9);
+          ctx.roundRect(-24, -18, 48, 36, 10);
           ctx.fill();
           ctx.stroke();
 
-          ctx.fillStyle = blink ? '#fb7185' : '#fde047';
-          ctx.font = '800 12px "Chakra Petch", sans-serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText('⚠ DROP', 0, 0);
-
           ctx.fillStyle = blink ? '#ef4444' : '#fbbf24';
           ctx.beginPath();
-          ctx.moveTo(-6, 18);
-          ctx.lineTo(6, 18);
-          ctx.lineTo(0, 26);
+          ctx.moveTo(0, -11);
+          ctx.lineTo(12, 8);
+          ctx.lineTo(-12, 8);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.fillStyle = '#0f172a';
+          ctx.font = '800 11px "Chakra Petch", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('!', 0, 2);
+
+          ctx.fillStyle = blink ? '#fbbf24' : '#ef4444';
+          ctx.beginPath();
+          ctx.moveTo(-6, 22);
+          ctx.lineTo(6, 22);
+          ctx.lineTo(0, 30);
           ctx.closePath();
           ctx.fill();
           ctx.restore();
@@ -2627,7 +3318,7 @@
 
             ctx.fillStyle = '#64748b';
             ctx.beginPath();
-            ctx.arc(-hz.radius * 0.28, -hz.radius * 0.25, hz.radius * 0.34, 0, Math.PI * 2);
+            ctx.arc(-hz.radius * 0.28, -hz.radius * 0.28, hz.radius * 0.34, 0, Math.PI * 2);
             ctx.fill();
           } else {
             ctx.strokeStyle = '#cbd5e1';
@@ -2652,8 +3343,8 @@
         }
       });
 
-      // 9. Player Construction Rig (Hidden once exploded on Game Over)
-      if (state.mode !== 'gameover') {
+      // 9. Player Construction Rig (Hidden once exploded)
+      if (state.mode !== 'exploding' && state.mode !== 'gameover') {
         drawConstructionRig(
           ctx,
           state.rig,
@@ -2665,7 +3356,71 @@
           state.player.wheelSpin,
           1
         );
+
+        // Active Safety Shield Bubble or Turbo Aura
+        if (state.activeShield || state.turboTimer > 0) {
+          const pulse = 0.65 + 0.35 * Math.sin(state.time * 12);
+          ctx.save();
+          ctx.strokeStyle = state.turboTimer > 0
+            ? `rgba(251, 191, 36, ${pulse.toFixed(2)})`
+            : `rgba(56, 189, 248, ${pulse.toFixed(2)})`;
+          ctx.fillStyle = state.turboTimer > 0
+            ? 'rgba(251, 191, 36, 0.14)'
+            : 'rgba(56, 189, 248, 0.14)';
+          ctx.lineWidth = 2.6;
+          ctx.beginPath();
+          ctx.arc(state.player.x, state.player.y, state.player.radius + 11, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+        }
       }
+
+      // 9B. Explosion Shockwaves & Flying Machine Parts
+      state.shockwaves.forEach((sw) => {
+        const prog = 1 - sw.life / sw.maxLife;
+        const rad = 14 + prog * 92;
+        const alpha = Math.max(0, sw.life / sw.maxLife);
+        ctx.save();
+        ctx.strokeStyle = `rgba(251, 191, 36, ${alpha.toFixed(2)})`;
+        ctx.lineWidth = 5 * alpha;
+        ctx.beginPath();
+        ctx.arc(sw.x, sw.y, rad, 0, Math.PI * 2);
+        ctx.stroke();
+
+        if (alpha > 0.35) {
+          ctx.fillStyle = `rgba(254, 240, 138, ${((alpha - 0.35) * 1.1).toFixed(2)})`;
+          ctx.beginPath();
+          ctx.arc(sw.x, sw.y, 28 * (1 - prog * 0.4), 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      });
+
+      state.debris.forEach((d) => {
+        ctx.save();
+        ctx.translate(d.x, d.y);
+        ctx.rotate(d.rotation);
+        if (d.shape === 'tire') {
+          ctx.fillStyle = '#0f172a';
+          ctx.beginPath();
+          ctx.arc(0, 0, d.size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#eab308';
+          ctx.beginPath();
+          ctx.arc(0, 0, d.size * 0.48, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.fillStyle = d.color;
+          ctx.strokeStyle = '#0f172a';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.roundRect(-d.size, -d.size * 0.65, d.size * 2, d.size * 1.3, 2);
+          ctx.fill();
+          ctx.stroke();
+        }
+        ctx.restore();
+      });
 
       // 10. Floating Score Popups
       state.floatingTexts.forEach((ft) => {
@@ -2682,122 +3437,6 @@
       });
 
       ctx.restore();
-    }
-    function spawnExplosion(x, y) {
-      state.explosionFlash = { x, y, life: 0.45, maxLife: 0.45 };
-      state.screenShake = 1.0;
-
-      // Fiery sparks & dark smoke clouds
-      const blastColors = [
-        'rgba(254, 240, 138, 0.65)',
-        'rgba(251, 146, 60, 0.65)',
-        'rgba(239, 68, 68, 0.65)',
-        'rgba(71, 85, 105, 0.65)'
-      ];
-      for (let i = 0; i < 34; i++) {
-        const angle = (Math.PI * 2 * i) / 34 + (Math.random() - 0.5) * 0.35;
-        const speed = 90 + Math.random() * 290;
-        state.particles.push({
-          x,
-          y,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed - 55,
-          size: 5 + Math.random() * 8,
-          life: 0.45 + Math.random() * 0.45,
-          maxLife: 0.9,
-          color: blastColors[i % blastColors.length]
-        });
-      }
-
-      // Flying heavy equipment parts (wheels, cab glass, yellow steel plates, bucket)
-      const partSpecs = [
-        { shape: 'wheel', w: 15, h: 15, color: '#0f172a' },
-        { shape: 'wheel', w: 15, h: 15, color: '#0f172a' },
-        { shape: 'plate', w: 18, h: 10, color: '#eab308' },
-        { shape: 'plate', w: 16, h: 9, color: '#facc15' },
-        { shape: 'plate', w: 14, h: 10, color: '#38bdf8' },
-        { shape: 'plate', w: 20, h: 7, color: '#334155' },
-        { shape: 'plate', w: 13, h: 8, color: '#ea580c' },
-        { shape: 'plate', w: 15, h: 7, color: '#eab308' }
-      ];
-      partSpecs.forEach((part, idx) => {
-        const ang = -Math.PI * 0.92 + (idx / (partSpecs.length - 1)) * (Math.PI * 0.84) + (Math.random() - 0.5) * 0.25;
-        const spd = 190 + Math.random() * 210;
-        state.explosionDebris.push({
-          ...part,
-          x,
-          y,
-          vx: Math.cos(ang) * spd,
-          vy: Math.sin(ang) * spd - 140,
-          rotation: Math.random() * Math.PI * 2,
-          rotSpeed: (Math.random() - 0.5) * 18,
-          life: 1.25
-        });
-      });
-    }
-
-    function triggerGameOver(reason) {
-      if (state.mode === 'gameover') return;
-      state.mode = 'gameover';
-      audio.playClangCrash();
-      spawnExplosion(state.player.x, state.player.y);
-
-      const currentName = state.playerNames[state.activePlayerIndex] || `Player ${state.activePlayerIndex + 1}`;
-      const previousOverallBest = state.bestScore;
-      const placedRank = recordPlayerScore(currentName, state.score, state.rig, state.playerCount > 1);
-      const isNewBest = state.score > 0 && state.score > previousOverallBest;
-
-      const shareBtn = document.getElementById('btn-share-score');
-      if (shareBtn) {
-        shareBtn.innerHTML = '<span>📤</span><span>Share</span>';
-        shareBtn.style.borderColor = 'rgba(56,189,248,0.45)';
-        shareBtn.style.color = '#7dd3fc';
-      }
-
-      const rankInfo = getRankDetails(state.score);
-      document.getElementById('go-reason').textContent = reason;
-      document.getElementById('go-player-title').textContent = state.playerCount > 1
-        ? `${currentName.toUpperCase()} — SHIFT OVER`
-        : 'SHIFT OVER';
-      document.getElementById('go-new-record').classList.toggle('hidden', !isNewBest);
-      document.getElementById('go-medal-icon').textContent = rankInfo.icon;
-      document.getElementById('go-rank-title').textContent = rankInfo.title;
-
-      const placementBadge = document.getElementById('go-placement-badge');
-      const placementText = document.getElementById('go-placement-text');
-      if (placedRank !== null && placedRank <= 10) {
-        placementBadge.classList.remove('hidden');
-        placementText.textContent = `TOP 10: #${placedRank}`;
-      } else {
-        placementBadge.classList.add('hidden');
-      }
-
-      document.getElementById('go-score').textContent = state.score;
-      document.getElementById('go-best').textContent = state.bestScore;
-      document.getElementById('go-hardhats').textContent = state.hardhatsCollected;
-      updateHUD();
-
-      renderLeaderboardList('go-leaderboard-list', 10, false, state.lastRunEntryId);
-
-      const nextHint = document.getElementById('go-next-up-hint');
-      const retryLabel = document.getElementById('btn-retry-label');
-      if (state.playerCount > 1) {
-        const nextIdx = (state.activePlayerIndex + 1) % state.playerCount;
-        const nextName = state.playerNames[nextIdx] || `Player ${nextIdx + 1}`;
-        nextHint.textContent = `Next: P${nextIdx + 1} ${nextName}`;
-        retryLabel.textContent = `Next: ${nextName}`;
-      } else {
-        nextHint.textContent = 'Solo Shift';
-        retryLabel.textContent = 'Retry Shift';
-      }
-
-      document.getElementById('ready-hint').classList.add('hidden');
-      if (state.gameOverTimeout) clearTimeout(state.gameOverTimeout);
-      state.gameOverTimeout = setTimeout(() => {
-        if (state.mode === 'gameover') {
-          document.getElementById('gameover-modal').classList.remove('hidden');
-        }
-      }, 520);
     }
 
     // =========================================================================
@@ -2819,7 +3458,7 @@
       const width = 66;
       const spawnX = customX !== null ? customX : state.width + 40;
       const isMoving = tier.tier >= 2 && Math.random() < tier.movingChance;
-      const hasWreckingBall = tier.tier >= 2 && Math.random() < tier.ballChance;
+      const hasWreckingBall = Math.random() < tier.ballChance;
       const isElectricWire = !hasWreckingBall && tier.tier >= 2 && Math.random() < tier.wireChance;
       const wireOffset = isElectricWire ? Math.round(gapHeight * 0.24) : 0;
 
@@ -2861,11 +3500,12 @@
 
     function spawnFallingHazard() {
       const tier = getDifficultyTier();
+      if (!tier.canFallHazards || state.fallingHazards.length >= 2) return;
       const isCityOrHarbor = state.biome.id === 'city' || state.biome.id === 'harbor';
       const type = isCityOrHarbor ? 'crane_load' : 'boulder';
-      const radius = type === 'boulder' ? 19 : 20;
+      const radius = type === 'boulder' ? 19 : 21;
 
-      const minX = state.width * 0.32;
+      const minX = state.width * 0.3;
       const maxX = state.width * 0.86;
       let dropX = minX + Math.random() * Math.max(40, maxX - minX);
 
@@ -2875,7 +3515,7 @@
         }
       }
 
-      const baseVy = (275 + Math.random() * 85) * tier.hazardMult;
+      const baseVy = (275 + Math.random() * 90) * tier.hazardMult;
       state.fallingHazards.push({
         type,
         x: dropX,
@@ -2883,8 +3523,8 @@
         vy: baseVy,
         radius,
         rotation: Math.random() * Math.PI * 2,
-        rotSpeed: (Math.random() - 0.5) * 3.2,
-        warnTimer: 0.95
+        rotSpeed: (Math.random() - 0.5) * 4.0,
+        warnTimer: 0.9
       });
     }
 
@@ -2914,6 +3554,132 @@
       });
     }
 
+    function triggerRigExplosion(reason) {
+      if (state.mode === 'exploding' || state.mode === 'gameover') return;
+      state.mode = 'exploding';
+      state.explodeTimer = 0.58;
+      state.pendingGameOverReason = reason;
+      state.screenShake = 1.0;
+      audio.playClangCrash();
+
+      const px = state.player.x;
+      const py = state.player.y;
+      const skin = getSkinById(state.equippedSkin);
+
+      state.shockwaves.push({ x: px, y: py, life: 0.42, maxLife: 0.42 });
+
+      const blastColors = [
+        'rgba(254, 240, 138, 0.65)',
+        'rgba(251, 146, 60, 0.65)',
+        'rgba(239, 68, 68, 0.65)',
+        'rgba(71, 85, 105, 0.65)'
+      ];
+      for (let i = 0; i < 24; i++) {
+        const ang = (i / 24) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
+        const spd = 95 + Math.random() * 240;
+        state.particles.push({
+          x: px,
+          y: py,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd - 45,
+          size: 5 + Math.random() * 7,
+          life: 0.42 + Math.random() * 0.3,
+          maxLife: 0.72,
+          color: blastColors[i % blastColors.length]
+        });
+      }
+
+      const partTypes = [
+        { shape: 'tire', size: 6.5, color: '#0f172a' },
+        { shape: 'tire', size: 6.5, color: '#0f172a' },
+        { shape: 'plate', size: 6.0, color: skin.body },
+        { shape: 'plate', size: 5.5, color: skin.accent },
+        { shape: 'plate', size: 5.0, color: skin.window },
+        { shape: 'plate', size: 5.5, color: '#334155' },
+        { shape: 'plate', size: 4.5, color: skin.shade }
+      ];
+      partTypes.forEach((pt, idx) => {
+        const ang = -Math.PI * 0.85 + (idx / (partTypes.length - 1)) * Math.PI * 0.75 + (Math.random() - 0.5) * 0.25;
+        const spd = 150 + Math.random() * 190;
+        state.debris.push({
+          x: px,
+          y: py,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd - 110,
+          rotation: Math.random() * Math.PI * 2,
+          rotSpeed: (Math.random() - 0.5) * 16,
+          shape: pt.shape,
+          size: pt.size,
+          color: pt.color
+        });
+      });
+    }
+
+    function triggerGameOver(reason) {
+      if (state.mode === 'gameover') return;
+      state.mode = 'gameover';
+
+      const earnedCoins = state.score;
+      if (earnedCoins > 0) {
+        state.coins += earnedCoins;
+        saveShopData();
+      }
+      updateWalletDisplays();
+
+      const currentName = state.playerNames[state.activePlayerIndex] || `Player ${state.activePlayerIndex + 1}`;
+      const previousOverallBest = state.bestScore;
+      const placedRank = recordPlayerScore(currentName, state.score, state.rig, state.playerCount > 1);
+      const isNewBest = state.score > 0 && state.score > previousOverallBest;
+
+      const shareBtn = document.getElementById('btn-share-score');
+      if (shareBtn) {
+        shareBtn.innerHTML = '<span>📤</span><span>Share</span>';
+        shareBtn.style.borderColor = 'rgba(56,189,248,0.45)';
+        shareBtn.style.color = '#7dd3fc';
+      }
+
+      const rankInfo = getRankDetails(state.score);
+      document.getElementById('go-reason').textContent = reason;
+      document.getElementById('go-player-title').textContent = state.playerCount > 1
+        ? `${currentName.toUpperCase()} — SHIFT OVER`
+        : 'SHIFT OVER';
+      document.getElementById('go-new-record').classList.toggle('hidden', !isNewBest);
+      document.getElementById('go-medal-icon').textContent = rankInfo.icon;
+      document.getElementById('go-rank-title').textContent = rankInfo.title;
+
+      const placementBadge = document.getElementById('go-placement-badge');
+      const placementText = document.getElementById('go-placement-text');
+      if (placedRank !== null && placedRank <= 10) {
+        placementBadge.classList.remove('hidden');
+        placementText.textContent = `TOP 10: #${placedRank}`;
+      } else {
+        placementBadge.classList.add('hidden');
+      }
+
+      document.getElementById('go-score').textContent = state.score;
+      document.getElementById('go-best').textContent = state.bestScore;
+      document.getElementById('go-earned-label').textContent = `BANKED +${earnedCoins}`;
+      document.getElementById('go-bank-total').innerHTML = `${state.coins} ${getHardhatSvg(16)}`;
+      updateHUD();
+
+      renderLeaderboardList('go-leaderboard-list', 10, false, state.lastRunEntryId);
+
+      const nextHint = document.getElementById('go-next-up-hint');
+      const retryLabel = document.getElementById('btn-retry-label');
+      if (state.playerCount > 1) {
+        const nextIdx = (state.activePlayerIndex + 1) % state.playerCount;
+        const nextName = state.playerNames[nextIdx] || `Player ${nextIdx + 1}`;
+        nextHint.textContent = `Next: P${nextIdx + 1} ${nextName}`;
+        retryLabel.textContent = `Next: ${nextName}`;
+      } else {
+        nextHint.textContent = 'Solo Shift';
+        retryLabel.textContent = 'Retry Shift';
+      }
+
+      document.getElementById('ready-hint').classList.add('hidden');
+      document.getElementById('gameover-modal').classList.remove('hidden');
+    }
+
     function circleRectOverlap(cx, cy, cr, rx, ry, rw, rh) {
       const nearestX = Math.max(rx, Math.min(cx, rx + rw));
       const nearestY = Math.max(ry, Math.min(cy, ry + rh));
@@ -2927,32 +3693,48 @@
       const spec = RIG_SPECS[state.rig] || RIG_SPECS.loader;
       const horizonY = state.height - state.groundHeight;
       const tier = getDifficultyTier();
-      const activeSpeed = state.mode === 'playing' ? state.scrollSpeed * tier.speedMult : state.scrollSpeed;
+      const turboMult = state.turboTimer > 0 ? 1.85 : 1.0;
+      const activeSpeed = state.mode === 'playing' ? state.scrollSpeed * tier.speedMult * turboMult : state.scrollSpeed;
 
       if (state.screenShake > 0) {
-        state.screenShake = Math.max(0, state.screenShake - dt * 2.6);
+        state.screenShake = Math.max(0, state.screenShake - dt * 2.4);
       }
 
-      if (state.explosionFlash && state.explosionFlash.life > 0) {
-        state.explosionFlash.life -= dt;
-      }
-
-      for (let i = state.explosionDebris.length - 1; i >= 0; i--) {
-        const d = state.explosionDebris[i];
-        d.vy += 980 * dt;
-        d.x += d.vx * dt;
-        d.y += d.vy * dt;
-        d.rotation += d.rotSpeed * dt;
-        if (d.y + d.h * 0.5 >= horizonY) {
-          d.y = horizonY - d.h * 0.5;
-          d.vy *= -0.45;
-          d.vx *= 0.72;
-          d.rotSpeed *= 0.6;
+      if (state.mode === 'exploding') {
+        for (let i = state.particles.length - 1; i >= 0; i--) {
+          const p = state.particles[i];
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.vy += 180 * dt;
+          p.life -= dt;
+          if (p.life <= 0) state.particles.splice(i, 1);
         }
-        d.life -= dt;
-        if (d.life <= 0) state.explosionDebris.splice(i, 1);
+        for (let i = state.shockwaves.length - 1; i >= 0; i--) {
+          const sw = state.shockwaves[i];
+          sw.life -= dt;
+          if (sw.life <= 0) state.shockwaves.splice(i, 1);
+        }
+        for (let i = state.debris.length - 1; i >= 0; i--) {
+          const d = state.debris[i];
+          d.vy += 880 * dt;
+          d.x += d.vx * dt;
+          d.y += d.vy * dt;
+          d.rotation += d.rotSpeed * dt;
+          if (d.y + d.size > horizonY) {
+            d.y = horizonY - d.size;
+            d.vy = -d.vy * 0.45;
+            d.vx *= 0.72;
+            d.rotSpeed *= 0.65;
+          }
+        }
+        state.explodeTimer -= dt;
+        if (state.explodeTimer <= 0) {
+          triggerGameOver(state.pendingGameOverReason);
+        }
+        return;
       }
 
+      // Ambient scenery scroll when not paused/gameover
       if (state.mode !== 'paused' && state.mode !== 'gameover') {
         state.bgScrollFar += activeSpeed * 0.14 * dt;
         state.bgScrollMid += activeSpeed * 0.34 * dt;
@@ -2965,6 +3747,7 @@
         });
       }
 
+      // Gentle hover bobbing in menu or ready states
       if (state.mode === 'menu' || state.mode === 'ready') {
         const baseHoverY = horizonY * 0.46;
         state.player.y = baseHoverY + Math.sin(state.time * 4.2) * 10;
@@ -2973,25 +3756,23 @@
         return;
       }
 
-      if (state.mode !== 'playing') {
-        // Keep explosion smoke/sparks animating smoothly during Game Over
-        for (let i = state.particles.length - 1; i >= 0; i--) {
-          const p = state.particles[i];
-          p.x += p.vx * dt;
-          p.y += p.vy * dt;
-          p.life -= dt;
-          if (p.life <= 0) state.particles.splice(i, 1);
-        }
-        return;
+      if (state.mode !== 'playing') return;
+
+      if (state.turboTimer > 0) {
+        state.turboTimer = Math.max(0, state.turboTimer - dt);
+        const targetAutoY = horizonY * 0.44;
+        state.player.y += (targetAutoY - state.player.y) * Math.min(1, dt * 8);
+        state.player.vy = 0;
+        state.player.rotation = 0;
+      } else {
+        // 1. Player Vertical Physics
+        state.player.vy = Math.min(spec.maxFall, state.player.vy + spec.gravity * dt);
+        state.player.y += state.player.vy * dt;
+
+        const targetRot = Math.max(-0.46, Math.min(0.75, state.player.vy / 520));
+        state.player.rotation += (targetRot - state.player.rotation) * Math.min(1, dt * 12);
+        state.player.bucketAngle += (0 - state.player.bucketAngle) * Math.min(1, dt * 7);
       }
-
-      // 1. Player Vertical Physics
-      state.player.vy = Math.min(spec.maxFall, state.player.vy + spec.gravity * dt);
-      state.player.y += state.player.vy * dt;
-
-      const targetRot = Math.max(-0.46, Math.min(0.75, state.player.vy / 520));
-      state.player.rotation += (targetRot - state.player.rotation) * Math.min(1, dt * 12);
-      state.player.bucketAngle += (0 - state.player.bucketAngle) * Math.min(1, dt * 7);
 
       // 2. Ceiling & Ground Bounds
       if (state.player.y - state.player.radius < 6) {
@@ -3000,11 +3781,23 @@
       }
       if (state.player.y + state.player.radius >= horizonY) {
         state.player.y = horizonY - state.player.radius;
-        triggerGameOver('GROUND IMPACT!');
-        return;
+        if (state.turboTimer > 0) {
+          state.player.vy = spec.flapVel * 0.85;
+        } else if (state.activeShield) {
+          state.activeShield = false;
+          state.player.vy = spec.flapVel * 1.1;
+          state.screenShake = 0.55;
+          audio.playHardhatPickup();
+          spawnDust(state.player.x, state.player.y, 14, '#38bdf8');
+          spawnFloatingText(state.player.x + 20, state.player.y - 26, '🛡️ SHIELD SAVED!', '#38bdf8');
+          updateHUD();
+        } else {
+          triggerRigExplosion('GROUND IMPACT!');
+          return;
+        }
       }
 
-      // 3. Obstacle Spawning & Movement
+      // 3. Obstacle Spawning & Movement (Exact uniform spacing on all screen sizes)
       const spacing = state.width < 600 ? 275 : 315;
       if (state.obstacles.length === 0) {
         spawnObstaclePair(state.width + 40);
@@ -3015,13 +3808,11 @@
         }
       }
 
-      // 3B. Falling Boulders & Crane Loads (Active from Phase 3 / 16+ pts)
-      if (tier.fallingEnabled) {
+      // 3B. Falling Boulders & Crane Loads (Disabled during first 15 pts warm-up)
+      if (tier.canFallHazards) {
         state.hazardTimer -= dt;
         if (state.hazardTimer <= 0) {
-          if (state.fallingHazards.length < tier.maxFalling) {
-            spawnFallingHazard();
-          }
+          spawnFallingHazard();
           state.hazardTimer = tier.hazardIntervalMin + Math.random() * tier.hazardIntervalRange;
         }
       }
@@ -3040,7 +3831,22 @@
           const dy = state.player.y - hz.y;
           const minDist = hitR + hz.radius * 0.85;
           if (dx * dx + dy * dy < minDist * minDist) {
-            triggerGameOver(hz.type === 'boulder' ? 'FALLING BOULDER!' : 'CRANE LOAD IMPACT!');
+            if (state.turboTimer > 0) {
+              state.fallingHazards.splice(i, 1);
+              spawnDust(hz.x, hz.y, 10, '#fbbf24');
+              continue;
+            }
+            if (state.activeShield) {
+              state.activeShield = false;
+              state.fallingHazards.splice(i, 1);
+              state.screenShake = 0.55;
+              audio.playHardhatPickup();
+              spawnDust(hz.x, hz.y, 14, '#38bdf8');
+              spawnFloatingText(state.player.x + 20, state.player.y - 26, '🛡️ SHIELD BLOCK!', '#38bdf8');
+              updateHUD();
+              continue;
+            }
+            triggerRigExplosion(hz.type === 'boulder' ? 'FALLING BOULDER!' : 'CRANE LOAD IMPACT!');
             return;
           }
         }
@@ -3086,10 +3892,23 @@
         }
 
         if (hitTop || hitBot || hitBall || hitWire) {
-          triggerGameOver(
-            hitBall ? 'WRECKING BALL!' : hitWire ? 'HIGH-VOLTAGE ARC!' : 'BEAM IMPACT!'
-          );
-          return;
+          if (state.turboTimer > 0) {
+            // Turbo Start phases safely through beams
+          } else if (state.activeShield) {
+            state.activeShield = false;
+            state.screenShake = 0.55;
+            audio.playHardhatPickup();
+            spawnDust(state.player.x + 12, state.player.y, 16, '#38bdf8');
+            spawnFloatingText(state.player.x + 24, state.player.y - 28, '🛡️ SHIELD SAVED!', '#38bdf8');
+            updateHUD();
+            state.obstacles.splice(i, 1);
+            continue;
+          } else {
+            triggerRigExplosion(
+              hitBall ? 'WRECKING BALL!' : hitWire ? 'HIGH-VOLTAGE ARC!' : 'BEAM IMPACT!'
+            );
+            return;
+          }
         }
 
         if (!obs.passed && obs.x + obs.width < state.player.x) {
@@ -3106,6 +3925,16 @@
       for (let i = state.collectibles.length - 1; i >= 0; i--) {
         const hat = state.collectibles[i];
         hat.x -= activeSpeed * dt;
+
+        if (!hat.collected && (state.activeMagnet || state.turboTimer > 0)) {
+          const mdx = state.player.x - hat.x;
+          const mdy = state.player.y - hat.y;
+          const mDist = Math.hypot(mdx, mdy);
+          if (mDist < 230 && mDist > 1) {
+            hat.x += (mdx / mDist) * 440 * dt;
+            hat.y += (mdy / mDist) * 440 * dt;
+          }
+        }
 
         if (!hat.collected) {
           const dx = state.player.x - hat.x;
@@ -3166,18 +3995,49 @@
     // =========================================================================
     // 7. INPUT CONTROLS & HUD SYNC
     // =========================================================================
+    function commitOwnedBoostsForShift() {
+      if (state.boostsCommitted) return;
+      state.boostsCommitted = true;
+      let usedBoost = false;
+      if ((state.ownedBoosts.shield || 0) > 0) {
+        state.ownedBoosts.shield -= 1;
+        state.activeShield = true;
+        usedBoost = true;
+      }
+      if ((state.ownedBoosts.magnet || 0) > 0) {
+        state.ownedBoosts.magnet -= 1;
+        state.activeMagnet = true;
+        usedBoost = true;
+      }
+      if ((state.ownedBoosts.turbo || 0) > 0) {
+        state.ownedBoosts.turbo -= 1;
+        state.turboTimer = 4.2;
+        usedBoost = true;
+      }
+      if (usedBoost) {
+        saveShopData();
+        updateHUD();
+      }
+    }
+
     function handleFlapAction() {
       if (state.mode === 'ready') {
         state.mode = 'playing';
         document.getElementById('ready-hint').classList.add('hidden');
+        commitOwnedBoostsForShift();
       }
       if (state.mode !== 'playing') return;
 
       const spec = RIG_SPECS[state.rig] || RIG_SPECS.loader;
+      const skin = getSkinById(state.equippedSkin);
+      const trail = getTrailById(state.equippedTrail);
+      const trailColor = state.equippedTrail === 'classic'
+        ? skin.exhaust
+        : trail.colors[Math.floor(Math.random() * trail.colors.length)];
       state.player.vy = spec.flapVel;
       state.player.bucketAngle = 0.72;
       audio.playHydraulicThrust();
-      spawnDust(state.player.x - 16, state.player.y + 6, 5, 'rgba(255,255,255,0.65)');
+      spawnDust(state.player.x - 16, state.player.y + 6, 6, trailColor);
     }
 
     function updateHUD(popScore = false) {
@@ -3197,6 +4057,24 @@
         bonusLabel.style.color = '#94a3b8';
         bonusVal.textContent = `${state.streak}/3`;
         bonusVal.style.color = '#38bdf8';
+      }
+
+      const boostsWrap = document.getElementById('hud-boosts-wrap');
+      if (boostsWrap) {
+        const activeIcons = [];
+        const hasShield = state.activeShield || (!state.boostsCommitted && (state.ownedBoosts.shield || 0) > 0);
+        const hasMagnet = state.activeMagnet || (!state.boostsCommitted && (state.ownedBoosts.magnet || 0) > 0);
+        const hasTurbo = state.turboTimer > 0 || (!state.boostsCommitted && (state.ownedBoosts.turbo || 0) > 0);
+        if (hasShield) activeIcons.push('<span title="Safety Shield Active" style="font-size:0.85rem;">🛡️</span>');
+        if (hasMagnet) activeIcons.push('<span title="Hardhat Magnet Active" style="font-size:0.85rem;">🧲</span>');
+        if (hasTurbo) activeIcons.push('<span title="Turbo Start Ready" style="font-size:0.85rem;">⚡</span>');
+        if (activeIcons.length > 0) {
+          boostsWrap.innerHTML = activeIcons.join('');
+          boostsWrap.classList.remove('hidden');
+        } else {
+          boostsWrap.innerHTML = '';
+          boostsWrap.classList.add('hidden');
+        }
       }
 
       const tier = getDifficultyTier();
@@ -3235,6 +4113,286 @@
           ? `${topEntry.name} • ${topEntry.score} pts`
           : 'No shifts yet';
       }
+      updateWalletDisplays();
+    }
+
+    function updateWalletDisplays() {
+      const menuWallet = document.getElementById('menu-wallet-balance');
+      const shopWallet = document.getElementById('shop-wallet-balance');
+      if (menuWallet) menuWallet.innerHTML = `${state.coins} ${getHardhatSvg(14)}`;
+      if (shopWallet) shopWallet.innerHTML = `${state.coins} ${getHardhatSvg(16)}`;
+    }
+
+    function showShopBanner(msg, isSuccess = true) {
+      const banner = document.getElementById('shop-feedback-banner');
+      if (!banner) return;
+      banner.innerHTML = msg;
+      banner.classList.remove('hidden');
+      if (isSuccess) {
+        banner.style.background = 'rgba(16, 185, 129, 0.2)';
+        banner.style.border = '1px solid #34d399';
+        banner.style.color = '#6ee7b7';
+      } else {
+        banner.style.background = 'rgba(245, 158, 11, 0.2)';
+        banner.style.border = '1px solid #fbbf24';
+        banner.style.color = '#fde68a';
+      }
+    }
+
+    function renderPaintShop() {
+      updateWalletDisplays();
+      const grid = document.getElementById('shop-skin-grid');
+      if (!grid) return;
+
+      document.querySelectorAll('#shop-tabs .shop-tab-btn').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.tab === state.shopTab);
+      });
+
+      if (state.shopTab === 'rigs') {
+        const rigKeys = Object.keys(RIG_SPECS);
+        grid.innerHTML = rigKeys.map((rigKey) => {
+          const rSpec = RIG_SPECS[rigKey];
+          const isUnlocked = state.unlockedRigs.includes(rigKey);
+          const isEquipped = state.rig === rigKey;
+          const canAfford = !isUnlocked && state.coins >= rSpec.cost;
+          let cardClass = 'skin-card';
+          if (isEquipped) cardClass += ' equipped';
+          else if (canAfford) cardClass += ' affordable';
+          else if (!isUnlocked) cardClass += ' locked';
+
+          let badgeHtml = '';
+          if (isEquipped) {
+            badgeHtml = '<div class="skin-badge" style="background:#10b981; color:#022c22;">✓ SELECTED</div>';
+          } else if (isUnlocked) {
+            badgeHtml = '<div class="skin-badge" style="background:rgba(56,189,248,0.2); color:#7dd3fc; border:1px solid rgba(56,189,248,0.4);">SELECT</div>';
+          } else if (canAfford) {
+            badgeHtml = `<div class="skin-badge" style="background:linear-gradient(135deg,#fbbf24,#d97706); color:#0f172a; display:inline-flex; align-items:center; gap:4px;">UNLOCK • ${rSpec.cost} ${getHardhatSvg(13)}</div>`;
+          } else {
+            badgeHtml = `<div class="skin-badge" style="background:rgba(15,23,42,0.7); color:#94a3b8; border:1px solid rgba(255,255,255,0.1); display:inline-flex; align-items:center; gap:4px;">🔒 ${rSpec.cost} ${getHardhatSvg(13)}</div>`;
+          }
+
+          return `
+            <button type="button" class="${cardClass}" data-rig-shop="${rigKey}">
+              <canvas id="shop-rig-preview-${rigKey}" width="136" height="84" style="width:68px; height:42px;"></canvas>
+              <div class="font-display" style="font-size:0.82rem; font-weight:700; color:#f8fafc; margin-top:2px;">${rSpec.name}</div>
+              <div style="font-size:0.62rem; color:#94a3b8;">${rSpec.subtitle}</div>
+              ${badgeHtml}
+            </button>
+          `;
+        }).join('');
+
+        const activeSkin = getSkinById(state.equippedSkin);
+        rigKeys.forEach((rigKey) => {
+          const sCanvas = document.getElementById(`shop-rig-preview-${rigKey}`);
+          if (!sCanvas) return;
+          const sCtx = sCanvas.getContext('2d');
+          sCtx.clearRect(0, 0, sCanvas.width, sCanvas.height);
+          drawConstructionRig(sCtx, rigKey, 66, 46, 25, -0.05, 0.25, 0.35, 1, activeSkin);
+        });
+
+        grid.querySelectorAll('[data-rig-shop]').forEach((card) => {
+          card.addEventListener('click', () => {
+            const rigKey = card.dataset.rigShop;
+            const rSpec = RIG_SPECS[rigKey];
+            if (state.unlockedRigs.includes(rigKey)) {
+              audio.playClick();
+              state.rig = rigKey;
+              saveShopData();
+              renderRigPreviews();
+              renderPaintShop();
+              showShopBanner(`🚜 Selected ${rSpec.name}!`, true);
+            } else if (state.coins >= rSpec.cost) {
+              state.coins -= rSpec.cost;
+              state.unlockedRigs.push(rigKey);
+              state.rig = rigKey;
+              saveShopData();
+              audio.playSkinUnlock();
+              renderRigPreviews();
+              renderPaintShop();
+              showShopBanner(`🎉 Unlocked ${rSpec.name}!`, true);
+            } else {
+              audio.playClick();
+              showShopBanner(`Need ${rSpec.cost - state.coins} more ${getHardhatSvg(14)} hardhats for ${rSpec.name}!`, false);
+            }
+          });
+        });
+        return;
+      }
+
+      if (state.shopTab === 'boosts') {
+        grid.innerHTML = SHIFT_BOOSTS.map((b) => {
+          const owned = state.ownedBoosts[b.id] || 0;
+          const canAfford = state.coins >= b.cost;
+          const cardClass = owned > 0 ? 'skin-card equipped' : canAfford ? 'skin-card affordable' : 'skin-card locked';
+          const btnHtml = canAfford
+            ? `<div class="skin-badge" style="background:linear-gradient(135deg,#fbbf24,#d97706); color:#0f172a; display:inline-flex; align-items:center; gap:4px;">BUY +1 • ${b.cost} ${getHardhatSvg(13)}</div>`
+            : `<div class="skin-badge" style="background:rgba(15,23,42,0.7); color:#94a3b8; border:1px solid rgba(255,255,255,0.1); display:inline-flex; align-items:center; gap:4px;">${b.cost} ${getHardhatSvg(13)}</div>`;
+
+          return `
+            <button type="button" class="${cardClass}" data-boost-id="${b.id}">
+              <div style="font-size:1.65rem; line-height:1.1; margin:4px 0;">${b.icon}</div>
+              <div class="font-display" style="font-size:0.82rem; font-weight:700; color:#f8fafc;">${b.name}</div>
+              <div style="font-size:0.62rem; color:#94a3b8;">${b.desc}</div>
+              <div style="font-size:0.64rem; font-weight:700; color:#34d399; margin-top:2px;">Owned: ${owned}</div>
+              ${btnHtml}
+            </button>
+          `;
+        }).join('');
+
+        grid.querySelectorAll('[data-boost-id]').forEach((card) => {
+          card.addEventListener('click', () => {
+            const b = SHIFT_BOOSTS.find((item) => item.id === card.dataset.boostId);
+            if (!b) return;
+            if (state.coins >= b.cost) {
+              state.coins -= b.cost;
+              state.ownedBoosts[b.id] = (state.ownedBoosts[b.id] || 0) + 1;
+              saveShopData();
+              audio.playSkinUnlock();
+              renderActiveBoostChips();
+              renderPaintShop();
+              showShopBanner(`${b.icon} Bought ${b.name}! Ready for your next shift.`, true);
+            } else {
+              audio.playClick();
+              showShopBanner(`Need ${b.cost - state.coins} more ${getHardhatSvg(14)} hardhats for ${b.name}!`, false);
+            }
+          });
+        });
+        return;
+      }
+
+      if (state.shopTab === 'trails') {
+        grid.innerHTML = EXHAUST_TRAILS.map((tr) => {
+          const isUnlocked = state.unlockedTrails.includes(tr.id);
+          const isEquipped = state.equippedTrail === tr.id;
+          const canAfford = !isUnlocked && state.coins >= tr.cost;
+          let cardClass = 'skin-card';
+          if (isEquipped) cardClass += ' equipped';
+          else if (canAfford) cardClass += ' affordable';
+          else if (!isUnlocked) cardClass += ' locked';
+
+          const dotsHtml = tr.colors.map((c) => `<span style="width:12px; height:12px; border-radius:999px; background:${c}; border:1px solid #0f172a; display:inline-block;"></span>`).join('');
+          let badgeHtml = '';
+          if (isEquipped) {
+            badgeHtml = '<div class="skin-badge" style="background:#10b981; color:#022c22;">✓ EQUIPPED</div>';
+          } else if (isUnlocked) {
+            badgeHtml = '<div class="skin-badge" style="background:rgba(56,189,248,0.2); color:#7dd3fc; border:1px solid rgba(56,189,248,0.4);">EQUIP</div>';
+          } else if (canAfford) {
+            badgeHtml = `<div class="skin-badge" style="background:linear-gradient(135deg,#fbbf24,#d97706); color:#0f172a; display:inline-flex; align-items:center; gap:4px;">UNLOCK • ${tr.cost} ${getHardhatSvg(13)}</div>`;
+          } else {
+            badgeHtml = `<div class="skin-badge" style="background:rgba(15,23,42,0.7); color:#94a3b8; border:1px solid rgba(255,255,255,0.1); display:inline-flex; align-items:center; gap:4px;">🔒 ${tr.cost} ${getHardhatSvg(13)}</div>`;
+          }
+
+          return `
+            <button type="button" class="${cardClass}" data-trail-id="${tr.id}">
+              <div style="display:flex; align-items:center; justify-content:center; gap:4px; height:32px;">${dotsHtml}</div>
+              <div class="font-display" style="font-size:0.82rem; font-weight:700; color:#f8fafc;">${tr.name}</div>
+              ${badgeHtml}
+            </button>
+          `;
+        }).join('');
+
+        grid.querySelectorAll('[data-trail-id]').forEach((card) => {
+          card.addEventListener('click', () => {
+            const tr = getTrailById(card.dataset.trailId);
+            if (state.unlockedTrails.includes(tr.id)) {
+              audio.playClick();
+              state.equippedTrail = tr.id;
+              saveShopData();
+              renderPaintShop();
+              showShopBanner(`🔥 Equipped ${tr.name} exhaust trail!`, true);
+            } else if (state.coins >= tr.cost) {
+              state.coins -= tr.cost;
+              state.unlockedTrails.push(tr.id);
+              state.equippedTrail = tr.id;
+              saveShopData();
+              audio.playSkinUnlock();
+              renderPaintShop();
+              showShopBanner(`🎉 Unlocked ${tr.name} trail!`, true);
+            } else {
+              audio.playClick();
+              showShopBanner(`Need ${tr.cost - state.coins} more ${getHardhatSvg(14)} hardhats for ${tr.name}!`, false);
+            }
+          });
+        });
+        return;
+      }
+
+      grid.innerHTML = MACHINE_SKINS.map((skin) => {
+        const isUnlocked = state.unlockedSkins.includes(skin.id);
+        const isEquipped = state.equippedSkin === skin.id;
+        const canAfford = !isUnlocked && state.coins >= skin.cost;
+
+        let cardClass = 'skin-card';
+        if (isEquipped) cardClass += ' equipped';
+        else if (canAfford) cardClass += ' affordable';
+        else if (!isUnlocked) cardClass += ' locked';
+
+        let badgeHtml = '';
+        if (isEquipped) {
+          badgeHtml = '<div class="skin-badge" style="background:#10b981; color:#022c22;">✓ EQUIPPED</div>';
+        } else if (isUnlocked) {
+          badgeHtml = '<div class="skin-badge" style="background:rgba(56,189,248,0.2); color:#7dd3fc; border:1px solid rgba(56,189,248,0.4);">EQUIP</div>';
+        } else if (canAfford) {
+          badgeHtml = `<div class="skin-badge" style="background:linear-gradient(135deg,#fbbf24,#d97706); color:#0f172a; display:inline-flex; align-items:center; gap:4px;">UNLOCK • ${skin.cost} ${getHardhatSvg(13)}</div>`;
+        } else {
+          badgeHtml = `<div class="skin-badge" style="background:rgba(15,23,42,0.7); color:#94a3b8; border:1px solid rgba(255,255,255,0.1); display:inline-flex; align-items:center; gap:4px;">🔒 ${skin.cost} ${getHardhatSvg(13)}</div>`;
+        }
+
+        return `
+          <button type="button" class="${cardClass}" data-skin-id="${skin.id}">
+            <canvas id="skin-preview-${skin.id}" width="136" height="84" style="width:68px; height:42px;"></canvas>
+            <div class="font-display" style="font-size:0.82rem; font-weight:700; color:#f8fafc; margin-top:2px;">${skin.name}</div>
+            ${badgeHtml}
+          </button>
+        `;
+      }).join('');
+
+      MACHINE_SKINS.forEach((skin) => {
+        const sCanvas = document.getElementById(`skin-preview-${skin.id}`);
+        if (!sCanvas) return;
+        const sCtx = sCanvas.getContext('2d');
+        sCtx.clearRect(0, 0, sCanvas.width, sCanvas.height);
+        drawConstructionRig(sCtx, state.rig, 66, 46, 25, -0.05, 0.25, 0.35, 1, skin);
+      });
+
+      grid.querySelectorAll('.skin-card').forEach((card) => {
+        card.addEventListener('click', () => {
+          const skinId = card.dataset.skinId;
+          const skin = getSkinById(skinId);
+          if (state.unlockedSkins.includes(skinId)) {
+            audio.playClick();
+            state.equippedSkin = skinId;
+            saveShopData();
+            renderRigPreviews();
+            renderPaintShop();
+            showShopBanner(`🎨 Equipped ${skin.name}!`, true);
+          } else if (state.coins >= skin.cost) {
+            state.coins -= skin.cost;
+            state.unlockedSkins.push(skinId);
+            state.equippedSkin = skinId;
+            saveShopData();
+            audio.playSkinUnlock();
+            renderRigPreviews();
+            renderPaintShop();
+            showShopBanner(`🎉 Unlocked & equipped ${skin.name}!`, true);
+          } else {
+            audio.playClick();
+            const needed = skin.cost - state.coins;
+            showShopBanner(`Need ${needed} more ${getHardhatSvg(14)} hardhats to unlock ${skin.name}!`, false);
+          }
+        });
+      });
+    }
+
+    function openPaintShop() {
+      const banner = document.getElementById('shop-feedback-banner');
+      if (banner) banner.classList.add('hidden');
+      renderPaintShop();
+      document.getElementById('shop-modal').classList.remove('hidden');
+    }
+
+    function closePaintShop() {
+      document.getElementById('shop-modal').classList.add('hidden');
     }
 
     function renderLeaderboardList(containerId, limit = 10, detailed = false, highlightId = null) {
@@ -3256,30 +4414,30 @@
           const rankInfo = getRankDetails(entry.score);
           const isCurrentRun = highlightId && entry.id === highlightId;
           const rowHighlightStyle = isCurrentRun
-            ? 'background:rgba(56,189,248,0.16); border:1px solid rgba(56,189,248,0.48); border-radius:11px; padding:0.46rem 0.65rem;'
-            : 'padding:0.36rem 0.2rem;';
+            ? 'background:rgba(56,189,248,0.16); border:1px solid rgba(56,189,248,0.48); border-radius:11px; padding:0.44rem 0.6rem;'
+            : 'padding:0.32rem 0.18rem;';
           const youBadge = isCurrentRun
             ? '<span style="background:#38bdf8; color:#0f172a; font-size:0.58rem; font-weight:800; padding:2px 6px; border-radius:999px; letter-spacing:0.03em; flex-shrink:0;">THIS SHIFT</span>'
             : '';
 
           if (detailed) {
             return `
-              <div class="lb-row" style="display:flex; align-items:center; justify-content:space-between; gap:0.6rem; ${isCurrentRun ? 'background:rgba(56,189,248,0.16); border:1px solid rgba(56,189,248,0.48); border-radius:10px; padding:0.34rem 0.55rem;' : 'padding:0.28rem 0.15rem;'}">
-                <div style="display:flex; align-items:center; gap:0.55rem; min-width:0; flex:1;">
-                  <div style="width:26px; height:26px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:rgba(15,23,42,0.55); border-radius:7px;">
+              <div class="lb-row" style="display:flex; align-items:center; justify-content:space-between; gap:0.65rem; ${rowHighlightStyle}">
+                <div style="display:flex; align-items:center; gap:0.6rem; min-width:0; flex:1;">
+                  <div style="width:28px; height:28px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:rgba(15,23,42,0.55); border-radius:8px;">
                     ${rankIcon}
                   </div>
                   <div style="min-width:0; flex:1;">
-                    <div style="display:flex; align-items:center; gap:0.38rem; min-width:0;">
-                      <span style="color:#f8fafc; font-weight:700; font-size:0.85rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${entry.name}</span>
+                    <div style="display:flex; align-items:center; gap:0.4rem; min-width:0;">
+                      <span style="color:#f8fafc; font-weight:700; font-size:0.88rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${entry.name}</span>
                       ${youBadge}
                     </div>
-                    <div style="color:#38bdf8; font-size:0.65rem; font-weight:700; margin-top:2px; line-height:1.2;">
+                    <div style="color:#38bdf8; font-size:0.67rem; font-weight:700; margin-top:3px; line-height:1.25;">
                       ${rankInfo.icon} ${rankInfo.title} <span style="color:#94a3b8; font-weight:600;">• ${rigName} (${modeTag})</span>
                     </div>
                   </div>
                 </div>
-                <span class="font-display" style="color:#fbbf24; font-weight:700; font-size:1.2rem; line-height:1; font-variant-numeric:tabular-nums; flex-shrink:0; padding-left:0.3rem;">${entry.score}</span>
+                <span class="font-display" style="color:#fbbf24; font-weight:700; font-size:1.25rem; line-height:1; font-variant-numeric:tabular-nums; flex-shrink:0; padding-left:0.35rem;">${entry.score}</span>
               </div>
             `;
           }
@@ -3352,10 +4510,6 @@
     }
 
     function prepareReadyShift(resetTour = false, advanceTurn = false) {
-      if (state.gameOverTimeout) {
-        clearTimeout(state.gameOverTimeout);
-        state.gameOverTimeout = null;
-      }
       if (resetTour) {
         state.activePlayerIndex = 0;
       } else if (advanceTurn && state.playerCount > 1) {
@@ -3374,12 +4528,19 @@
       state.collectibles = [];
       state.fallingHazards = [];
       state.particles = [];
-      state.explosionDebris = [];
-      state.explosionFlash = null;
-      state.screenShake = 0;
+      state.debris = [];
+      state.shockwaves = [];
       state.floatingTexts = [];
+      state.screenShake = 0;
+      state.explodeTimer = 0;
       state.spawnTimer = 0;
-      state.hazardTimer = 4.2;
+      state.hazardTimer = 3.5;
+
+      // Prepare purchased boosts (committed on first flap so abandoned shifts don't waste items)
+      state.activeShield = false;
+      state.activeMagnet = false;
+      state.turboTimer = 0;
+      state.boostsCommitted = false;
 
       const spacing = state.width < 600 ? 275 : 315;
       const firstSpawnX = Math.max(state.player.x + 360, Math.min(state.width + 40, state.player.x + 430));
@@ -3412,21 +4573,21 @@
     }
 
     function returnToGarage() {
-      if (state.gameOverTimeout) {
-        clearTimeout(state.gameOverTimeout);
-        state.gameOverTimeout = null;
-      }
       state.mode = 'menu';
       rollNewProceduralBiome(true);
       state.obstacles = [];
       state.collectibles = [];
       state.fallingHazards = [];
       state.particles = [];
-      state.explosionDebris = [];
-      state.explosionFlash = null;
-      state.screenShake = 0;
+      state.debris = [];
+      state.shockwaves = [];
       state.floatingTexts = [];
+      state.activeShield = false;
+      state.activeMagnet = false;
+      state.turboTimer = 0;
+      state.boostsCommitted = false;
       updateRecordDisplay();
+      renderRigPreviews();
       document.getElementById('hud').classList.add('hidden');
       document.getElementById('ready-hint').classList.add('hidden');
       document.getElementById('pause-modal').classList.add('hidden');
@@ -3440,12 +4601,30 @@
       handleFlapAction();
     });
 
-    // Keyboard Controls (Space, Up Arrow, W)
+    // Keyboard Controls (Space, Up Arrow, W, P / Esc)
     window.addEventListener('keydown', (e) => {
       if (document.activeElement && document.activeElement.tagName === 'INPUT') {
         if (e.code === 'Enter') document.activeElement.blur();
         return;
       }
+      const shopOpen = !document.getElementById('shop-modal').classList.contains('hidden');
+      const lbOpen = !document.getElementById('leaderboard-modal').classList.contains('hidden');
+      if (e.code === 'Escape' || e.code === 'KeyP') {
+        if (shopOpen) {
+          closePaintShop();
+          return;
+        }
+        if (lbOpen) {
+          closeTop10Leaderboard();
+          return;
+        }
+        if (state.mode === 'playing' || state.mode === 'paused') {
+          audio.playClick();
+          togglePauseState();
+        }
+        return;
+      }
+      if (shopOpen || lbOpen) return;
       if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
         e.preventDefault();
         if (state.mode === 'ready' || state.mode === 'playing') {
@@ -3472,10 +4651,30 @@
     // Rig Selector Buttons
     document.querySelectorAll('#rig-selector .rig-card').forEach((card) => {
       card.addEventListener('click', () => {
+        const rigKey = card.dataset.rig;
+        if (!state.unlockedRigs.includes(rigKey)) {
+          audio.playClick();
+          state.shopTab = 'rigs';
+          openPaintShop();
+          const rSpec = RIG_SPECS[rigKey];
+          showShopBanner(`🔒 Unlock ${rSpec.name} for ${rSpec.cost} ${getHardhatSvg(14)} hardhats!`, false);
+          return;
+        }
         audio.playClick();
         document.querySelectorAll('#rig-selector .rig-card').forEach((c) => c.classList.remove('selected'));
         card.classList.add('selected');
         state.rig = card.dataset.rig;
+        saveShopData();
+      });
+    });
+
+    document.querySelectorAll('#shop-tabs .shop-tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        audio.playClick();
+        state.shopTab = btn.dataset.tab || 'rigs';
+        const banner = document.getElementById('shop-feedback-banner');
+        if (banner) banner.classList.add('hidden');
+        renderPaintShop();
       });
     });
 
@@ -3504,6 +4703,38 @@
     document.getElementById('btn-go-garage').addEventListener('click', () => {
       audio.playClick();
       returnToGarage();
+    });
+
+    document.getElementById('btn-open-shop').addEventListener('click', () => {
+      audio.playClick();
+      openPaintShop();
+    });
+
+    document.getElementById('btn-go-shop').addEventListener('click', () => {
+      audio.playClick();
+      openPaintShop();
+    });
+
+    document.getElementById('btn-go-bank-box').addEventListener('click', () => {
+      audio.playClick();
+      openPaintShop();
+    });
+
+    document.getElementById('btn-close-shop').addEventListener('click', () => {
+      audio.playClick();
+      closePaintShop();
+    });
+
+    document.getElementById('btn-close-shop-bottom').addEventListener('click', () => {
+      audio.playClick();
+      closePaintShop();
+    });
+
+    document.getElementById('shop-modal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        audio.playClick();
+        closePaintShop();
+      }
     });
 
     document.getElementById('btn-share-score').addEventListener('click', async () => {
@@ -3620,38 +4851,35 @@
     });
 
     // =========================================================================
-    // 8. MAIN ANIMATION LOOP
+    // 8. MAIN ANIMATION LOOP & LIVE FPS MONITOR
     // =========================================================================
     let lastTimestamp = performance.now();
     let fpsFrames = 0;
-    let fpsLastUpdate = lastTimestamp;
-    const fpsBadgeEl = document.getElementById('hud-fps');
-    const fpsValEl = document.getElementById('hud-fps-val');
+    let fpsLastUpdate = performance.now();
+    const fpsEl = document.getElementById('hud-fps');
 
     function gameLoop(timestamp) {
-      const rawDt = Math.max(0.001, (timestamp - lastTimestamp) / 1000);
-      const dt = Math.min(0.05, rawDt);
+      const dt = Math.min(0.05, Math.max(0.001, (timestamp - lastTimestamp) / 1000));
       lastTimestamp = timestamp;
 
       fpsFrames++;
-      const elapsedFps = timestamp - fpsLastUpdate;
-      if (elapsedFps >= 350) {
-        const currentFps = Math.min(120, Math.round((fpsFrames * 1000) / elapsedFps));
-        fpsFrames = 0;
-        fpsLastUpdate = timestamp;
-        if (fpsValEl && fpsBadgeEl) {
-          fpsValEl.textContent = `${currentFps} FPS`;
-          if (currentFps >= 50) {
-            fpsValEl.style.color = '#34d399';
-            fpsBadgeEl.style.borderColor = 'rgba(52, 211, 153, 0.45)';
-          } else if (currentFps >= 35) {
-            fpsValEl.style.color = '#fbbf24';
-            fpsBadgeEl.style.borderColor = 'rgba(251, 191, 36, 0.55)';
+      if (timestamp - fpsLastUpdate >= 400) {
+        const fps = Math.min(60, Math.round((fpsFrames * 1000) / (timestamp - fpsLastUpdate)));
+        if (fpsEl) {
+          fpsEl.textContent = `${fps} FPS`;
+          if (fps >= 50) {
+            fpsEl.style.color = '#6ee7b7';
+            fpsEl.style.borderColor = 'rgba(52, 211, 153, 0.42)';
+          } else if (fps >= 35) {
+            fpsEl.style.color = '#fde047';
+            fpsEl.style.borderColor = 'rgba(251, 191, 36, 0.55)';
           } else {
-            fpsValEl.style.color = '#fb7185';
-            fpsBadgeEl.style.borderColor = 'rgba(251, 113, 133, 0.65)';
+            fpsEl.style.color = '#fda4af';
+            fpsEl.style.borderColor = 'rgba(251, 113, 133, 0.6)';
           }
         }
+        fpsFrames = 0;
+        fpsLastUpdate = timestamp;
       }
 
       updateSimulation(dt);
