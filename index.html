@@ -13,8 +13,8 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Heavy Flap</title>
-  <link id="apple-touch-icon" rel="apple-touch-icon" sizes="512x512" href="" />
-  <link id="app-favicon" rel="icon" type="image/png" sizes="512x512" href="" />
+  <link id="apple-touch-icon" rel="apple-touch-icon" sizes="512x512" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230f172a'/%3E%3Crect y='0' width='512' height='32' fill='%23fbbf24'/%3E%3Crect y='480' width='512' height='32' fill='%23fbbf24'/%3E%3Crect x='118' y='210' width='220' height='98' rx='22' fill='%23eab308'/%3E%3Crect x='186' y='136' width='106' height='82' rx='14' fill='%2338bdf8'/%3E%3Ccircle cx='182' cy='334' r='48' fill='%231e293b' stroke='%23eab308' stroke-width='16'/%3E%3Ccircle cx='294' cy='334' r='48' fill='%231e293b' stroke='%23eab308' stroke-width='16'/%3E%3C/svg%3E" />
+  <link id="app-favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230f172a'/%3E%3Crect y='0' width='512' height='32' fill='%23fbbf24'/%3E%3Crect y='480' width='512' height='32' fill='%23fbbf24'/%3E%3Crect x='118' y='210' width='220' height='98' rx='22' fill='%23eab308'/%3E%3Crect x='186' y='136' width='106' height='82' rx='14' fill='%2338bdf8'/%3E%3Ccircle cx='182' cy='334' r='48' fill='%231e293b' stroke='%23eab308' stroke-width='16'/%3E%3Ccircle cx='294' cy='334' r='48' fill='%231e293b' stroke='%23eab308' stroke-width='16'/%3E%3C/svg%3E" />
   <link id="app-manifest" rel="manifest" href="" />
 
   <!-- Typography: Chakra Petch (Industrial Display) & Inter (Clean UI) -->
@@ -919,12 +919,12 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.66rem; font-weight:800; letter-spacing:0.12em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v4.5</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v4.9</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.6rem, 6.8vw, 2.1rem); font-weight:700; line-height:1.05; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.35rem; flex-wrap:wrap;">
               <button type="button" id="btn-sync-latest" style="background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.38); color:#e0f2fe; border-radius:999px; padding:0.2rem 0.6rem; font-size:0.64rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.25rem;">
-                <span id="sync-status-text">↻ Get Latest (v4.5)</span>
+                <span id="sync-status-text">↻ Get Latest (v4.9)</span>
               </button>
               <button type="button" class="bank-pill" id="btn-open-shop" title="Unlock Machines, Boosts, Trails & Skins">
                 <span style="display:inline-flex; align-items:center; gap:0.32rem;">
@@ -1441,7 +1441,7 @@
     window.addEventListener('keydown', unlockIOSAudioOnce, { capture: true, passive: true });
 
     // =========================================================================
-    // 1B. CUSTOM HOME SCREEN APP ICON & WEB MANIFEST GENERATOR ("Heavy Flap")
+    // 1B. CUSTOM HOME SCREEN & MACOS DOCK APP ICON GENERATOR ("Heavy Flap")
     // =========================================================================
     function generateHomeScreenAppIcon() {
       try {
@@ -1560,7 +1560,10 @@
         const touchLink = document.getElementById('apple-touch-icon');
         const favLink = document.getElementById('app-favicon');
         if (touchLink) touchLink.href = dataUrl;
-        if (favLink) favLink.href = dataUrl;
+        if (favLink) {
+          favLink.type = 'image/png';
+          favLink.href = dataUrl;
+        }
 
         const manifest = {
           name: 'Heavy Flap',
@@ -1572,15 +1575,22 @@
           icons: [
             {
               src: dataUrl,
+              sizes: '192x192',
+              type: 'image/png',
+              purpose: 'any'
+            },
+            {
+              src: dataUrl,
               sizes: '512x512',
               type: 'image/png',
               purpose: 'any maskable'
             }
           ]
         };
-        const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
         const manifestLink = document.getElementById('app-manifest');
-        if (manifestLink) manifestLink.href = URL.createObjectURL(manifestBlob);
+        if (manifestLink) {
+          manifestLink.href = `data:application/manifest+json;charset=utf-8,${encodeURIComponent(JSON.stringify(manifest))}`;
+        }
       } catch (e) {}
     }
 
@@ -1938,7 +1948,7 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v4.5';
+    const APP_VERSION = 'v4.9';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -2483,9 +2493,11 @@
 
       const r = radius;
 
-      // Exhaust puff pipe
-      context.fillStyle = '#0f172a';
-      context.fillRect(-r * 0.68, -r * 0.98, r * 0.18, r * 0.48);
+      // Exhaust puff pipe (hidden on cartoon heads)
+      if (!rigType.startsWith('flappy')) {
+        context.fillStyle = '#0f172a';
+        context.fillRect(-r * 0.68, -r * 0.98, r * 0.18, r * 0.48);
+      }
 
       if (rigType === 'loader') {
         // --- WHEEL LOADER ---
@@ -2849,11 +2861,10 @@
           context.fill();
         });
       } else if (rigType === 'flappylong') {
-        // --- FLAPPY LONG (2014 APP STORE TRIBUTE CHARACTER HEAD) ---
+        // --- FLAPPY LONG (CHIEF CREATOR CARTOON HEAD) ---
         context.save();
         context.scale(1.06, 1.06);
 
-        // Teal turtleneck collar at bottom
         context.fillStyle = '#5ec4c6';
         context.strokeStyle = '#0f172a';
         context.lineWidth = 2.1;
@@ -2866,7 +2877,6 @@
         context.lineTo(r * 0.36, r * 0.72);
         context.stroke();
 
-        // Back / side spiky black hair silhouette
         context.fillStyle = '#111111';
         context.strokeStyle = '#0f172a';
         context.lineWidth = 2;
@@ -2886,7 +2896,6 @@
         context.fill();
         context.stroke();
 
-        // Yellow face & neck contour
         context.fillStyle = '#fef08a';
         context.strokeStyle = '#0f172a';
         context.lineWidth = 2.1;
@@ -2901,14 +2910,12 @@
         context.fill();
         context.stroke();
 
-        // Ear on left side
         context.fillStyle = '#fef08a';
         context.beginPath();
         context.arc(-r * 0.48, -r * 0.02, r * 0.2, Math.PI * 0.45, Math.PI * 1.55);
         context.fill();
         context.stroke();
 
-        // Spiky black bangs over forehead
         context.fillStyle = '#111111';
         context.beginPath();
         context.moveTo(-r * 0.54, -r * 0.35);
@@ -2925,7 +2932,6 @@
         context.closePath();
         context.fill();
 
-        // Eyebrows
         context.strokeStyle = '#0f172a';
         context.lineWidth = 2.4;
         context.lineCap = 'round';
@@ -2936,7 +2942,6 @@
         context.lineTo(r * 0.48, -r * 0.34);
         context.stroke();
 
-        // Big round Simpsons-style eyes
         const eyeRadius = r * 0.17;
         [
           { ex: r * 0.14, ey: -r * 0.18 },
@@ -2956,7 +2961,6 @@
           context.fill();
         });
 
-        // Iconic nose
         context.fillStyle = '#fef08a';
         context.strokeStyle = '#0f172a';
         context.lineWidth = 1.9;
@@ -2967,7 +2971,6 @@
         context.fill();
         context.stroke();
 
-        // Rectangular glasses frames & temple arm
         context.strokeStyle = '#0f172a';
         context.lineWidth = 1.9;
         context.beginPath();
@@ -2982,7 +2985,6 @@
         context.fillRect(r * 0.34, -r * 0.13, r * 0.25, r * 0.16);
         context.strokeRect(r * 0.34, -r * 0.13, r * 0.25, r * 0.16);
 
-        // Big white toothy grin
         context.fillStyle = '#ffffff';
         context.strokeStyle = '#0f172a';
         context.lineWidth = 1.8;
@@ -3002,7 +3004,6 @@
         context.lineTo(r * 0.27, r * 0.35);
         context.stroke();
 
-        // Chin beauty mark / mole
         context.fillStyle = '#0f172a';
         context.beginPath();
         context.arc(r * 0.06, r * 0.44, r * 0.042, 0, Math.PI * 2);
@@ -3010,11 +3011,10 @@
 
         context.restore();
       } else if (rigType === 'flappyemmy') {
-        // --- FLAPPY EMMY (~10 YRS, SIMPSONS-STYLE PORTRAIT WITH TWIN PONYTAILS) ---
+        // --- FLAPPY EMMY (BLAST CREATOR CARTOON HEAD) ---
         context.save();
         context.scale(0.98, 0.98);
 
-        // Coral-pink sweater collar
         context.fillStyle = '#f472b6';
         context.strokeStyle = '#0f172a';
         context.lineWidth = 2.1;
@@ -3027,11 +3027,9 @@
         context.lineTo(r * 0.32, r * 0.71);
         context.stroke();
 
-        // High playful back ponytail (left) & top ponytail (right)
         context.fillStyle = '#3b2314';
         context.strokeStyle = '#0f172a';
         context.lineWidth = 2;
-        // Left swept ponytail
         context.beginPath();
         context.moveTo(-r * 0.45, -r * 0.55);
         context.quadraticCurveTo(-r * 1.05, -r * 0.78, -r * 0.92, -r * 0.12);
@@ -3040,7 +3038,6 @@
         context.fill();
         context.stroke();
 
-        // Top-right perky ponytail
         context.beginPath();
         context.moveTo(r * 0.05, -r * 0.85);
         context.quadraticCurveTo(r * 0.48, -r * 1.24, r * 0.58, -r * 0.76);
@@ -3049,7 +3046,6 @@
         context.fill();
         context.stroke();
 
-        // Pink hair scrunchies / ties
         context.fillStyle = '#fb7185';
         context.beginPath();
         context.arc(-r * 0.48, -r * 0.48, r * 0.11, 0, Math.PI * 2);
@@ -3057,7 +3053,6 @@
         context.fill();
         context.stroke();
 
-        // Hair cap & back neck hair
         context.fillStyle = '#3b2314';
         context.beginPath();
         context.moveTo(-r * 0.46, r * 0.34);
@@ -3069,7 +3064,6 @@
         context.fill();
         context.stroke();
 
-        // Youthful yellow face & neck
         context.fillStyle = '#fef08a';
         context.strokeStyle = '#0f172a';
         context.lineWidth = 2.1;
@@ -3084,14 +3078,12 @@
         context.fill();
         context.stroke();
 
-        // Ear
         context.fillStyle = '#fef08a';
         context.beginPath();
         context.arc(-r * 0.44, 0, r * 0.17, Math.PI * 0.45, Math.PI * 1.55);
         context.fill();
         context.stroke();
 
-        // Cute feathered bangs
         context.fillStyle = '#3b2314';
         context.beginPath();
         context.moveTo(-r * 0.46, -r * 0.3);
@@ -3107,7 +3099,6 @@
         context.closePath();
         context.fill();
 
-        // Big expressive eyes with eyelashes
         const eyeR = r * 0.165;
         [
           { ex: r * 0.12, ey: -r * 0.15 },
@@ -3134,7 +3125,6 @@
           context.fill();
         });
 
-        // Small cute upturned nose
         context.fillStyle = '#fef08a';
         context.strokeStyle = '#0f172a';
         context.lineWidth = 1.8;
@@ -3145,7 +3135,6 @@
         context.fill();
         context.stroke();
 
-        // Cute freckles on cheek
         context.fillStyle = '#d97706';
         context.beginPath();
         context.arc(r * 0.02, r * 0.08, r * 0.024, 0, Math.PI * 2);
@@ -3153,7 +3142,6 @@
         context.arc(r * 0.05, r * 0.15, r * 0.024, 0, Math.PI * 2);
         context.fill();
 
-        // Happy big smile
         context.fillStyle = '#ffffff';
         context.strokeStyle = '#0f172a';
         context.lineWidth = 1.8;
@@ -3168,11 +3156,10 @@
 
         context.restore();
       } else if (rigType === 'flappyemma') {
-        // --- FLAPPY EMMA (~12 YRS, SIMPSONS-STYLE PORTRAIT WITH HEADBAND & SHOULDER HAIR) ---
+        // --- FLAPPY EMMA (SHOP CREATOR CARTOON HEAD) ---
         context.save();
         context.scale(1.03, 1.03);
 
-        // Lavender/purple turtleneck sweater collar
         context.fillStyle = '#a78bfa';
         context.strokeStyle = '#0f172a';
         context.lineWidth = 2.1;
@@ -3185,7 +3172,6 @@
         context.lineTo(r * 0.34, r * 0.72);
         context.stroke();
 
-        // Flowing shoulder-length chestnut-brown hair silhouette
         context.fillStyle = '#29170e';
         context.strokeStyle = '#0f172a';
         context.lineWidth = 2;
@@ -3200,7 +3186,6 @@
         context.fill();
         context.stroke();
 
-        // Yellow face & neck contour
         context.fillStyle = '#fef08a';
         context.strokeStyle = '#0f172a';
         context.lineWidth = 2.1;
@@ -3215,14 +3200,12 @@
         context.fill();
         context.stroke();
 
-        // Ear peeking through hair
         context.fillStyle = '#fef08a';
         context.beginPath();
         context.arc(-r * 0.45, 0, r * 0.18, Math.PI * 0.45, Math.PI * 1.55);
         context.fill();
         context.stroke();
 
-        // Side-swept bangs & hair over crown
         context.fillStyle = '#29170e';
         context.beginPath();
         context.moveTo(-r * 0.5, -r * 0.32);
@@ -3233,7 +3216,6 @@
         context.closePath();
         context.fill();
 
-        // Stylish teal/lavender headband arc
         context.strokeStyle = '#38bdf8';
         context.lineWidth = 4.2;
         context.lineCap = 'round';
@@ -3242,7 +3224,6 @@
         context.quadraticCurveTo(-r * 0.28, -r * 0.78, r * 0.04, -r * 0.86);
         context.stroke();
 
-        // Eyebrows
         context.strokeStyle = '#0f172a';
         context.lineWidth = 2;
         context.beginPath();
@@ -3252,7 +3233,6 @@
         context.lineTo(r * 0.45, -r * 0.32);
         context.stroke();
 
-        // Big expressive Simpsons eyes with subtle lashes
         const eyeR = r * 0.165;
         [
           { ex: r * 0.13, ey: -r * 0.16 },
@@ -3277,7 +3257,6 @@
           context.fill();
         });
 
-        // Cute nose
         context.fillStyle = '#fef08a';
         context.strokeStyle = '#0f172a';
         context.lineWidth = 1.8;
@@ -3288,7 +3267,6 @@
         context.fill();
         context.stroke();
 
-        // Confident cheerful toothy smile
         context.fillStyle = '#ffffff';
         context.strokeStyle = '#0f172a';
         context.lineWidth = 1.8;
@@ -4190,15 +4168,23 @@
         });
       }
 
-      const partTypes = [
-        { shape: 'tire', size: 6.5, color: '#0f172a' },
-        { shape: 'tire', size: 6.5, color: '#0f172a' },
-        { shape: 'plate', size: 6.0, color: skin.body },
-        { shape: 'plate', size: 5.5, color: skin.accent },
-        { shape: 'plate', size: 5.0, color: skin.window },
-        { shape: 'plate', size: 5.5, color: '#334155' },
-        { shape: 'plate', size: 4.5, color: skin.shade }
-      ];
+      const partTypes = state.rig.startsWith('flappy')
+        ? [
+            { shape: 'plate', size: 6.0, color: '#fef08a' },
+            { shape: 'plate', size: 5.5, color: '#fef08a' },
+            { shape: 'plate', size: 5.5, color: state.rig === 'flappylong' ? '#5ec4c6' : state.rig === 'flappyemmy' ? '#f472b6' : '#a78bfa' },
+            { shape: 'plate', size: 5.0, color: '#111111' },
+            { shape: 'plate', size: 4.5, color: '#ffffff' }
+          ]
+        : [
+            { shape: 'tire', size: 6.5, color: '#0f172a' },
+            { shape: 'tire', size: 6.5, color: '#0f172a' },
+            { shape: 'plate', size: 6.0, color: skin.body },
+            { shape: 'plate', size: 5.5, color: skin.accent },
+            { shape: 'plate', size: 5.0, color: skin.window },
+            { shape: 'plate', size: 5.5, color: '#334155' },
+            { shape: 'plate', size: 4.5, color: skin.shade }
+          ];
       partTypes.forEach((pt, idx) => {
         const ang = -Math.PI * 0.85 + (idx / (partTypes.length - 1)) * Math.PI * 0.75 + (Math.random() - 0.5) * 0.25;
         const spd = 150 + Math.random() * 190;
