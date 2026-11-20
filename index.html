@@ -1557,11 +1557,11 @@
 
         const dataUrl = iconCanvas.toDataURL('image/png');
         const touchLink = document.getElementById('apple-touch-icon');
-        if (touchLink) touchLink.href = dataUrl;
+        if (touchLink && dataUrl) touchLink.href = dataUrl;
       } catch (e) {}
     }
 
-    // =========================================================================
+// =========================================================================
     // 2. HEAVY RIG CONFIGURATIONS, SKINS, SHIFT LIGHTING & PROCEDURAL BIOMES
     // =========================================================================
     const RIG_SPECS = {
