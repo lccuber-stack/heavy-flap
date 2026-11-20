@@ -1798,7 +1798,7 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v4.0';
+    const APP_VERSION = 'v4.1';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -4387,12 +4387,21 @@
     function openPaintShop() {
       const banner = document.getElementById('shop-feedback-banner');
       if (banner) banner.classList.add('hidden');
+      const bottomBtn = document.getElementById('btn-close-shop-bottom');
+      if (bottomBtn) {
+        bottomBtn.textContent = state.mode === 'gameover'
+          ? 'Done • Go to Garage'
+          : 'Back to Garage';
+      }
       renderPaintShop();
       document.getElementById('shop-modal').classList.remove('hidden');
     }
 
-    function closePaintShop() {
+    function closePaintShop(goToGarage = false) {
       document.getElementById('shop-modal').classList.add('hidden');
+      if (goToGarage && state.mode !== 'menu') {
+        returnToGarage();
+      }
     }
 
     function renderLeaderboardList(containerId, limit = 10, detailed = false, highlightId = null) {
@@ -4414,8 +4423,8 @@
           const rankInfo = getRankDetails(entry.score);
           const isCurrentRun = highlightId && entry.id === highlightId;
           const rowHighlightStyle = isCurrentRun
-            ? 'background:rgba(56,189,248,0.16); border:1px solid rgba(56,189,248,0.48); border-radius:11px; padding:0.44rem 0.6rem;'
-            : 'padding:0.32rem 0.18rem;';
+            ? 'background:rgba(56,189,248,0.16); border:1px solid rgba(56,189,248,0.48); border-radius:11px; padding:0.46rem 0.65rem;'
+            : 'padding:0.36rem 0.2rem;';
           const youBadge = isCurrentRun
             ? '<span style="background:#38bdf8; color:#0f172a; font-size:0.58rem; font-weight:800; padding:2px 6px; border-radius:999px; letter-spacing:0.03em; flex-shrink:0;">THIS SHIFT</span>'
             : '';
@@ -4492,14 +4501,21 @@
         `;
         const input = row.querySelector('input');
         input.addEventListener('input', (e) => {
-          const val = e.target.value.trim();
-          state.playerNames[i] = val || `Player ${i + 1}`;
+          const rawVal = e.target.value;
+          const trimmedVal = rawVal.trim();
+          state.playerNames[i] = trimmedVal || `Player ${i + 1}`;
           saveRosterToStorage();
           if (i === 0) {
             startLabel.textContent = state.playerCount > 1
               ? `Start: ${state.playerNames[0]}`
               : 'Start Shift';
           }
+        });
+        input.addEventListener('blur', (e) => {
+          const clean = e.target.value.trim();
+          e.target.value = clean || `Player ${i + 1}`;
+          state.playerNames[i] = e.target.value;
+          saveRosterToStorage();
         });
         container.appendChild(row);
       }
@@ -4536,7 +4552,6 @@
       state.spawnTimer = 0;
       state.hazardTimer = 3.5;
 
-      // Prepare purchased boosts (committed on first flap so abandoned shifts don't waste items)
       state.activeShield = false;
       state.activeMagnet = false;
       state.turboTimer = 0;
@@ -4558,6 +4573,7 @@
       document.getElementById('start-modal').classList.add('hidden');
       document.getElementById('pause-modal').classList.add('hidden');
       document.getElementById('gameover-modal').classList.add('hidden');
+      document.getElementById('shop-modal').classList.add('hidden');
       document.getElementById('hud').classList.remove('hidden');
       document.getElementById('ready-hint').classList.remove('hidden');
     }
@@ -4574,6 +4590,7 @@
 
     function returnToGarage() {
       state.mode = 'menu';
+      state.activePlayerIndex = 0;
       rollNewProceduralBiome(true);
       state.obstacles = [];
       state.collectibles = [];
@@ -4592,16 +4609,15 @@
       document.getElementById('ready-hint').classList.add('hidden');
       document.getElementById('pause-modal').classList.add('hidden');
       document.getElementById('gameover-modal').classList.add('hidden');
+      document.getElementById('shop-modal').classList.add('hidden');
       document.getElementById('start-modal').classList.remove('hidden');
     }
 
-    // Canvas Tap / Pointer Controls
     canvas.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       handleFlapAction();
     });
 
-    // Keyboard Controls (Space, Up Arrow, W, P / Esc)
     window.addEventListener('keydown', (e) => {
       if (document.activeElement && document.activeElement.tagName === 'INPUT') {
         if (e.code === 'Enter') document.activeElement.blur();
@@ -4722,18 +4738,18 @@
 
     document.getElementById('btn-close-shop').addEventListener('click', () => {
       audio.playClick();
-      closePaintShop();
+      closePaintShop(false);
     });
 
     document.getElementById('btn-close-shop-bottom').addEventListener('click', () => {
       audio.playClick();
-      closePaintShop();
+      closePaintShop(true);
     });
 
     document.getElementById('shop-modal').addEventListener('click', (e) => {
       if (e.target === e.currentTarget) {
         audio.playClick();
-        closePaintShop();
+        closePaintShop(false);
       }
     });
 
