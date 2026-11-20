@@ -13,8 +13,8 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Heavy Flap</title>
-  <link id="apple-touch-icon" rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPj/HwADBwIAMCbHYQAAAABJRU5ErkJggg==" />
-  <link id="app-favicon" rel="icon" type="image/png" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPj/HwADBwIAMCbHYQAAAABJRU5ErkJggg==" />
+  <link id="apple-touch-icon" rel="apple-touch-icon" sizes="512x512" href="" />
+  <link id="app-favicon" rel="icon" type="image/png" sizes="512x512" href="" />
   <link id="app-manifest" rel="manifest" href="" />
 
   <!-- Typography: Chakra Petch (Industrial Display) & Inter (Clean UI) -->
@@ -919,12 +919,12 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.66rem; font-weight:800; letter-spacing:0.12em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.0</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.2</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.6rem, 6.8vw, 2.1rem); font-weight:700; line-height:1.05; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.35rem; flex-wrap:wrap;">
               <button type="button" id="btn-sync-latest" style="background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.38); color:#e0f2fe; border-radius:999px; padding:0.2rem 0.6rem; font-size:0.64rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.25rem;">
-                <span id="sync-status-text">↻ Get Latest (v5.0)</span>
+                <span id="sync-status-text">↻ Get Latest (v5.2)</span>
               </button>
               <button type="button" class="bank-pill" id="btn-open-shop" title="Unlock Machines, Boosts, Trails & Skins">
                 <span style="display:inline-flex; align-items:center; gap:0.32rem;">
@@ -1562,11 +1562,10 @@
         if (touchLink) touchLink.href = dataUrl;
         if (favLink) favLink.href = dataUrl;
 
-        const cleanBase = window.location.href.split('?')[0].split('#')[0];
         const manifest = {
           name: 'Heavy Flap',
           short_name: 'Heavy Flap',
-          start_url: cleanBase,
+          start_url: window.location.href.split('?')[0].split('#')[0],
           display: 'standalone',
           background_color: '#0f172a',
           theme_color: '#0f172a',
@@ -1579,10 +1578,9 @@
             }
           ]
         };
+        const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
         const manifestLink = document.getElementById('app-manifest');
-        if (manifestLink) {
-          manifestLink.href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
-        }
+        if (manifestLink) manifestLink.href = URL.createObjectURL(manifestBlob);
       } catch (e) {}
     }
 
@@ -1940,7 +1938,7 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v5.0';
+    const APP_VERSION = 'v5.2';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
