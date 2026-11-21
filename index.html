@@ -1116,6 +1116,7 @@
               <button type="button" id="btn-sync-latest" class="sync-circle-btn" title="Check for latest update">
                 <span id="sync-status-text">↻</span>
               </button>
+              <span id="sync-toast-pill" class="hidden" style="font-size:0.62rem; font-weight:700; color:#6ee7b7; background:rgba(16,185,129,0.16); border:1px solid rgba(52,211,153,0.4); border-radius:999px; padding:2px 8px; white-space:nowrap;"></span>
             </div>
           </div>
           <button type="button" class="record-btn" id="btn-open-leaderboard" title="View Top 10 High Scores">
@@ -2178,11 +2179,30 @@
     }
 
     let initialSignature = null;
+    let syncToastTimeout = null;
 
-    function setSyncButtonFeedback(text, stateType = 'default') {
+    function setSyncButtonFeedback(text, stateType = 'default', toastMsg = '') {
       const btn = document.getElementById('btn-sync-latest');
       const label = document.getElementById('sync-status-text');
+      const toast = document.getElementById('sync-toast-pill');
       if (label) label.textContent = text;
+      if (toast && toastMsg) {
+        toast.textContent = toastMsg;
+        toast.classList.remove('hidden');
+        if (stateType === 'warn') {
+          toast.style.color = '#fde68a';
+          toast.style.background = 'rgba(245, 158, 11, 0.18)';
+          toast.style.borderColor = 'rgba(251, 191, 36, 0.45)';
+        } else {
+          toast.style.color = '#6ee7b7';
+          toast.style.background = 'rgba(16, 185, 129, 0.16)';
+          toast.style.borderColor = 'rgba(52, 211, 153, 0.4)';
+        }
+        clearTimeout(syncToastTimeout);
+        syncToastTimeout = setTimeout(() => {
+          toast.classList.add('hidden');
+        }, 2600);
+      }
       if (!btn) return;
       if (stateType === 'latest') {
         btn.style.background = 'rgba(16, 185, 129, 0.22)';
@@ -2201,12 +2221,12 @@
 
     async function checkAndApplyLatestBuild(manual = false) {
       if (manual) {
-        setSyncButtonFeedback('⏳', 'default');
+        setSyncButtonFeedback('⏳', 'default', 'Checking...');
       }
       try {
         const baseUrl = window.location.href.split('?')[0].split('#')[0];
         if (!baseUrl.startsWith('http')) {
-          if (manual) setSyncButtonFeedback('✓', 'latest');
+          if (manual) setSyncButtonFeedback('✓', 'latest', `Latest (${APP_VERSION})`);
           return;
         }
         const bustUrl = `${baseUrl}?v=${Date.now()}`;
@@ -2222,19 +2242,19 @@
         if (initialSignature === null) {
           initialSignature = signature;
           if (manual) {
-            setSyncButtonFeedback('✓', 'latest');
+            setSyncButtonFeedback('✓', 'latest', `Latest (${APP_VERSION})`);
           }
           return;
         }
         if (signature !== initialSignature) {
-          if (manual) setSyncButtonFeedback('↻', 'default');
+          if (manual) setSyncButtonFeedback('↻', 'default', 'Updating...');
           window.location.replace(baseUrl);
         } else if (manual) {
-          setSyncButtonFeedback('✓', 'latest');
+          setSyncButtonFeedback('✓', 'latest', `Latest (${APP_VERSION})`);
         }
       } catch (err) {
         if (manual) {
-          setSyncButtonFeedback('!', 'warn');
+          setSyncButtonFeedback('!', 'warn', 'Offline');
         }
       }
     }
