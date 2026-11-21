@@ -797,6 +797,62 @@
       min-width: 0;
     }
 
+    /* Tactical In-Game Power-Up Bar (Bottom Right) */
+    .tactical-bar {
+      position: fixed;
+      right: calc(0.9rem + var(--safe-right));
+      bottom: calc(1.1rem + var(--safe-bottom));
+      z-index: 15;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      pointer-events: auto;
+    }
+
+    .tactical-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.45rem;
+      padding: 0.55rem 0.85rem;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1.5px solid rgba(251, 191, 36, 0.55);
+      color: #f8fafc;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.15s ease, border-color 0.15s ease;
+    }
+
+    .tactical-btn:active {
+      transform: scale(0.94);
+    }
+
+    .tactical-btn.shield-btn {
+      border-color: rgba(56, 189, 248, 0.65);
+    }
+
+    .tactical-btn.turbo-btn {
+      border-color: rgba(251, 191, 36, 0.72);
+    }
+
+    .tactical-btn.is-active {
+      opacity: 0.68;
+      border-color: #34d399;
+      background: rgba(6, 78, 59, 0.88);
+    }
+
+    .tactical-count {
+      background: rgba(255, 255, 255, 0.14);
+      padding: 1px 6px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      color: #fde047;
+    }
+
     @media (max-width: 440px) {
       .hud-badge {
         padding: 0.34rem 0.5rem;
@@ -911,6 +967,18 @@
         <span id="ready-hint-text">TAP, CLICK OR PRESS SPACE</span>
       </div>
     </div>
+
+    <!-- On-Demand Tactical Power-Up Buttons (Shield & Turbo Boost) -->
+    <div id="tactical-powerups" class="tactical-bar hidden">
+      <button type="button" class="tactical-btn shield-btn hidden" id="btn-use-shield" title="Activate Safety Shield (Key: 1 or E)">
+        <span>🛡️ Shield</span>
+        <span class="tactical-count" id="tactical-shield-count">×1</span>
+      </button>
+      <button type="button" class="tactical-btn turbo-btn hidden" id="btn-use-turbo" title="Activate Turbo Boost (Key: 2 or T)">
+        <span>⚡ Turbo</span>
+        <span class="tactical-count" id="tactical-turbo-count">×1</span>
+      </button>
+    </div>
   </div>
 
   <!-- Start / Garage Menu Modal -->
@@ -922,12 +990,12 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.66rem; font-weight:800; letter-spacing:0.12em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.3</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.4</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.6rem, 6.8vw, 2.1rem); font-weight:700; line-height:1.05; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.35rem; flex-wrap:wrap;">
               <button type="button" id="btn-sync-latest" style="background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.38); color:#e0f2fe; border-radius:999px; padding:0.2rem 0.6rem; font-size:0.64rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.25rem;">
-                <span id="sync-status-text">↻ Get Latest (v5.3)</span>
+                <span id="sync-status-text">↻ Get Latest (v5.4)</span>
               </button>
               <button type="button" class="bank-pill" id="btn-open-shop" title="Unlock Machines, Boosts, Trails & Skins">
                 <span style="display:inline-flex; align-items:center; gap:0.32rem;">
@@ -1679,9 +1747,9 @@
     ];
 
     const SHIFT_BOOSTS = [
-      { id: 'shield', name: 'Safety Shield', icon: '🛡️', cost: 25, desc: 'Survive 1 crash' },
-      { id: 'magnet', name: 'Hardhat Magnet', icon: '🧲', cost: 30, desc: 'Auto-pull hardhats' },
-      { id: 'turbo', name: 'Turbo Start', icon: '⚡', cost: 40, desc: 'Blast past 8 beams' }
+      { id: 'shield', name: 'Safety Shield', icon: '🛡️', cost: 25, desc: 'Activate mid-flight • 1 crash' },
+      { id: 'magnet', name: 'Hardhat Magnet', icon: '🧲', cost: 30, desc: 'Auto-pulls hardhats' },
+      { id: 'turbo', name: 'Turbo Boost', icon: '⚡', cost: 40, desc: 'Activate mid-flight • 8 beams' }
     ];
 
     function getTrailById(trailId) {
@@ -1919,7 +1987,7 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v5.3';
+    const APP_VERSION = 'v5.4';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -4592,25 +4660,96 @@
     function commitOwnedBoostsForShift() {
       if (state.boostsCommitted) return;
       state.boostsCommitted = true;
-      let usedBoost = false;
-      if ((state.ownedBoosts.shield || 0) > 0) {
-        state.ownedBoosts.shield -= 1;
-        state.activeShield = true;
-        usedBoost = true;
-      }
       if ((state.ownedBoosts.magnet || 0) > 0) {
         state.ownedBoosts.magnet -= 1;
         state.activeMagnet = true;
-        usedBoost = true;
-      }
-      if ((state.ownedBoosts.turbo || 0) > 0) {
-        state.ownedBoosts.turbo -= 1;
-        state.turboTimer = 4.2;
-        usedBoost = true;
-      }
-      if (usedBoost) {
         saveShopData();
-        updateHUD();
+        spawnFloatingText(state.player.x + 18, state.player.y - 26, '🧲 MAGNET ACTIVE!', '#34d399');
+      }
+      updateHUD();
+    }
+
+    function activateShieldOnDemand() {
+      if (state.mode !== 'playing') return;
+      if (state.activeShield) {
+        spawnFloatingText(state.player.x + 16, state.player.y - 24, '🛡️ SHIELD ALREADY ON!', '#38bdf8');
+        return;
+      }
+      if ((state.ownedBoosts.shield || 0) <= 0) return;
+      state.ownedBoosts.shield -= 1;
+      state.activeShield = true;
+      saveShopData();
+      audio.playHardhatPickup();
+      spawnDust(state.player.x, state.player.y, 12, '#38bdf8');
+      spawnFloatingText(state.player.x + 20, state.player.y - 28, '🛡️ SAFETY SHIELD ON!', '#38bdf8');
+      updateHUD();
+    }
+
+    function activateTurboOnDemand() {
+      if (state.mode !== 'playing') return;
+      if (state.turboTimer > 0) {
+        state.turboTimer += 4.2;
+      } else {
+        if ((state.ownedBoosts.turbo || 0) <= 0) return;
+        state.turboTimer = 4.2;
+      }
+      state.ownedBoosts.turbo -= 1;
+      state.turboGraceTimer = 0;
+      state.screenShake = 0.35;
+      saveShopData();
+      audio.playSkinUnlock();
+      spawnDust(state.player.x - 10, state.player.y, 16, '#fbbf24');
+      spawnFloatingText(state.player.x + 24, state.player.y - 30, '⚡ TURBO BOOST!', '#fde047');
+      updateHUD();
+    }
+
+    function updateTacticalButtons() {
+      const bar = document.getElementById('tactical-powerups');
+      const shieldBtn = document.getElementById('btn-use-shield');
+      const turboBtn = document.getElementById('btn-use-turbo');
+      const shieldCount = document.getElementById('tactical-shield-count');
+      const turboCount = document.getElementById('tactical-turbo-count');
+      if (!bar || !shieldBtn || !turboBtn) return;
+
+      if (state.mode !== 'playing') {
+        bar.classList.add('hidden');
+        return;
+      }
+
+      const ownedShields = state.ownedBoosts.shield || 0;
+      const ownedTurbos = state.ownedBoosts.turbo || 0;
+      const showShield = ownedShields > 0 || state.activeShield;
+      const showTurbo = ownedTurbos > 0 || state.turboTimer > 0;
+
+      if (!showShield && !showTurbo) {
+        bar.classList.add('hidden');
+        return;
+      }
+
+      bar.classList.remove('hidden');
+
+      if (showShield) {
+        shieldBtn.classList.remove('hidden');
+        shieldBtn.classList.toggle('is-active', state.activeShield);
+        if (shieldCount) {
+          shieldCount.textContent = state.activeShield
+            ? (ownedShields > 0 ? `ON (+${ownedShields})` : 'ON')
+            : `×${ownedShields}`;
+        }
+      } else {
+        shieldBtn.classList.add('hidden');
+      }
+
+      if (showTurbo) {
+        turboBtn.classList.remove('hidden');
+        turboBtn.classList.toggle('is-active', state.turboTimer > 0);
+        if (turboCount) {
+          turboCount.textContent = state.turboTimer > 0
+            ? (ownedTurbos > 0 ? `ON (+${ownedTurbos})` : 'ON')
+            : `×${ownedTurbos}`;
+        }
+      } else {
+        turboBtn.classList.add('hidden');
       }
     }
 
@@ -4656,12 +4795,9 @@
       const boostsWrap = document.getElementById('hud-boosts-wrap');
       if (boostsWrap) {
         const activeIcons = [];
-        const hasShield = state.activeShield || (!state.boostsCommitted && (state.ownedBoosts.shield || 0) > 0);
-        const hasMagnet = state.activeMagnet || (!state.boostsCommitted && (state.ownedBoosts.magnet || 0) > 0);
-        const hasTurbo = state.turboTimer > 0 || (!state.boostsCommitted && (state.ownedBoosts.turbo || 0) > 0);
-        if (hasShield) activeIcons.push('<span title="Safety Shield Active" style="font-size:0.85rem;">🛡️</span>');
-        if (hasMagnet) activeIcons.push('<span title="Hardhat Magnet Active" style="font-size:0.85rem;">🧲</span>');
-        if (hasTurbo) activeIcons.push('<span title="Turbo Start Ready" style="font-size:0.85rem;">⚡</span>');
+        if (state.activeShield) activeIcons.push('<span title="Safety Shield Active" style="font-size:0.82rem;">🛡️</span>');
+        if (state.activeMagnet) activeIcons.push('<span title="Hardhat Magnet Active" style="font-size:0.82rem;">🧲</span>');
+        if (state.turboTimer > 0 || state.turboGraceTimer > 0) activeIcons.push('<span title="Turbo Boost Active" style="font-size:0.82rem;">⚡</span>');
         if (activeIcons.length > 0) {
           boostsWrap.innerHTML = activeIcons.join('');
           boostsWrap.classList.remove('hidden');
@@ -4670,6 +4806,8 @@
           boostsWrap.classList.add('hidden');
         }
       }
+
+      updateTacticalButtons();
 
       const tier = getDifficultyTier();
       const tierPill = document.getElementById('hud-tier-pill');
@@ -4993,6 +5131,8 @@
 
     function closePaintShop(goToGarage = false) {
       document.getElementById('shop-modal').classList.add('hidden');
+      updateRecordDisplay();
+      renderRigPreviews();
       if (goToGarage && state.mode !== 'menu') {
         returnToGarage();
       }
@@ -5237,6 +5377,20 @@
         return;
       }
       if (shopOpen || lbOpen) return;
+      if (e.code === 'Digit1' || e.code === 'KeyE') {
+        if (state.mode === 'playing') {
+          e.preventDefault();
+          activateShieldOnDemand();
+        }
+        return;
+      }
+      if (e.code === 'Digit2' || e.code === 'KeyT') {
+        if (state.mode === 'playing') {
+          e.preventDefault();
+          activateTurboOnDemand();
+        }
+        return;
+      }
       if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
         e.preventDefault();
         if (state.mode === 'ready' || state.mode === 'playing') {
@@ -5302,6 +5456,24 @@
       audio.playClick();
       prepareReadyShift(true, false);
     });
+
+    const shieldBtnEl = document.getElementById('btn-use-shield');
+    if (shieldBtnEl) {
+      shieldBtnEl.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        activateShieldOnDemand();
+      });
+    }
+
+    const turboBtnEl = document.getElementById('btn-use-turbo');
+    if (turboBtnEl) {
+      turboBtnEl.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        activateTurboOnDemand();
+      });
+    }
 
     document.getElementById('btn-retry-shift').addEventListener('click', () => {
       audio.playClick();
