@@ -275,7 +275,7 @@
     /* Ready Prompt Overlay */
     #ready-hint {
       position: fixed;
-      bottom: calc(17% + var(--safe-bottom));
+      bottom: calc(9.4rem + var(--safe-bottom));
       left: 50%;
       transform: translateX(-50%);
       z-index: 12;
@@ -284,25 +284,79 @@
       max-width: 92vw;
       animation: floatPulse 1.6s ease-in-out infinite;
     }
+    /* Tactical In-Game Power-Up Bar (Centered Lower Above Ground Curb) */
+    .tactical-bar {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(3.15rem + var(--safe-bottom));
+      z-index: 16;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      justify-content: center;
+      gap: 0.6rem;
+      width: max-content;
+      max-width: calc(100vw - 1.2rem - var(--safe-left) - var(--safe-right));
+      pointer-events: auto;
+    }
 
-    .tap-pill {
-      background: rgba(15, 23, 42, 0.88);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 2px solid var(--cat-yellow);
-      border-radius: 999px;
-      padding: 0.58rem 1.1rem;
+    @media (min-width: 720px) and (min-height: 540px) {
+      .tactical-bar {
+        bottom: calc(3.75rem + var(--safe-bottom));
+        gap: 0.75rem;
+      }
+      #ready-hint {
+        bottom: calc(10.2rem + var(--safe-bottom));
+      }
+    }
+
+    .tactical-btn {
+      min-width: 142px;
+      min-height: 52px;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
+      justify-content: space-between;
+      gap: 0.65rem;
+      padding: 0.56rem 0.88rem;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 2px solid rgba(251, 191, 36, 0.72);
+      color: #f8fafc;
       font-family: 'Chakra Petch', sans-serif;
       font-weight: 700;
-      font-size: clamp(0.84rem, 3.5vw, 1.02rem);
-      letter-spacing: 0.04em;
-      color: #ffffff;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+      font-size: 0.92rem;
       white-space: nowrap;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 0.12s ease, opacity 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    @media (max-width: 420px) {
+      .tactical-btn {
+        min-width: 126px;
+        min-height: 48px;
+        padding: 0.5rem 0.72rem;
+        font-size: 0.84rem;
+        gap: 0.45rem;
+      }
+    }
+
+    .tactical-btn:hover:not(:disabled) {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    .tactical-btn:active:not(:disabled) {
+      transform: scale(0.94);
+    }
+
+    .tactical-btn.is-spent {
+      opacity: 0.48;
+      border-color: rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.82);
+      cursor: default;
     }
 
     @keyframes floatPulse {
@@ -1019,25 +1073,25 @@
         <span id="ready-hint-text">TAP, CLICK OR PRESS SPACE</span>
       </div>
       <div id="ready-boost-hint" class="hidden" style="margin-top:6px;">
-        <span style="display:inline-block; background:rgba(15,23,42,0.9); border:1px solid rgba(56,189,248,0.55); border-radius:999px; padding:4px 12px; font-family:'Chakra Petch',sans-serif; font-size:0.72rem; font-weight:700; color:#7dd3fc; letter-spacing:0.03em;">
-          ⚡ TAP SHIELD / TURBO BUTTONS (OR E / T) MID-FLIGHT
+        <span style="display:inline-block; background:rgba(15,23,42,0.92); border:1px solid rgba(56,189,248,0.55); border-radius:999px; padding:4px 12px; font-family:'Chakra Petch',sans-serif; font-size:0.7rem; font-weight:700; color:#7dd3fc; letter-spacing:0.03em;">
+          ⚡ MAX 1 PER SHIFT • TAP SHIELD / TURBO (OR E / T)
         </span>
       </div>
     </div>
 
-    <!-- On-Demand Tactical Power-Up Buttons (Large Touch Targets for iPhone, iPad & Desktop) -->
+    <!-- On-Demand Tactical Power-Up Buttons (Centered Lower Above Ground Curb) -->
     <div id="tactical-powerups" class="tactical-bar hidden">
-      <button type="button" class="tactical-btn shield-btn hidden" id="btn-use-shield" title="Tap or press E / 1 to activate Safety Shield">
+      <button type="button" class="tactical-btn shield-btn hidden" id="btn-use-shield" title="Tap or press E / 1 to activate Safety Shield (Max 1 per shift)">
         <span class="tactical-label-col">
           <span>🛡️ SHIELD</span>
-          <span class="tactical-subhint">TAP • KEY [E]</span>
+          <span class="tactical-subhint">MAX 1/SHIFT • [E]</span>
         </span>
         <span class="tactical-count" id="tactical-shield-count">×1</span>
       </button>
-      <button type="button" class="tactical-btn turbo-btn hidden" id="btn-use-turbo" title="Tap or press T / 2 to activate Turbo Boost">
+      <button type="button" class="tactical-btn turbo-btn hidden" id="btn-use-turbo" title="Tap or press T / 2 to activate Turbo Boost (Max 1 per shift)">
         <span class="tactical-label-col">
           <span>⚡ TURBO</span>
-          <span class="tactical-subhint">TAP • KEY [T]</span>
+          <span class="tactical-subhint">MAX 1/SHIFT • [T]</span>
         </span>
         <span class="tactical-count" id="tactical-turbo-count">×1</span>
       </button>
@@ -1053,12 +1107,12 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.66rem; font-weight:800; letter-spacing:0.12em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.6</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.7</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.6rem, 6.8vw, 2.1rem); font-weight:700; line-height:1.05; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.35rem; flex-wrap:wrap;">
               <button type="button" id="btn-sync-latest" style="background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.38); color:#e0f2fe; border-radius:999px; padding:0.2rem 0.6rem; font-size:0.64rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.25rem;">
-                <span id="sync-status-text">↻ Get Latest (v5.6)</span>
+                <span id="sync-status-text">↻ Get Latest (v5.7)</span>
               </button>
               <button type="button" class="bank-pill" id="btn-open-shop" title="Unlock Machines, Boosts, Trails & Skins">
                 <span style="display:inline-flex; align-items:center; gap:0.32rem;">
@@ -1810,9 +1864,9 @@
     ];
 
     const SHIFT_BOOSTS = [
-      { id: 'shield', name: 'Safety Shield', icon: '🛡️', cost: 25, desc: 'Activate mid-flight • 1 crash' },
-      { id: 'magnet', name: 'Hardhat Magnet', icon: '🧲', cost: 30, desc: 'Auto-pulls hardhats' },
-      { id: 'turbo', name: 'Turbo Boost', icon: '⚡', cost: 40, desc: 'Activate mid-flight • 8 beams' }
+      { id: 'shield', name: 'Safety Shield', icon: '🛡️', cost: 25, desc: '1 crash • Tap [E] (1/shift)' },
+      { id: 'magnet', name: 'Hardhat Magnet', icon: '🧲', cost: 30, desc: 'Full shift • Auto-active' },
+      { id: 'turbo', name: 'Turbo Boost', icon: '⚡', cost: 40, desc: '8 beams • Tap [T] (1/shift)' }
     ];
 
     function getTrailById(trailId) {
@@ -2050,7 +2104,7 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v5.6';
+    const APP_VERSION = 'v5.8';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -2381,6 +2435,8 @@
       activeMagnet: false,
       turboTimer: 0,
       turboGraceTimer: 0,
+      shieldUsedThisShift: false,
+      turboUsedThisShift: false,
       boostsCommitted: false,
       coins: initialShop.coins,
       shift: 'day',
@@ -4740,6 +4796,7 @@
 
     function activateShieldOnDemand() {
       if (state.mode === 'ready') {
+        if (state.shieldUsedThisShift || (state.ownedBoosts.shield || 0) <= 0) return;
         state.mode = 'playing';
         document.getElementById('ready-hint').classList.add('hidden');
         commitOwnedBoostsForShift();
@@ -4751,9 +4808,14 @@
         spawnFloatingText(state.player.x + 16, state.player.y - 24, '🛡️ SHIELD ALREADY ON!', '#38bdf8');
         return;
       }
+      if (state.shieldUsedThisShift) {
+        spawnFloatingText(state.player.x + 16, state.player.y - 24, 'MAX 1 SHIELD PER SHIFT!', '#94a3b8');
+        return;
+      }
       if ((state.ownedBoosts.shield || 0) <= 0) return;
       state.ownedBoosts.shield -= 1;
       state.activeShield = true;
+      state.shieldUsedThisShift = true;
       saveShopData();
       audio.playHardhatPickup();
       spawnDust(state.player.x, state.player.y, 12, '#38bdf8');
@@ -4763,18 +4825,24 @@
 
     function activateTurboOnDemand() {
       if (state.mode === 'ready') {
+        if (state.turboUsedThisShift || (state.ownedBoosts.turbo || 0) <= 0) return;
         state.mode = 'playing';
         document.getElementById('ready-hint').classList.add('hidden');
         commitOwnedBoostsForShift();
       }
       if (state.mode !== 'playing') return;
       if (state.turboTimer > 0) {
-        state.turboTimer += 4.2;
-      } else {
-        if ((state.ownedBoosts.turbo || 0) <= 0) return;
-        state.turboTimer = 4.2;
+        spawnFloatingText(state.player.x + 16, state.player.y - 24, '⚡ TURBO ALREADY ON!', '#fde047');
+        return;
       }
+      if (state.turboUsedThisShift) {
+        spawnFloatingText(state.player.x + 16, state.player.y - 24, 'MAX 1 TURBO PER SHIFT!', '#94a3b8');
+        return;
+      }
+      if ((state.ownedBoosts.turbo || 0) <= 0) return;
       state.ownedBoosts.turbo -= 1;
+      state.turboTimer = 4.2;
+      state.turboUsedThisShift = true;
       state.turboGraceTimer = 0;
       state.screenShake = 0.35;
       saveShopData();
@@ -4801,8 +4869,8 @@
 
       const ownedShields = state.ownedBoosts.shield || 0;
       const ownedTurbos = state.ownedBoosts.turbo || 0;
-      const showShield = ownedShields > 0 || state.activeShield;
-      const showTurbo = ownedTurbos > 0 || state.turboTimer > 0;
+      const showShield = ownedShields > 0 || state.activeShield || state.shieldUsedThisShift;
+      const showTurbo = ownedTurbos > 0 || state.turboTimer > 0 || state.turboUsedThisShift;
 
       if (readyBoostHint) {
         readyBoostHint.classList.toggle('hidden', state.mode !== 'ready' || (!showShield && !showTurbo));
@@ -4818,10 +4886,14 @@
       if (showShield) {
         shieldBtn.classList.remove('hidden');
         shieldBtn.classList.toggle('is-active', state.activeShield);
+        const isSpent = state.shieldUsedThisShift && !state.activeShield;
+        shieldBtn.classList.toggle('is-spent', isSpent);
         if (shieldCount) {
           shieldCount.textContent = state.activeShield
-            ? (ownedShields > 0 ? `ON (+${ownedShields})` : 'ON')
-            : `×${ownedShields}`;
+            ? 'ON'
+            : isSpent
+              ? 'USED'
+              : `×${ownedShields}`;
         }
       } else {
         shieldBtn.classList.add('hidden');
@@ -4830,10 +4902,14 @@
       if (showTurbo) {
         turboBtn.classList.remove('hidden');
         turboBtn.classList.toggle('is-active', state.turboTimer > 0);
+        const isSpent = state.turboUsedThisShift && state.turboTimer <= 0;
+        turboBtn.classList.toggle('is-spent', isSpent);
         if (turboCount) {
           turboCount.textContent = state.turboTimer > 0
             ? `${state.turboTimer.toFixed(1)}s`
-            : `×${ownedTurbos}`;
+            : isSpent
+              ? 'USED'
+              : `×${ownedTurbos}`;
         }
       } else {
         turboBtn.classList.add('hidden');
@@ -5039,7 +5115,7 @@
       }
 
       if (state.shopTab === 'boosts') {
-        grid.innerHTML = SHIFT_BOOSTS.map((b) => {
+        grid.innerHTML = `<div style="grid-column: 1 / -1; text-align:center; font-size:0.68rem; font-weight:700; color:#94a3b8; background:rgba(15,23,42,0.65); border:1px solid rgba(255,255,255,0.08); border-radius:9px; padding:4px 8px;">⚡ Single-shift items • Uses 1 from stock per shift</div>` + SHIFT_BOOSTS.map((b) => {
           const owned = state.ownedBoosts[b.id] || 0;
           const canAfford = state.coins >= b.cost;
           const cardClass = owned > 0 ? 'skin-card equipped' : canAfford ? 'skin-card affordable' : 'skin-card locked';
@@ -5377,6 +5453,8 @@
       state.activeMagnet = false;
       state.turboTimer = 0;
       state.turboGraceTimer = 0;
+      state.shieldUsedThisShift = false;
+      state.turboUsedThisShift = false;
       state.boostsCommitted = false;
 
       const spacing = state.width < 600 ? 275 : 315;
@@ -5425,6 +5503,8 @@
       state.activeMagnet = false;
       state.turboTimer = 0;
       state.turboGraceTimer = 0;
+      state.shieldUsedThisShift = false;
+      state.turboUsedThisShift = false;
       state.boostsCommitted = false;
       updateRecordDisplay();
       renderRigPreviews();
