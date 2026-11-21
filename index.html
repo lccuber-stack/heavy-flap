@@ -432,23 +432,27 @@
     .active-boosts-bar {
       display: flex;
       align-items: center;
-      gap: 0.32rem;
-      flex-wrap: wrap;
-      margin-top: 0.42rem;
+      justify-content: space-between;
+      gap: 0.25rem;
+      flex-wrap: nowrap;
+      margin-top: 0.36rem;
+      overflow-x: auto;
     }
 
     .boost-chip {
       display: inline-flex;
       align-items: center;
-      gap: 0.25rem;
+      gap: 0.2rem;
       background: rgba(16, 185, 129, 0.18);
       border: 1px solid rgba(52, 211, 153, 0.48);
       color: #6ee7b7;
       border-radius: 999px;
-      padding: 2px 8px;
+      padding: 2px 6px;
       font-family: 'Chakra Petch', sans-serif;
-      font-size: 0.64rem;
+      font-size: 0.6rem;
       font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     /* Garage Shop & Hardhat Bank */
@@ -824,22 +828,22 @@
     /* Extra compact spacing for short iPhone viewports (e.g. Safari with bottom bar) */
     @media (max-height: 760px) {
       .card-body {
-        padding: 0.62rem 0.8rem 0.72rem 0.8rem;
+        padding: 0.56rem 0.78rem 0.68rem 0.78rem;
       }
       .rig-grid {
-        gap: 0.28rem;
+        gap: 0.24rem;
       }
       .rig-card {
-        padding: 0.22rem 0.15rem;
+        padding: 0.2rem 0.14rem;
       }
       .rig-preview {
-        width: 48px;
-        height: 31px;
-        margin-bottom: 0.08rem;
+        width: 46px;
+        height: 30px;
+        margin-bottom: 0.06rem;
       }
       .btn-launch {
-        margin-top: 0.52rem;
-        padding: 0.62rem 0.95rem;
+        margin-top: 0.45rem;
+        padding: 0.58rem 0.9rem;
       }
     }
   </style>
@@ -918,12 +922,12 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.66rem; font-weight:800; letter-spacing:0.12em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.2</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.3</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.6rem, 6.8vw, 2.1rem); font-weight:700; line-height:1.05; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.35rem; flex-wrap:wrap;">
               <button type="button" id="btn-sync-latest" style="background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.38); color:#e0f2fe; border-radius:999px; padding:0.2rem 0.6rem; font-size:0.64rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.25rem;">
-                <span id="sync-status-text">↻ Get Latest (v5.2)</span>
+                <span id="sync-status-text">↻ Get Latest (v5.3)</span>
               </button>
               <button type="button" class="bank-pill" id="btn-open-shop" title="Unlock Machines, Boosts, Trails & Skins">
                 <span style="display:inline-flex; align-items:center; gap:0.32rem;">
@@ -1915,7 +1919,7 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v5.2';
+    const APP_VERSION = 'v5.3';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -2245,6 +2249,7 @@
       activeShield: false,
       activeMagnet: false,
       turboTimer: 0,
+      turboGraceTimer: 0,
       boostsCommitted: false,
       coins: initialShop.coins,
       shift: 'day',
@@ -2836,14 +2841,14 @@
           context.fill();
         });
       } else if (rigType === 'flappylong') {
-        // --- FLAPPY LONG (2014 APP STORE TRIBUTE CHARACTER HEAD) ---
+        // --- FLAPPY LONG (CRISP THIN-LINE PORTRAIT) ---
         context.save();
         context.scale(1.06, 1.06);
 
         // Teal turtleneck collar at bottom
         context.fillStyle = '#5ec4c6';
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 2.1;
+        context.lineWidth = 1.15;
         context.beginPath();
         context.roundRect(-r * 0.48, r * 0.56, r * 0.88, r * 0.32, 6);
         context.fill();
@@ -2856,7 +2861,7 @@
         // Back / side spiky black hair silhouette
         context.fillStyle = '#111111';
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 2;
+        context.lineWidth = 1.1;
         context.beginPath();
         context.moveTo(-r * 0.62, r * 0.55);
         context.lineTo(-r * 0.76, r * 0.32);
@@ -2876,7 +2881,7 @@
         // Yellow face & neck contour
         context.fillStyle = '#fef08a';
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 2.1;
+        context.lineWidth = 1.15;
         context.beginPath();
         context.moveTo(-r * 0.42, r * 0.58);
         context.lineTo(-r * 0.46, -r * 0.42);
@@ -2914,7 +2919,7 @@
 
         // Eyebrows
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 2.4;
+        context.lineWidth = 1.3;
         context.lineCap = 'round';
         context.beginPath();
         context.moveTo(r * 0.02, -r * 0.36);
@@ -2931,7 +2936,7 @@
         ].forEach((eye) => {
           context.fillStyle = '#ffffff';
           context.strokeStyle = '#0f172a';
-          context.lineWidth = 1.8;
+          context.lineWidth = 1.0;
           context.beginPath();
           context.arc(eye.ex, eye.ey, eyeRadius, 0, Math.PI * 2);
           context.fill();
@@ -2946,7 +2951,7 @@
         // Iconic nose
         context.fillStyle = '#fef08a';
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 1.9;
+        context.lineWidth = 1.05;
         context.beginPath();
         context.moveTo(r * 0.34, -r * 0.04);
         context.quadraticCurveTo(r * 0.66, -r * 0.04, r * 0.62, r * 0.11);
@@ -2956,7 +2961,7 @@
 
         // Rectangular glasses frames & temple arm
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 1.9;
+        context.lineWidth = 1.05;
         context.beginPath();
         context.moveTo(-r * 0.36, -r * 0.14);
         context.lineTo(r * 0.02, -r * 0.12);
@@ -2972,7 +2977,7 @@
         // Big white toothy grin
         context.fillStyle = '#ffffff';
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 1.8;
+        context.lineWidth = 1.0;
         context.beginPath();
         context.moveTo(r * 0.04, r * 0.21);
         context.quadraticCurveTo(r * 0.28, r * 0.25, r * 0.44, r * 0.22);
@@ -2997,14 +3002,14 @@
 
         context.restore();
       } else if (rigType === 'flappyemmy') {
-        // --- FLAPPY EMMY (~10 YRS, SIMPSONS-STYLE PORTRAIT WITH TWIN PONYTAILS) ---
+        // --- FLAPPY EMMY (CRISP THIN-LINE PORTRAIT WITH TWIN PONYTAILS) ---
         context.save();
         context.scale(0.98, 0.98);
 
         // Coral-pink sweater collar
         context.fillStyle = '#f472b6';
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 2.1;
+        context.lineWidth = 1.15;
         context.beginPath();
         context.roundRect(-r * 0.42, r * 0.56, r * 0.78, r * 0.3, 6);
         context.fill();
@@ -3017,8 +3022,7 @@
         // High playful back ponytail (left) & top ponytail (right)
         context.fillStyle = '#3b2314';
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 2;
-        // Left swept ponytail
+        context.lineWidth = 1.1;
         context.beginPath();
         context.moveTo(-r * 0.45, -r * 0.55);
         context.quadraticCurveTo(-r * 1.05, -r * 0.78, -r * 0.92, -r * 0.12);
@@ -3027,7 +3031,6 @@
         context.fill();
         context.stroke();
 
-        // Top-right perky ponytail
         context.beginPath();
         context.moveTo(r * 0.05, -r * 0.85);
         context.quadraticCurveTo(r * 0.48, -r * 1.24, r * 0.58, -r * 0.76);
@@ -3059,7 +3062,7 @@
         // Youthful yellow face & neck
         context.fillStyle = '#fef08a';
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 2.1;
+        context.lineWidth = 1.15;
         context.beginPath();
         context.moveTo(-r * 0.36, r * 0.58);
         context.lineTo(-r * 0.42, -r * 0.36);
@@ -3101,7 +3104,7 @@
           { ex: r * 0.38, ey: -r * 0.14 }
         ].forEach((eye) => {
           context.strokeStyle = '#0f172a';
-          context.lineWidth = 1.7;
+          context.lineWidth = 0.95;
           context.beginPath();
           context.moveTo(eye.ex - eyeR * 0.7, eye.ey - eyeR * 0.8);
           context.lineTo(eye.ex - eyeR * 1.15, eye.ey - eyeR * 1.15);
@@ -3124,7 +3127,7 @@
         // Small cute upturned nose
         context.fillStyle = '#fef08a';
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 1.8;
+        context.lineWidth = 1.0;
         context.beginPath();
         context.moveTo(r * 0.32, -r * 0.02);
         context.quadraticCurveTo(r * 0.56, -r * 0.03, r * 0.52, r * 0.09);
@@ -3135,15 +3138,15 @@
         // Cute freckles on cheek
         context.fillStyle = '#d97706';
         context.beginPath();
-        context.arc(r * 0.02, r * 0.08, r * 0.024, 0, Math.PI * 2);
-        context.arc(r * 0.1, r * 0.11, r * 0.024, 0, Math.PI * 2);
-        context.arc(r * 0.05, r * 0.15, r * 0.024, 0, Math.PI * 2);
+        context.arc(r * 0.02, r * 0.08, r * 0.022, 0, Math.PI * 2);
+        context.arc(r * 0.1, r * 0.11, r * 0.022, 0, Math.PI * 2);
+        context.arc(r * 0.05, r * 0.15, r * 0.022, 0, Math.PI * 2);
         context.fill();
 
         // Happy big smile
         context.fillStyle = '#ffffff';
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 1.8;
+        context.lineWidth = 1.0;
         context.beginPath();
         context.moveTo(r * 0.05, r * 0.21);
         context.quadraticCurveTo(r * 0.26, r * 0.24, r * 0.4, r * 0.21);
@@ -3155,14 +3158,14 @@
 
         context.restore();
       } else if (rigType === 'flappyemma') {
-        // --- FLAPPY EMMA (~12 YRS, SIMPSONS-STYLE PORTRAIT WITH HEADBAND & SHOULDER HAIR) ---
+        // --- FLAPPY EMMA (CRISP THIN-LINE PORTRAIT WITH HEADBAND & SHOULDER HAIR) ---
         context.save();
         context.scale(1.03, 1.03);
 
         // Lavender/purple turtleneck sweater collar
         context.fillStyle = '#a78bfa';
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 2.1;
+        context.lineWidth = 1.15;
         context.beginPath();
         context.roundRect(-r * 0.44, r * 0.56, r * 0.82, r * 0.31, 6);
         context.fill();
@@ -3175,7 +3178,7 @@
         // Flowing shoulder-length chestnut-brown hair silhouette
         context.fillStyle = '#29170e';
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 2;
+        context.lineWidth = 1.1;
         context.beginPath();
         context.moveTo(-r * 0.66, r * 0.62);
         context.quadraticCurveTo(-r * 0.78, r * 0.15, -r * 0.68, -r * 0.38);
@@ -3190,7 +3193,7 @@
         // Yellow face & neck contour
         context.fillStyle = '#fef08a';
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 2.1;
+        context.lineWidth = 1.15;
         context.beginPath();
         context.moveTo(-r * 0.38, r * 0.58);
         context.lineTo(-r * 0.44, -r * 0.38);
@@ -3222,7 +3225,7 @@
 
         // Stylish teal/lavender headband arc
         context.strokeStyle = '#38bdf8';
-        context.lineWidth = 4.2;
+        context.lineWidth = 2.6;
         context.lineCap = 'round';
         context.beginPath();
         context.moveTo(-r * 0.44, -r * 0.38);
@@ -3231,7 +3234,7 @@
 
         // Eyebrows
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 2;
+        context.lineWidth = 1.15;
         context.beginPath();
         context.moveTo(r * 0.03, -r * 0.34);
         context.lineTo(r * 0.2, -r * 0.36);
@@ -3246,7 +3249,7 @@
           { ex: r * 0.4, ey: -r * 0.15 }
         ].forEach((eye) => {
           context.strokeStyle = '#0f172a';
-          context.lineWidth = 1.7;
+          context.lineWidth = 0.95;
           context.beginPath();
           context.moveTo(eye.ex - eyeR * 0.75, eye.ey - eyeR * 0.75);
           context.lineTo(eye.ex - eyeR * 1.15, eye.ey - eyeR * 1.1);
@@ -3267,7 +3270,7 @@
         // Cute nose
         context.fillStyle = '#fef08a';
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 1.8;
+        context.lineWidth = 1.0;
         context.beginPath();
         context.moveTo(r * 0.33, -r * 0.03);
         context.quadraticCurveTo(r * 0.6, -r * 0.03, r * 0.56, r * 0.1);
@@ -3278,7 +3281,7 @@
         // Confident cheerful toothy smile
         context.fillStyle = '#ffffff';
         context.strokeStyle = '#0f172a';
-        context.lineWidth = 1.8;
+        context.lineWidth = 1.0;
         context.beginPath();
         context.moveTo(r * 0.04, r * 0.21);
         context.quadraticCurveTo(r * 0.27, r * 0.25, r * 0.42, r * 0.21);
@@ -3406,11 +3409,12 @@
     function renderActiveBoostChips() {
       const bar = document.getElementById('menu-active-boosts');
       if (!bar) return;
+      const shortNames = { shield: 'Shield', magnet: 'Magnet', turbo: 'Turbo' };
       const chips = [];
       SHIFT_BOOSTS.forEach((b) => {
         const qty = state.ownedBoosts[b.id] || 0;
         if (qty > 0) {
-          chips.push(`<span class="boost-chip">${b.icon} ${b.name} ×${qty}</span>`);
+          chips.push(`<span class="boost-chip">${b.icon} ${shortNames[b.id]} ×${qty}</span>`);
         }
       });
       if (chips.length > 0) {
@@ -3946,13 +3950,14 @@
         );
 
         // Active Safety Shield Bubble or Turbo Aura
-        if (state.activeShield || state.turboTimer > 0) {
+        if (state.activeShield || state.turboTimer > 0 || state.turboGraceTimer > 0) {
           const pulse = 0.65 + 0.35 * Math.sin(state.time * 12);
+          const isTurboProtected = state.turboTimer > 0 || state.turboGraceTimer > 0;
           ctx.save();
-          ctx.strokeStyle = state.turboTimer > 0
+          ctx.strokeStyle = isTurboProtected
             ? `rgba(251, 191, 36, ${pulse.toFixed(2)})`
             : `rgba(56, 189, 248, ${pulse.toFixed(2)})`;
-          ctx.fillStyle = state.turboTimer > 0
+          ctx.fillStyle = isTurboProtected
             ? 'rgba(251, 191, 36, 0.14)'
             : 'rgba(56, 189, 248, 0.14)';
           ctx.lineWidth = 2.6;
@@ -4344,13 +4349,21 @@
 
       if (state.mode !== 'playing') return;
 
+      const isTurboProtected = state.turboTimer > 0 || state.turboGraceTimer > 0;
+
       if (state.turboTimer > 0) {
         state.turboTimer = Math.max(0, state.turboTimer - dt);
+        if (state.turboTimer === 0) {
+          state.turboGraceTimer = 0.85;
+        }
         const targetAutoY = horizonY * 0.44;
         state.player.y += (targetAutoY - state.player.y) * Math.min(1, dt * 8);
         state.player.vy = 0;
         state.player.rotation = 0;
       } else {
+        if (state.turboGraceTimer > 0) {
+          state.turboGraceTimer = Math.max(0, state.turboGraceTimer - dt);
+        }
         state.player.vy = Math.min(spec.maxFall, state.player.vy + spec.gravity * dt);
         state.player.y += state.player.vy * dt;
 
@@ -4365,7 +4378,7 @@
       }
       if (state.player.y + state.player.radius >= horizonY) {
         state.player.y = horizonY - state.player.radius;
-        if (state.turboTimer > 0) {
+        if (isTurboProtected) {
           state.player.vy = spec.flapVel * 0.85;
         } else if (state.activeShield) {
           state.activeShield = false;
@@ -4413,7 +4426,7 @@
           const dy = state.player.y - hz.y;
           const minDist = hitR + hz.radius * 0.85;
           if (dx * dx + dy * dy < minDist * minDist) {
-            if (state.turboTimer > 0) {
+            if (isTurboProtected) {
               state.fallingHazards.splice(i, 1);
               spawnDust(hz.x, hz.y, 10, '#fbbf24');
               continue;
@@ -4474,8 +4487,8 @@
         }
 
         if (hitTop || hitBot || hitBall || hitWire) {
-          if (state.turboTimer > 0) {
-            // Turbo Start phases safely through beams
+          if (isTurboProtected) {
+            // Turbo Start & 0.85s grace buffer phase safely through beams without consuming Safety Shield
           } else if (state.activeShield) {
             state.activeShield = false;
             state.screenShake = 0.55;
@@ -4503,11 +4516,12 @@
         }
       }
 
+      // 4. Hardhat Collectibles
       for (let i = state.collectibles.length - 1; i >= 0; i--) {
         const hat = state.collectibles[i];
         hat.x -= activeSpeed * dt;
 
-        if (!hat.collected && (state.activeMagnet || state.turboTimer > 0)) {
+        if (!hat.collected && (state.activeMagnet || isTurboProtected)) {
           const mdx = state.player.x - hat.x;
           const mdy = state.player.y - hat.y;
           const mDist = Math.hypot(mdx, mdy);
@@ -5135,6 +5149,7 @@
       state.activeShield = false;
       state.activeMagnet = false;
       state.turboTimer = 0;
+      state.turboGraceTimer = 0;
       state.boostsCommitted = false;
 
       const spacing = state.width < 600 ? 275 : 315;
@@ -5182,6 +5197,7 @@
       state.activeShield = false;
       state.activeMagnet = false;
       state.turboTimer = 0;
+      state.turboGraceTimer = 0;
       state.boostsCommitted = false;
       updateRecordDisplay();
       renderRigPreviews();
