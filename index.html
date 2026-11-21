@@ -448,9 +448,9 @@
     }
 
     .rig-preview {
-      width: 56px;
-      height: 36px;
-      margin-bottom: 0.12rem;
+      width: 78px;
+      height: 48px;
+      margin-bottom: 0.08rem;
     }
 
     .shop-tabs {
@@ -990,22 +990,22 @@
     /* Extra compact spacing for short iPhone viewports (e.g. Safari with bottom bar) */
     @media (max-height: 760px) {
       .card-body {
-        padding: 0.56rem 0.78rem 0.68rem 0.78rem;
+        padding: 0.52rem 0.78rem 0.64rem 0.78rem;
       }
       .rig-grid {
         gap: 0.24rem;
       }
       .rig-card {
-        padding: 0.2rem 0.14rem;
+        padding: 0.18rem 0.14rem;
       }
       .rig-preview {
-        width: 46px;
-        height: 30px;
-        margin-bottom: 0.06rem;
+        width: 66px;
+        height: 41px;
+        margin-bottom: 0.04rem;
       }
       .btn-launch {
-        margin-top: 0.45rem;
-        padding: 0.58rem 0.9rem;
+        margin-top: 0.42rem;
+        padding: 0.56rem 0.9rem;
       }
     }
   </style>
@@ -1107,12 +1107,12 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.66rem; font-weight:800; letter-spacing:0.12em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.7</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.6rem, 6.8vw, 2.1rem); font-weight:700; line-height:1.05; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.35rem; flex-wrap:wrap;">
               <button type="button" id="btn-sync-latest" style="background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.38); color:#e0f2fe; border-radius:999px; padding:0.2rem 0.6rem; font-size:0.64rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.25rem;">
-                <span id="sync-status-text">↻ Get Latest (v5.7)</span>
+                <span id="sync-status-text">↻ Get Latest (v5.9)</span>
               </button>
               <button type="button" class="bank-pill" id="btn-open-shop" title="Unlock Machines, Boosts, Trails & Skins">
                 <span style="display:inline-flex; align-items:center; gap:0.32rem;">
@@ -1161,55 +1161,55 @@
           </div>
           <div class="rig-grid" id="rig-selector">
             <button type="button" class="rig-card selected" data-rig="loader">
-              <canvas class="rig-preview" id="preview-loader" width="136" height="92"></canvas>
+              <canvas class="rig-preview" id="preview-loader" width="240" height="156"></canvas>
               <div class="font-display" style="font-size:0.76rem; font-weight:700; color:#fff; line-height:1.1;">Wheel Loader</div>
               <div style="font-size:0.58rem; color:#94a3b8; margin-top:1px;" id="rig-sub-loader">Balanced</div>
             </button>
 
             <button type="button" class="rig-card" data-rig="excavator">
-              <canvas class="rig-preview" id="preview-excavator" width="136" height="92"></canvas>
+              <canvas class="rig-preview" id="preview-excavator" width="240" height="156"></canvas>
               <div class="font-display" style="font-size:0.76rem; font-weight:700; color:#fff; line-height:1.1;">Excavator</div>
               <div style="font-size:0.58rem; color:#94a3b8; margin-top:1px;" id="rig-sub-excavator">Snappy Lift</div>
             </button>
 
             <button type="button" class="rig-card" data-rig="hauler">
-              <canvas class="rig-preview" id="preview-hauler" width="136" height="92"></canvas>
+              <canvas class="rig-preview" id="preview-hauler" width="240" height="156"></canvas>
               <div class="font-display" style="font-size:0.76rem; font-weight:700; color:#fff; line-height:1.1;">Artic Hauler</div>
               <div style="font-size:0.58rem; color:#94a3b8; margin-top:1px;" id="rig-sub-hauler">Smooth Glide</div>
             </button>
 
             <button type="button" class="rig-card" data-rig="bulldozer">
-              <canvas class="rig-preview" id="preview-bulldozer" width="136" height="92"></canvas>
+              <canvas class="rig-preview" id="preview-bulldozer" width="240" height="156"></canvas>
               <div class="font-display" style="font-size:0.76rem; font-weight:700; color:#fff; line-height:1.1;">Bulldozer</div>
               <div style="font-size:0.58rem; color:#fbbf24; margin-top:1px;" id="rig-sub-bulldozer">🔒 120</div>
             </button>
 
             <button type="button" class="rig-card" data-rig="skycrane">
-              <canvas class="rig-preview" id="preview-skycrane" width="136" height="92"></canvas>
+              <canvas class="rig-preview" id="preview-skycrane" width="240" height="156"></canvas>
               <div class="font-display" style="font-size:0.76rem; font-weight:700; color:#fff; line-height:1.1;">Skycrane</div>
               <div style="font-size:0.58rem; color:#fbbf24; margin-top:1px;" id="rig-sub-skycrane">🔒 260</div>
             </button>
 
             <button type="button" class="rig-card" data-rig="jetrig">
-              <canvas class="rig-preview" id="preview-jetrig" width="136" height="92"></canvas>
+              <canvas class="rig-preview" id="preview-jetrig" width="240" height="156"></canvas>
               <div class="font-display" style="font-size:0.76rem; font-weight:700; color:#fff; line-height:1.1;">Jet-Pack Rig</div>
               <div style="font-size:0.58rem; color:#fbbf24; margin-top:1px;" id="rig-sub-jetrig">🔒 450</div>
             </button>
 
             <button type="button" class="rig-card" data-rig="flappylong">
-              <canvas class="rig-preview" id="preview-flappylong" width="136" height="92"></canvas>
+              <canvas class="rig-preview" id="preview-flappylong" width="240" height="156"></canvas>
               <div class="font-display" style="font-size:0.74rem; font-weight:700; color:#fde047; line-height:1.1;">Flappy Long</div>
               <div style="font-size:0.56rem; color:#fbbf24; margin-top:1px;" id="rig-sub-flappylong">🔒 1000</div>
             </button>
 
             <button type="button" class="rig-card" data-rig="flappyemmy">
-              <canvas class="rig-preview" id="preview-flappyemmy" width="136" height="92"></canvas>
+              <canvas class="rig-preview" id="preview-flappyemmy" width="240" height="156"></canvas>
               <div class="font-display" style="font-size:0.74rem; font-weight:700; color:#f9a8d4; line-height:1.1;">Flappy Emmy</div>
               <div style="font-size:0.56rem; color:#fbbf24; margin-top:1px;" id="rig-sub-flappyemmy">🔒 1000</div>
             </button>
 
             <button type="button" class="rig-card" data-rig="flappyemma">
-              <canvas class="rig-preview" id="preview-flappyemma" width="136" height="92"></canvas>
+              <canvas class="rig-preview" id="preview-flappyemma" width="240" height="156"></canvas>
               <div class="font-display" style="font-size:0.74rem; font-weight:700; color:#c4b5fd; line-height:1.1;">Flappy Emma</div>
               <div style="font-size:0.56rem; color:#fbbf24; margin-top:1px;" id="rig-sub-flappyemma">🔒 1000</div>
             </button>
@@ -2104,7 +2104,7 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v5.8';
+    const APP_VERSION = 'v5.9';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -3562,12 +3562,17 @@
 
     function renderRigPreviews() {
       const activeSkin = getSkinById(state.equippedSkin);
+      const portraitRigs = new Set(['flappylong', 'flappyemmy', 'flappyemma']);
       Object.keys(RIG_SPECS).forEach((rigKey) => {
         const pCanvas = document.getElementById(`preview-${rigKey}`);
         if (!pCanvas) return;
         const pCtx = pCanvas.getContext('2d');
         pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
-        drawConstructionRig(pCtx, rigKey, 66, 50, 27, -0.04, 0.2, 0.4, 1, activeSkin);
+        const isPortrait = portraitRigs.has(rigKey);
+        const drawX = isPortrait ? 126 : 114;
+        const drawY = isPortrait ? 84 : 86;
+        const drawRadius = isPortrait ? 54 : 46;
+        drawConstructionRig(pCtx, rigKey, drawX, drawY, drawRadius, -0.04, 0.2, 0.4, 1, activeSkin);
 
         const card = document.querySelector(`#rig-selector .rig-card[data-rig="${rigKey}"]`);
         const isUnlocked = state.unlockedRigs.includes(rigKey);
@@ -5068,7 +5073,7 @@
 
           return `
             <button type="button" class="${cardClass}" data-rig-shop="${rigKey}">
-              <canvas id="shop-rig-preview-${rigKey}" width="136" height="84" style="width:68px; height:42px;"></canvas>
+              <canvas id="shop-rig-preview-${rigKey}" width="240" height="150" style="width:84px; height:52px;"></canvas>
               <div class="font-display" style="font-size:0.82rem; font-weight:700; color:#f8fafc; margin-top:2px;">${rSpec.name}</div>
               <div style="font-size:0.62rem; color:#94a3b8;">${rSpec.subtitle}</div>
               ${badgeHtml}
@@ -5077,12 +5082,14 @@
         }).join('');
 
         const activeSkin = getSkinById(state.equippedSkin);
+        const portraitRigs = new Set(['flappylong', 'flappyemmy', 'flappyemma']);
         rigKeys.forEach((rigKey) => {
           const sCanvas = document.getElementById(`shop-rig-preview-${rigKey}`);
           if (!sCanvas) return;
           const sCtx = sCanvas.getContext('2d');
           sCtx.clearRect(0, 0, sCanvas.width, sCanvas.height);
-          drawConstructionRig(sCtx, rigKey, 66, 46, 25, -0.05, 0.25, 0.35, 1, activeSkin);
+          const isPortrait = portraitRigs.has(rigKey);
+          drawConstructionRig(sCtx, rigKey, isPortrait ? 124 : 114, 82, isPortrait ? 52 : 44, -0.05, 0.25, 0.35, 1, activeSkin);
         });
 
         grid.querySelectorAll('[data-rig-shop]').forEach((card) => {
@@ -5235,19 +5242,21 @@
 
         return `
           <button type="button" class="${cardClass}" data-skin-id="${skin.id}">
-            <canvas id="skin-preview-${skin.id}" width="136" height="84" style="width:68px; height:42px;"></canvas>
+            <canvas id="skin-preview-${skin.id}" width="240" height="150" style="width:84px; height:52px;"></canvas>
             <div class="font-display" style="font-size:0.82rem; font-weight:700; color:#f8fafc; margin-top:2px;">${skin.name}</div>
             ${badgeHtml}
           </button>
         `;
       }).join('');
 
+      const portraitRigs = new Set(['flappylong', 'flappyemmy', 'flappyemma']);
+      const isPortrait = portraitRigs.has(state.rig);
       MACHINE_SKINS.forEach((skin) => {
         const sCanvas = document.getElementById(`skin-preview-${skin.id}`);
         if (!sCanvas) return;
         const sCtx = sCanvas.getContext('2d');
         sCtx.clearRect(0, 0, sCanvas.width, sCanvas.height);
-        drawConstructionRig(sCtx, state.rig, 66, 46, 25, -0.05, 0.25, 0.35, 1, skin);
+        drawConstructionRig(sCtx, state.rig, isPortrait ? 124 : 114, 82, isPortrait ? 52 : 44, -0.05, 0.25, 0.35, 1, skin);
       });
 
       grid.querySelectorAll('.skin-card').forEach((card) => {
