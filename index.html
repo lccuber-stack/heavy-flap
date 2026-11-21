@@ -784,45 +784,45 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 0.42rem;
       width: 100%;
-    }
-
-    .go-secondary-btn {
-      padding: 0.62rem 0.35rem;
-      font-size: 0.82rem;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.28rem;
-      min-width: 0;
-    }
-
-    /* Tactical In-Game Power-Up Bar (Bottom Right) */
+    /* Tactical In-Game Power-Up Bar (Bottom Right, Well Above Ground Curb) */
     .tactical-bar {
       position: fixed;
-      right: calc(0.9rem + var(--safe-right));
-      bottom: calc(1.1rem + var(--safe-bottom));
-      z-index: 15;
+      right: calc(0.85rem + var(--safe-right));
+      bottom: calc(max(4.6rem, 11.5vh) + var(--safe-bottom));
+      z-index: 16;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
       gap: 0.45rem;
+      max-width: calc(100vw - 1.7rem - var(--safe-left) - var(--safe-right));
       pointer-events: auto;
+    }
+
+    @media (min-width: 720px) and (min-height: 540px) {
+      .tactical-bar {
+        flex-direction: column;
+        align-items: stretch;
+        bottom: calc(5.4rem + var(--safe-bottom));
+      }
     }
 
     .tactical-btn {
       display: inline-flex;
       align-items: center;
       justify-content: space-between;
-      gap: 0.45rem;
-      padding: 0.55rem 0.85rem;
-      border-radius: 14px;
-      background: rgba(15, 23, 42, 0.92);
-      border: 1.5px solid rgba(251, 191, 36, 0.55);
+      gap: 0.42rem;
+      padding: 0.5rem 0.78rem;
+      border-radius: 13px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1.5px solid rgba(251, 191, 36, 0.6);
       color: #f8fafc;
       font-family: 'Chakra Petch', sans-serif;
       font-weight: 700;
-      font-size: 0.82rem;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+      font-size: 0.8rem;
+      white-space: nowrap;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55);
       cursor: pointer;
       transition: transform 0.12s ease, opacity 0.15s ease, border-color 0.15s ease;
     }
@@ -832,24 +832,24 @@
     }
 
     .tactical-btn.shield-btn {
-      border-color: rgba(56, 189, 248, 0.65);
+      border-color: rgba(56, 189, 248, 0.7);
     }
 
     .tactical-btn.turbo-btn {
-      border-color: rgba(251, 191, 36, 0.72);
+      border-color: rgba(251, 191, 36, 0.75);
     }
 
     .tactical-btn.is-active {
-      opacity: 0.68;
       border-color: #34d399;
-      background: rgba(6, 78, 59, 0.88);
+      background: rgba(6, 78, 59, 0.92);
+      box-shadow: 0 0 16px rgba(52, 211, 153, 0.35);
     }
 
     .tactical-count {
-      background: rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.15);
       padding: 1px 6px;
       border-radius: 999px;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       color: #fde047;
     }
 
@@ -990,12 +990,12 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.66rem; font-weight:800; letter-spacing:0.12em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.4</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.5</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.6rem, 6.8vw, 2.1rem); font-weight:700; line-height:1.05; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.35rem; flex-wrap:wrap;">
               <button type="button" id="btn-sync-latest" style="background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.38); color:#e0f2fe; border-radius:999px; padding:0.2rem 0.6rem; font-size:0.64rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.25rem;">
-                <span id="sync-status-text">↻ Get Latest (v5.4)</span>
+                <span id="sync-status-text">↻ Get Latest (v5.5)</span>
               </button>
               <button type="button" class="bank-pill" id="btn-open-shop" title="Unlock Machines, Boosts, Trails & Skins">
                 <span style="display:inline-flex; align-items:center; gap:0.32rem;">
@@ -1987,7 +1987,7 @@
     // =========================================================================
     // 3. GAME STATE, LOCAL LEADERBOARD & AUTO-UPDATE FROM GITHUB PAGES
     // =========================================================================
-    const APP_VERSION = 'v5.4';
+    const APP_VERSION = 'v5.5';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -4423,6 +4423,9 @@
         state.turboTimer = Math.max(0, state.turboTimer - dt);
         if (state.turboTimer === 0) {
           state.turboGraceTimer = 0.85;
+          updateHUD();
+        } else {
+          updateTacticalButtons();
         }
         const targetAutoY = horizonY * 0.44;
         state.player.y += (targetAutoY - state.player.y) * Math.min(1, dt * 8);
@@ -4431,6 +4434,9 @@
       } else {
         if (state.turboGraceTimer > 0) {
           state.turboGraceTimer = Math.max(0, state.turboGraceTimer - dt);
+          if (state.turboGraceTimer === 0) {
+            updateHUD();
+          }
         }
         state.player.vy = Math.min(spec.maxFall, state.player.vy + spec.gravity * dt);
         state.player.y += state.player.vy * dt;
@@ -4711,7 +4717,7 @@
       const turboCount = document.getElementById('tactical-turbo-count');
       if (!bar || !shieldBtn || !turboBtn) return;
 
-      if (state.mode !== 'playing') {
+      if (state.mode !== 'playing' && state.mode !== 'ready') {
         bar.classList.add('hidden');
         return;
       }
@@ -4745,7 +4751,7 @@
         turboBtn.classList.toggle('is-active', state.turboTimer > 0);
         if (turboCount) {
           turboCount.textContent = state.turboTimer > 0
-            ? (ownedTurbos > 0 ? `ON (+${ownedTurbos})` : 'ON')
+            ? `${state.turboTimer.toFixed(1)}s`
             : `×${ownedTurbos}`;
         }
       } else {
