@@ -587,24 +587,24 @@
 
     .shop-tabs {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 0.22rem;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.18rem;
       background: rgba(15, 23, 42, 0.75);
-      padding: 0.22rem;
+      padding: 0.2rem;
       border-radius: 11px;
       border: 1px solid rgba(255, 255, 255, 0.1);
       margin-top: 0.55rem;
     }
 
     .shop-tab-btn {
-      padding: 0.36rem 0.12rem;
+      padding: 0.34rem 0.08rem;
       border: 1px solid transparent;
       border-radius: 8px;
       background: transparent;
       color: var(--text-muted);
       font-family: 'Chakra Petch', sans-serif;
       font-weight: 700;
-      font-size: 0.67rem;
+      font-size: 0.61rem;
       white-space: nowrap;
       cursor: pointer;
       transition: all 0.14s ease;
@@ -1142,7 +1142,7 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.64rem; font-weight:800; letter-spacing:0.11em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.18</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.19</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.55rem, 6.6vw, 2.05rem); font-weight:700; line-height:1.04; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.32rem; flex-wrap:nowrap;">
@@ -1413,6 +1413,7 @@
 
         <div class="shop-tabs" id="shop-tabs">
           <button type="button" class="shop-tab-btn active" data-tab="rigs">🚜 Fleet</button>
+          <button type="button" class="shop-tab-btn" data-tab="beams">🧱 Beams</button>
           <button type="button" class="shop-tab-btn" data-tab="stages">🗺️ Stages</button>
           <button type="button" class="shop-tab-btn" data-tab="boosts">⚡ Boosts</button>
           <button type="button" class="shop-tab-btn" data-tab="trails">🔥 Trails</button>
@@ -2021,6 +2022,55 @@
       { id: 'turbo', name: 'Turbo Boost', icon: '⚡', cost: 40, desc: '8 beams • Tap [T] (1/shift)' }
     ];
 
+    const BEAM_THEMES = [
+      {
+        id: 'classic',
+        name: 'Industrial Steel',
+        icon: '🏗️',
+        cost: 0,
+        subtitle: 'Riveted I-Beam'
+      },
+      {
+        id: 'christmas',
+        name: "Emma's Christmas",
+        icon: '🎄',
+        cost: 75,
+        subtitle: 'Garlands & Gold Bells'
+      },
+      {
+        id: 'easter',
+        name: 'Pastel Easter',
+        icon: '🐣',
+        cost: 95,
+        subtitle: 'Painted Eggs & Ears'
+      },
+      {
+        id: 'midsummer',
+        name: 'Midsummer Pole',
+        icon: '🇸🇪',
+        cost: 115,
+        subtitle: 'Birch Wreaths & Gold'
+      },
+      {
+        id: 'halloween',
+        name: 'Spooky Halloween',
+        icon: '🎃',
+        cost: 140,
+        subtitle: 'Pumpkins & Cobwebs'
+      },
+      {
+        id: 'neon',
+        name: 'Cyber Neon Grid',
+        icon: '💎',
+        cost: 185,
+        subtitle: 'Laser Circuitry'
+      }
+    ];
+
+    function getBeamThemeById(themeId) {
+      return BEAM_THEMES.find((b) => b.id === themeId) || BEAM_THEMES[0];
+    }
+
     function getTrailById(trailId) {
       return EXHAUST_TRAILS.find((t) => t.id === trailId) || EXHAUST_TRAILS[0];
     }
@@ -2331,7 +2381,7 @@
     // =========================================================================
     // 3. GAME STATE, PER-PLAYER PROFILES, TOP 10 & CROSS-DEVICE SYNC
     // =========================================================================
-    const APP_VERSION = 'v5.9.18';
+    const APP_VERSION = 'v5.9.20';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -2352,6 +2402,8 @@
         unlockedRigs: ['loader', 'excavator', 'hauler'],
         unlockedTrails: ['classic'],
         equippedTrail: 'classic',
+        unlockedBeams: ['classic'],
+        equippedBeam: 'classic',
         unlockedStages: [...DEFAULT_UNLOCKED_STAGES],
         stageSelection: 'random',
         ownedBoosts: { shield: 0, magnet: 0, turbo: 0 }
@@ -2362,6 +2414,7 @@
       const validIds = new Set(MACHINE_SKINS.map((s) => s.id));
       const validRigs = new Set(Object.keys(RIG_SPECS));
       const validTrails = new Set(EXHAUST_TRAILS.map((t) => t.id));
+      const validBeams = new Set(BEAM_THEMES.map((b) => b.id));
       const validStages = new Set(PROCEDURAL_BIOMES.map((b) => b.id));
       if (!data || typeof data !== 'object') return createDefaultShopProfile();
 
@@ -2370,9 +2423,11 @@
       const equipped = unlocked.includes(data.equipped) ? data.equipped : 'classic';
       const unlockedRigs = Array.from(new Set(['loader', 'excavator', 'hauler', ...(Array.isArray(data.unlockedRigs) ? data.unlockedRigs.filter((r) => validRigs.has(r)) : [])]));
       const unlockedTrails = Array.from(new Set(['classic', ...(Array.isArray(data.unlockedTrails) ? data.unlockedTrails.filter((t) => validTrails.has(t)) : [])]));
+      const unlockedBeams = Array.from(new Set(['classic', ...(Array.isArray(data.unlockedBeams) ? data.unlockedBeams.filter((b) => validBeams.has(b)) : [])]));
       const unlockedStages = Array.from(new Set([...DEFAULT_UNLOCKED_STAGES, ...(Array.isArray(data.unlockedStages) ? data.unlockedStages.filter((s) => validStages.has(s)) : [])]));
       const stageSelection = (data.stageSelection === 'random' || unlockedStages.includes(data.stageSelection)) ? data.stageSelection : 'random';
       const equippedTrail = unlockedTrails.includes(data.equippedTrail) ? data.equippedTrail : 'classic';
+      const equippedBeam = unlockedBeams.includes(data.equippedBeam) ? data.equippedBeam : 'classic';
       const equippedRig = unlockedRigs.includes(data.equippedRig) ? data.equippedRig : 'loader';
       const rawBoosts = data.ownedBoosts || data.boosts || {};
       const ownedBoosts = {
@@ -2389,6 +2444,8 @@
         unlockedRigs,
         unlockedTrails,
         equippedTrail,
+        unlockedBeams,
+        equippedBeam,
         unlockedStages,
         stageSelection,
         ownedBoosts
@@ -2474,6 +2531,8 @@
       state.unlockedRigs = clean.unlockedRigs;
       state.unlockedTrails = clean.unlockedTrails;
       state.equippedTrail = clean.equippedTrail;
+      state.unlockedBeams = clean.unlockedBeams;
+      state.equippedBeam = clean.equippedBeam;
       state.unlockedStages = clean.unlockedStages;
       state.stageSelection = clean.stageSelection;
       state.ownedBoosts = clean.ownedBoosts;
@@ -2490,6 +2549,8 @@
         unlockedRigs: state.unlockedRigs,
         unlockedTrails: state.unlockedTrails,
         equippedTrail: state.equippedTrail,
+        unlockedBeams: state.unlockedBeams,
+        equippedBeam: state.equippedBeam,
         unlockedStages: state.unlockedStages,
         stageSelection: state.stageSelection,
         ownedBoosts: state.ownedBoosts
@@ -2672,6 +2733,8 @@
         unlockedRigs: Array.from(new Set([...existing.unlockedRigs, ...incoming.unlockedRigs])),
         unlockedTrails: Array.from(new Set([...existing.unlockedTrails, ...incoming.unlockedTrails])),
         equippedTrail: incoming.equippedTrail || existing.equippedTrail,
+        unlockedBeams: Array.from(new Set([...existing.unlockedBeams, ...incoming.unlockedBeams])),
+        equippedBeam: incoming.equippedBeam || existing.equippedBeam,
         unlockedStages: Array.from(new Set([...existing.unlockedStages, ...incoming.unlockedStages])),
         stageSelection: incoming.stageSelection || existing.stageSelection,
         ownedBoosts: {
@@ -2824,6 +2887,8 @@
       unlockedRigs: initialShop.unlockedRigs,
       unlockedTrails: initialShop.unlockedTrails,
       equippedTrail: initialShop.equippedTrail,
+      unlockedBeams: initialShop.unlockedBeams,
+      equippedBeam: initialShop.equippedBeam,
       unlockedStages: initialShop.unlockedStages,
       stageSelection: initialShop.stageSelection,
       ownedBoosts: initialShop.ownedBoosts,
@@ -4369,325 +4434,325 @@
 
       drawProceduralBackdrop(biome, lighting, horizonY);
 
-      state.obstacles.forEach((obs) => {
+      const drawThemedBeamSegment = (targetCtx, bx, by, bw, bh, isTop, themeId, animTime = 0) => {
+        if (bh <= 0) return;
         const capH = 20;
         const capOverhang = 8;
+        const flangeY = isTop ? by + bh - capH : by;
+        const shaftH = Math.max(0, bh - capH);
+        const shaftY = isTop ? by : by + capH;
 
-        const drawBeamSegment = (bx, by, bw, bh, isTop) => {
-          if (bh <= 0) return;
-          ctx.fillStyle = lighting.beamMain;
-          ctx.fillRect(bx, by, bw, bh);
+        if (themeId === 'christmas') {
+          // Festive Pine-Green Steel Column with Red & Green Garlands + Golden Bells
+          targetCtx.fillStyle = '#14532d';
+          targetCtx.fillRect(bx, by, bw, bh);
+          targetCtx.fillStyle = '#22c55e';
+          targetCtx.fillRect(bx + 6, by, 7, bh);
+          targetCtx.fillStyle = '#052e16';
+          targetCtx.fillRect(bx + bw - 10, by, 10, bh);
 
-          ctx.fillStyle = lighting.beamHighlight;
-          ctx.fillRect(bx + 6, by, 7, bh);
-          ctx.fillStyle = lighting.beamShadow;
-          ctx.fillRect(bx + bw - 10, by, 10, bh);
+          // Intertwined Red & Bright Green Garlands
+          if (shaftH > 12) {
+            targetCtx.save();
+            targetCtx.beginPath();
+            targetCtx.rect(bx - 3, shaftY, bw + 6, shaftH);
+            targetCtx.clip();
 
-          ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
-          for (let ry = by + 16; ry < by + bh - 12; ry += 26) {
-            ctx.beginPath();
-            ctx.arc(bx + 18, ry, 2.5, 0, Math.PI * 2);
-            ctx.arc(bx + bw - 18, ry, 2.5, 0, Math.PI * 2);
-            ctx.fill();
+            const stepY = 46;
+            const startStep = Math.floor(shaftY / stepY) * stepY - stepY;
+            for (let gy = startStep; gy < shaftY + shaftH + stepY; gy += stepY) {
+              // Red garland loop
+              targetCtx.strokeStyle = '#dc2626';
+              targetCtx.lineWidth = 4.2;
+              targetCtx.lineCap = 'round';
+              targetCtx.beginPath();
+              targetCtx.moveTo(bx - 2, gy);
+              targetCtx.bezierCurveTo(bx + bw * 0.35, gy + 18, bx + bw * 0.65, gy - 6, bx + bw + 2, gy + 14);
+              targetCtx.stroke();
+
+              // Green garland loop
+              targetCtx.strokeStyle = '#4ade80';
+              targetCtx.lineWidth = 3.8;
+              targetCtx.beginPath();
+              targetCtx.moveTo(bx - 2, gy + 16);
+              targetCtx.bezierCurveTo(bx + bw * 0.35, gy - 2, bx + bw * 0.65, gy + 24, bx + bw + 2, gy + 4);
+              targetCtx.stroke();
+
+              // Golden Jingle Bell & Ornament
+              const bellX = bx + ((Math.abs(Math.round(gy / stepY)) % 2 === 0) ? bw * 0.28 : bw * 0.72);
+              const bellY = gy + 12;
+              targetCtx.fillStyle = '#facc15';
+              targetCtx.strokeStyle = '#78350f';
+              targetCtx.lineWidth = 1.4;
+              targetCtx.beginPath();
+              targetCtx.arc(bellX, bellY, 6.2, Math.PI, 0);
+              targetCtx.lineTo(bellX + 7.5, bellY + 5);
+              targetCtx.lineTo(bellX - 7.5, bellY + 5);
+              targetCtx.closePath();
+              targetCtx.fill();
+              targetCtx.stroke();
+
+              targetCtx.fillStyle = '#fef08a';
+              targetCtx.beginPath();
+              targetCtx.arc(bellX, bellY + 6, 2.2, 0, Math.PI * 2);
+              targetCtx.fill();
+            }
+            targetCtx.restore();
           }
 
-          const flangeY = isTop ? by + bh - capH : by;
-          ctx.fillStyle = '#1e293b';
-          ctx.beginPath();
-          ctx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
-          ctx.fill();
+          // Candy-Cane Red & White Flange Cap with Gold Trim
+          targetCtx.fillStyle = '#991b1b';
+          targetCtx.beginPath();
+          targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
+          targetCtx.fill();
 
-          ctx.fillStyle = '#eab308';
-          ctx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
-        };
+          targetCtx.save();
+          targetCtx.beginPath();
+          targetCtx.roundRect(bx - capOverhang + 2, flangeY + 2, bw + capOverhang * 2 - 4, capH - 8, 3);
+          targetCtx.clip();
+          targetCtx.fillStyle = '#f8fafc';
+          for (let sx = bx - capOverhang - 16; sx < bx + bw + capOverhang + 16; sx += 16) {
+            targetCtx.beginPath();
+            targetCtx.moveTo(sx, flangeY);
+            targetCtx.lineTo(sx + 8, flangeY);
+            targetCtx.lineTo(sx + 2, flangeY + capH);
+            targetCtx.lineTo(sx - 6, flangeY + capH);
+            targetCtx.closePath();
+            targetCtx.fill();
+          }
+          targetCtx.restore();
 
-        drawBeamSegment(obs.x, 0, obs.width, obs.topHeight, true);
+          targetCtx.fillStyle = '#facc15';
+          targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
+          return;
+        }
+
+        if (themeId === 'halloween') {
+          // Haunted Obsidian Beam with Cobwebs & Glowing Jack-o'-Lanterns
+          targetCtx.fillStyle = '#1c1917';
+          targetCtx.fillRect(bx, by, bw, bh);
+          targetCtx.fillStyle = '#44403c';
+          targetCtx.fillRect(bx + 6, by, 7, bh);
+          targetCtx.fillStyle = '#090d16';
+          targetCtx.fillRect(bx + bw - 10, by, 10, bh);
+
+          if (shaftH > 16) {
+            targetCtx.save();
+            targetCtx.beginPath();
+            targetCtx.rect(bx, shaftY, bw, shaftH);
+            targetCtx.clip();
+
+            // Corner Cobweb Arcs
+            targetCtx.strokeStyle = 'rgba(226, 232, 240, 0.35)';
+            targetCtx.lineWidth = 1.3;
+            const webY = isTop ? flangeY - 2 : flangeY + capH + 2;
+            const dirY = isTop ? -1 : 1;
+            [12, 22, 32].forEach((rad) => {
+              targetCtx.beginPath();
+              targetCtx.arc(bx, webY, rad, isTop ? -Math.PI * 0.5 : 0, isTop ? 0 : Math.PI * 0.5);
+              targetCtx.stroke();
+            });
+
+            // Glowing Jack-o'-Lanterns along the shaft
+            const pStep = 68;
+            const pStart = Math.floor(shaftY / pStep) * pStep + 34;
+            for (let py = pStart; py < shaftY + shaftH - 16; py += pStep) {
+              const px = bx + bw * 0.5;
+              targetCtx.fillStyle = '#f97316';
+              targetCtx.beginPath();
+              targetCtx.ellipse(px, py, 12, 9.5, 0, 0, Math.PI * 2);
+              targetCtx.fill();
+              targetCtx.fillStyle = '#16a34a';
+              targetCtx.fillRect(px - 2, py - 12, 4, 4);
+
+              // Glowing eyes & grin
+              targetCtx.fillStyle = '#fef08a';
+              targetCtx.beginPath();
+              targetCtx.moveTo(px - 6, py - 2);
+              targetCtx.lineTo(px - 3, py - 5);
+              targetCtx.lineTo(px - 1, py - 2);
+              targetCtx.moveTo(px + 6, py - 2);
+              targetCtx.lineTo(px + 3, py - 5);
+              targetCtx.lineTo(px + 1, py - 2);
+              targetCtx.fill();
+              targetCtx.fillRect(px - 5, py + 2, 10, 2.5);
+            }
+            targetCtx.restore();
+          }
+
+          targetCtx.fillStyle = '#581c87';
+          targetCtx.beginPath();
+          targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
+          targetCtx.fill();
+          targetCtx.fillStyle = '#f97316';
+          targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
+          return;
+        }
+
+        if (themeId === 'easter') {
+          // Spring Pastel Mint & Lavender Column with Painted Easter Eggs
+          targetCtx.fillStyle = '#6ee7b7';
+          targetCtx.fillRect(bx, by, bw, bh);
+          targetCtx.fillStyle = '#a7f3d0';
+          targetCtx.fillRect(bx + 6, by, 7, bh);
+          targetCtx.fillStyle = '#059669';
+          targetCtx.fillRect(bx + bw - 10, by, 10, bh);
+
+          if (shaftH > 16) {
+            targetCtx.save();
+            targetCtx.beginPath();
+            targetCtx.rect(bx, shaftY, bw, shaftH);
+            targetCtx.clip();
+
+            const eStep = 56;
+            const eStart = Math.floor(shaftY / eStep) * eStep + 28;
+            const eggColors = ['#f472b6', '#c084fc', '#fde047', '#38bdf8'];
+            let eIdx = 0;
+            for (let ey = eStart; ey < shaftY + shaftH - 12; ey += eStep) {
+              const ex = bx + bw * 0.5 + (eIdx % 2 === 0 ? -6 : 6);
+              const eCol = eggColors[eIdx % eggColors.length];
+              targetCtx.fillStyle = eCol;
+              targetCtx.strokeStyle = '#0f172a';
+              targetCtx.lineWidth = 1.4;
+              targetCtx.beginPath();
+              targetCtx.ellipse(ex, ey, 8.5, 11, 0, 0, Math.PI * 2);
+              targetCtx.fill();
+              targetCtx.stroke();
+
+              targetCtx.strokeStyle = '#ffffff';
+              targetCtx.lineWidth = 1.6;
+              targetCtx.beginPath();
+              targetCtx.moveTo(ex - 6, ey);
+              targetCtx.lineTo(ex - 2, ey - 3);
+              targetCtx.lineTo(ex + 2, ey + 2);
+              targetCtx.lineTo(ex + 6, ey - 1);
+              targetCtx.stroke();
+              eIdx++;
+            }
+            targetCtx.restore();
+          }
+
+          targetCtx.fillStyle = '#c084fc';
+          targetCtx.beginPath();
+          targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
+          targetCtx.fill();
+          targetCtx.fillStyle = '#fde047';
+          targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
+          return;
+        }
+
+        if (themeId === 'midsummer') {
+          // Swedish Midsummer Maypole: Royal Blue & Yellow with Birch Leaf Rings
+          targetCtx.fillStyle = '#1d4ed8';
+          targetCtx.fillRect(bx, by, bw, bh);
+          targetCtx.fillStyle = '#60a5fa';
+          targetCtx.fillRect(bx + 6, by, 7, bh);
+          targetCtx.fillStyle = '#1e3a8a';
+          targetCtx.fillRect(bx + bw - 10, by, 10, bh);
+
+          if (shaftH > 16) {
+            targetCtx.save();
+            targetCtx.beginPath();
+            targetCtx.rect(bx - 4, shaftY, bw + 8, shaftH);
+            targetCtx.clip();
+
+            // Golden Vertical Ribbon
+            targetCtx.fillStyle = '#facc15';
+            targetCtx.fillRect(bx + bw * 0.5 - 4, shaftY, 8, shaftH);
+
+            // Green Birch Leaf Garlands & Wildflowers
+            const mStep = 52;
+            const mStart = Math.floor(shaftY / mStep) * mStep + 26;
+            for (let my = mStart; my < shaftY + shaftH - 10; my += mStep) {
+              targetCtx.strokeStyle = '#16a34a';
+              targetCtx.lineWidth = 5;
+              targetCtx.beginPath();
+              targetCtx.moveTo(bx - 2, my - 6);
+              targetCtx.quadraticCurveTo(bx + bw * 0.5, my + 12, bx + bw + 2, my - 6);
+              targetCtx.stroke();
+
+              targetCtx.fillStyle = '#fef08a';
+              targetCtx.beginPath();
+              targetCtx.arc(bx + bw * 0.25, my + 2, 3.2, 0, Math.PI * 2);
+              targetCtx.arc(bx + bw * 0.75, my + 2, 3.2, 0, Math.PI * 2);
+              targetCtx.fill();
+            }
+            targetCtx.restore();
+          }
+
+          targetCtx.fillStyle = '#15803d';
+          targetCtx.beginPath();
+          targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
+          targetCtx.fill();
+          targetCtx.fillStyle = '#facc15';
+          targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
+          return;
+        }
+
+        if (themeId === 'neon') {
+          // Cyber Neon Laser Circuitry Column
+          const pulse = 0.65 + 0.35 * Math.sin(animTime * 6);
+          targetCtx.fillStyle = '#090d16';
+          targetCtx.fillRect(bx, by, bw, bh);
+          targetCtx.fillStyle = '#1e293b';
+          targetCtx.fillRect(bx + 6, by, 6, bh);
+
+          targetCtx.save();
+          targetCtx.strokeStyle = `rgba(34, 211, 238, ${pulse.toFixed(2)})`;
+          targetCtx.lineWidth = 2.4;
+          targetCtx.beginPath();
+          targetCtx.moveTo(bx + 18, by);
+          targetCtx.lineTo(bx + 18, by + bh);
+          targetCtx.moveTo(bx + bw - 18, by);
+          targetCtx.lineTo(bx + bw - 18, by + bh);
+          targetCtx.stroke();
+
+          targetCtx.fillStyle = '#f472b6';
+          for (let ny = by + 24; ny < by + bh - 16; ny += 36) {
+            targetCtx.fillRect(bx + 15, ny, 6, 6);
+            targetCtx.fillRect(bx + bw - 21, ny + 14, 6, 6);
+          }
+          targetCtx.restore();
+
+          targetCtx.fillStyle = '#0e7490';
+          targetCtx.beginPath();
+          targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
+          targetCtx.fill();
+          targetCtx.fillStyle = '#f472b6';
+          targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
+          return;
+        }
+
+        // Default: Classic Industrial Steel I-Beam
+        targetCtx.fillStyle = lighting.beamMain;
+        targetCtx.fillRect(bx, by, bw, bh);
+
+        targetCtx.fillStyle = lighting.beamHighlight;
+        targetCtx.fillRect(bx + 6, by, 7, bh);
+        targetCtx.fillStyle = lighting.beamShadow;
+        targetCtx.fillRect(bx + bw - 10, by, 10, bh);
+
+        targetCtx.fillStyle = 'rgba(15, 23, 42, 0.45)';
+        for (let ry = by + 16; ry < by + bh - 12; ry += 26) {
+          targetCtx.beginPath();
+          targetCtx.arc(bx + 18, ry, 2.5, 0, Math.PI * 2);
+          targetCtx.arc(bx + bw - 18, ry, 2.5, 0, Math.PI * 2);
+          targetCtx.fill();
+        }
+
+        targetCtx.fillStyle = '#1e293b';
+        targetCtx.beginPath();
+        targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
+        targetCtx.fill();
+
+        targetCtx.fillStyle = '#eab308';
+        targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
+      };
+
+      state.obstacles.forEach((obs) => {
+        drawThemedBeamSegment(ctx, obs.x, 0, obs.width, obs.topHeight, true, state.equippedBeam, state.time);
         const botY = obs.topHeight + obs.gap;
-        drawBeamSegment(obs.x, botY, obs.width, horizonY - botY, false);
-
-        if (obs.hasWreckingBall) {
-          const anchorX = obs.x + obs.width * 0.5;
-          const anchorY = obs.topHeight;
-          const ballX = anchorX + Math.sin(obs.ballPhase) * 14;
-          const ballY = anchorY + obs.ballDrop;
-
-          ctx.strokeStyle = '#94a3b8';
-          ctx.lineWidth = 3;
-          ctx.beginPath();
-          ctx.moveTo(anchorX, anchorY);
-          ctx.lineTo(ballX, ballY);
-          ctx.stroke();
-
-          ctx.fillStyle = '#0f172a';
-          ctx.beginPath();
-          ctx.arc(ballX, ballY, obs.ballRadius, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = '#475569';
-          ctx.beginPath();
-          ctx.arc(ballX - 4, ballY - 4, obs.ballRadius * 0.35, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        if (obs.isElectricWire) {
-          const wireY = obs.topHeight + obs.wireOffset;
-          const pulse = 0.55 + 0.45 * Math.sin(state.time * 14 + obs.x * 0.05);
-
-          ctx.fillStyle = '#0f172a';
-          ctx.fillRect(obs.x - 4, wireY - 5, 8, 10);
-          ctx.fillRect(obs.x + obs.width - 4, wireY - 5, 8, 10);
-
-          ctx.save();
-          ctx.strokeStyle = `rgba(56, 189, 248, ${pulse.toFixed(2)})`;
-          ctx.shadowColor = '#38bdf8';
-          ctx.shadowBlur = 10;
-          ctx.lineWidth = 3.5;
-          ctx.beginPath();
-          ctx.moveTo(obs.x, wireY);
-          const midX = obs.x + obs.width * 0.5;
-          const jitter = Math.sin(state.time * 28) * 3.5;
-          ctx.lineTo(midX, wireY + jitter);
-          ctx.lineTo(obs.x + obs.width, wireY);
-          ctx.stroke();
-          ctx.restore();
-        }
-      });
-
-      // Gold, Silver & Bronze Ore Nuggets
-      const isBonusActive = state.streak >= 3;
-      state.collectibles.forEach((nugget) => {
-        if (nugget.collected) return;
-        const tier = nugget.tier || NUGGET_TIERS.bronze;
-        const bobY = nugget.y + Math.sin(state.time * 4.5 + nugget.bobPhase) * 5;
-        const blink = 0.5 + 0.5 * Math.sin(state.time * 11 + nugget.bobPhase);
-        const mult = isBonusActive ? 2 : 1;
-        const ptsValue = tier.value * mult;
-
-        ctx.save();
-        ctx.translate(nugget.x, bobY);
-
-        ctx.fillStyle = isBonusActive ? 'rgba(15, 23, 42, 0.74)' : 'rgba(15, 23, 42, 0.62)';
-        ctx.beginPath();
-        ctx.arc(0, 0, 21.5, 0, Math.PI * 2);
-        ctx.fill();
-
-        const ringRadius = isBonusActive ? 21.5 + blink * 3.2 : 21.5;
-        ctx.strokeStyle = isBonusActive
-          ? (blink > 0.5 ? '#34d399' : tier.body)
-          : tier.body;
-        ctx.lineWidth = isBonusActive ? 2.4 : 1.8;
-        ctx.beginPath();
-        ctx.arc(0, 0, ringRadius, 0, Math.PI * 2);
-        ctx.stroke();
-
-        if (tier.id === 'gold' || isBonusActive) {
-          const sparkCount = tier.id === 'gold' ? 3 : 2;
-          for (let sp = 0; sp < sparkCount; sp++) {
-            const ang = state.time * 4.2 + (sp * Math.PI * 2) / sparkCount;
-            const sx = Math.cos(ang) * 23;
-            const sy = Math.sin(ang) * 23;
-            ctx.fillStyle = sp % 2 === 0 ? tier.highlight : '#34d399';
-            ctx.beginPath();
-            ctx.arc(sx, sy, 2.3, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        }
-
-        // Faceted Ore Nugget Shape
-        ctx.save();
-        ctx.rotate(Math.sin(state.time * 2.4 + nugget.bobPhase) * 0.14);
-        ctx.fillStyle = tier.body;
-        ctx.strokeStyle = '#0f172a';
-        ctx.lineWidth = 2.1;
-        ctx.beginPath();
-        ctx.moveTo(-7, -12);
-        ctx.lineTo(7, -12);
-        ctx.lineTo(14, -2);
-        ctx.lineTo(9, 11);
-        ctx.lineTo(-9, 11);
-        ctx.lineTo(-14, -2);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = tier.shade;
-        ctx.beginPath();
-        ctx.moveTo(7, -12);
-        ctx.lineTo(14, -2);
-        ctx.lineTo(9, 11);
-        ctx.lineTo(3, 3);
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.fillStyle = tier.highlight;
-        ctx.beginPath();
-        ctx.moveTo(-5, -8.5);
-        ctx.lineTo(4, -8.5);
-        ctx.lineTo(6.5, -2.5);
-        ctx.lineTo(-2, -1);
-        ctx.closePath();
-        ctx.fill();
-        ctx.restore();
-
-        // Value Badge (+1 / +2 / +3 or +2 / +4 / +6 with 2X)
-        if (ptsValue > 1 || isBonusActive) {
-          ctx.fillStyle = isBonusActive ? '#064e3b' : '#0f172a';
-          ctx.strokeStyle = isBonusActive ? '#34d399' : tier.body;
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.roundRect(-13, -27, 26, 12, 6);
-          ctx.fill();
-          ctx.stroke();
-
-          ctx.fillStyle = isBonusActive ? '#6ee7b7' : tier.highlight;
-          ctx.font = '800 8px "Chakra Petch", sans-serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(`+${ptsValue}`, 0, -21);
-        }
-
-        ctx.restore();
-      });
-
-      ctx.fillStyle = biome.groundDirt;
-      ctx.fillRect(0, horizonY, state.width, state.groundHeight);
-
-      ctx.fillStyle = biome.groundTop;
-      ctx.fillRect(0, horizonY, state.width, 16);
-
-      const stripeW = 36;
-      const offset = -(state.groundScroll % (stripeW * 2));
-      for (let sx = offset; sx < state.width + stripeW * 2; sx += stripeW * 2) {
-        ctx.fillStyle = '#eab308';
-        ctx.fillRect(sx, horizonY + 16, stripeW, 10);
-        ctx.fillStyle = '#0f172a';
-        ctx.fillRect(sx + stripeW, horizonY + 16, stripeW, 10);
-      }
-
-      state.particles.forEach((p) => {
-        const alpha = Math.max(0, p.life / p.maxLife);
-        ctx.fillStyle = p.color.replace('0.65', (alpha * 0.65).toFixed(2));
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      state.fallingHazards.forEach((hz) => {
-        if (hz.warnTimer > 0) {
-          const blink = Math.sin(state.time * 24) > 0;
-          const warnY = Math.max(98, state.height * 0.145);
-          ctx.save();
-          ctx.translate(hz.x, warnY);
-
-          ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
-          ctx.strokeStyle = blink ? '#fbbf24' : '#ef4444';
-          ctx.lineWidth = 2.5;
-          ctx.beginPath();
-          ctx.roundRect(-24, -18, 48, 36, 10);
-          ctx.fill();
-          ctx.stroke();
-
-          ctx.fillStyle = blink ? '#ef4444' : '#fbbf24';
-          ctx.beginPath();
-          ctx.moveTo(0, -11);
-          ctx.lineTo(12, 8);
-          ctx.lineTo(-12, 8);
-          ctx.closePath();
-          ctx.fill();
-
-          ctx.fillStyle = '#0f172a';
-          ctx.font = '800 11px "Chakra Petch", sans-serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText('!', 0, 2);
-
-          ctx.fillStyle = blink ? '#fbbf24' : '#ef4444';
-          ctx.beginPath();
-          ctx.moveTo(-6, 22);
-          ctx.lineTo(6, 22);
-          ctx.lineTo(0, 30);
-          ctx.closePath();
-          ctx.fill();
-          ctx.restore();
-        } else {
-          ctx.save();
-          ctx.translate(hz.x, hz.y);
-          if (hz.type === 'boulder') {
-            ctx.rotate(hz.rotation);
-            ctx.fillStyle = '#475569';
-            ctx.strokeStyle = '#0f172a';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(0, 0, hz.radius, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-
-            ctx.fillStyle = '#64748b';
-            ctx.beginPath();
-            ctx.arc(-hz.radius * 0.28, -hz.radius * 0.28, hz.radius * 0.34, 0, Math.PI * 2);
-            ctx.fill();
-          } else {
-            ctx.strokeStyle = '#cbd5e1';
-            ctx.lineWidth = 2.5;
-            ctx.beginPath();
-            ctx.moveTo(0, -hz.y - 20);
-            ctx.lineTo(0, -hz.radius * 0.6);
-            ctx.stroke();
-
-            ctx.fillStyle = '#ea580c';
-            ctx.strokeStyle = '#0f172a';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.roundRect(-hz.radius * 1.15, -hz.radius * 0.65, hz.radius * 2.3, hz.radius * 1.3, 5);
-            ctx.fill();
-            ctx.stroke();
-
-            ctx.fillStyle = '#fbbf24';
-            ctx.fillRect(-hz.radius * 1.0, -3, hz.radius * 2.0, 6);
-          }
-          ctx.restore();
-        }
-      });
-
-      if (state.mode !== 'exploding' && state.mode !== 'gameover') {
-        drawConstructionRig(
-          ctx,
-          state.rig,
-          state.player.x,
-          state.player.y,
-          state.player.radius,
-          state.player.rotation,
-          state.player.bucketAngle,
-          state.player.wheelSpin,
-          1
-        );
-
-        if (state.activeShield || state.turboTimer > 0 || state.turboGraceTimer > 0) {
-          const pulse = 0.65 + 0.35 * Math.sin(state.time * 12);
-          const isTurboProtected = state.turboTimer > 0 || state.turboGraceTimer > 0;
-          ctx.save();
-          ctx.strokeStyle = isTurboProtected
-            ? `rgba(251, 191, 36, ${pulse.toFixed(2)})`
-            : `rgba(56, 189, 248, ${pulse.toFixed(2)})`;
-          ctx.fillStyle = isTurboProtected
-            ? 'rgba(251, 191, 36, 0.14)'
-            : 'rgba(56, 189, 248, 0.14)';
-          ctx.lineWidth = 2.6;
-          ctx.beginPath();
-          ctx.arc(state.player.x, state.player.y, state.player.radius + 11, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.stroke();
-          ctx.restore();
-        }
-      }
-
-      state.shockwaves.forEach((sw) => {
-        const prog = 1 - sw.life / sw.maxLife;
-        const rad = 14 + prog * 92;
-        const alpha = Math.max(0, sw.life / sw.maxLife);
-        ctx.save();
-        ctx.strokeStyle = `rgba(251, 191, 36, ${alpha.toFixed(2)})`;
-        ctx.lineWidth = 5 * alpha;
-        ctx.beginPath();
+        drawThemedBeamSegment(ctx, obs.x, botY, obs.width, horizonY - botY, false, state.equippedBeam, state.time);
         ctx.arc(sw.x, sw.y, rad, 0, Math.PI * 2);
         ctx.stroke();
 
@@ -5643,6 +5708,183 @@
         return;
       }
 
+      if (state.shopTab === 'beams') {
+        grid.innerHTML = BEAM_THEMES.map((bm) => {
+          const isUnlocked = state.unlockedBeams.includes(bm.id);
+          const isEquipped = state.equippedBeam === bm.id;
+          const canAfford = !isUnlocked && state.coins >= bm.cost;
+          let cardClass = 'skin-card';
+          if (isEquipped) cardClass += ' equipped';
+          else if (canAfford) cardClass += ' affordable';
+          else if (!isUnlocked) cardClass += ' locked';
+
+          let badgeHtml = '';
+          if (isEquipped) {
+            badgeHtml = '<div class="skin-badge" style="background:#10b981; color:#022c22;">✓ EQUIPPED</div>';
+          } else if (isUnlocked) {
+            badgeHtml = '<div class="skin-badge" style="background:rgba(56,189,248,0.2); color:#7dd3fc; border:1px solid rgba(56,189,248,0.4);">EQUIP</div>';
+          } else if (canAfford) {
+            badgeHtml = `<div class="skin-badge" style="background:linear-gradient(135deg,#fbbf24,#d97706); color:#0f172a; display:inline-flex; align-items:center; gap:4px;">UNLOCK • ${bm.cost} ${getNuggetSvg(13, 'gold')}</div>`;
+          } else {
+            badgeHtml = `<div class="skin-badge" style="background:rgba(15,23,42,0.7); color:#94a3b8; border:1px solid rgba(255,255,255,0.1); display:inline-flex; align-items:center; gap:4px;">🔒 ${bm.cost} ${getNuggetSvg(13, 'gold')}</div>`;
+          }
+
+          return `
+            <button type="button" class="${cardClass}" data-beam-id="${bm.id}">
+              <canvas id="beam-preview-${bm.id}" width="160" height="170" style="width:74px; height:78px;"></canvas>
+              <div class="font-display" style="font-size:0.8rem; font-weight:700; color:#f8fafc; margin-top:2px;">${bm.icon} ${bm.name}</div>
+              <div style="font-size:0.6rem; color:#94a3b8;">${bm.subtitle}</div>
+              ${badgeHtml}
+            </button>
+          `;
+        }).join('');
+
+        BEAM_THEMES.forEach((bm) => {
+          const bCanvas = document.getElementById(`beam-preview-${bm.id}`);
+          if (!bCanvas) return;
+          const bCtx = bCanvas.getContext('2d');
+          bCtx.clearRect(0, 0, bCanvas.width, bCanvas.height);
+
+          const drawMiniBeam = (bx, by, bw, bh, isTop) => {
+            const capH = 14;
+            const capOver = 6;
+            const flangeY = isTop ? by + bh - capH : by;
+            const shaftY = isTop ? by : by + capH;
+            const shaftH = Math.max(0, bh - capH);
+
+            if (bm.id === 'christmas') {
+              bCtx.fillStyle = '#14532d';
+              bCtx.fillRect(bx, by, bw, bh);
+              bCtx.fillStyle = '#22c55e';
+              bCtx.fillRect(bx + 5, by, 5, bh);
+              bCtx.save();
+              bCtx.beginPath();
+              bCtx.rect(bx - 2, shaftY, bw + 4, shaftH);
+              bCtx.clip();
+              for (let gy = shaftY - 8; gy < shaftY + shaftH + 16; gy += 28) {
+                bCtx.strokeStyle = '#dc2626';
+                bCtx.lineWidth = 3;
+                bCtx.beginPath();
+                bCtx.moveTo(bx, gy);
+                bCtx.bezierCurveTo(bx + bw * 0.4, gy + 12, bx + bw * 0.6, gy - 4, bx + bw, gy + 9);
+                bCtx.stroke();
+                bCtx.strokeStyle = '#4ade80';
+                bCtx.lineWidth = 2.6;
+                bCtx.beginPath();
+                bCtx.moveTo(bx, gy + 10);
+                bCtx.bezierCurveTo(bx + bw * 0.4, gy - 2, bx + bw * 0.6, gy + 14, bx + bw, gy + 2);
+                bCtx.stroke();
+                bCtx.fillStyle = '#facc15';
+                bCtx.beginPath();
+                bCtx.arc(bx + bw * 0.5, gy + 8, 4.2, 0, Math.PI * 2);
+                bCtx.fill();
+              }
+              bCtx.restore();
+              bCtx.fillStyle = '#dc2626';
+              bCtx.beginPath();
+              bCtx.roundRect(bx - capOver, flangeY, bw + capOver * 2, capH, 3);
+              bCtx.fill();
+              bCtx.fillStyle = '#facc15';
+              bCtx.fillRect(bx - capOver + 2, isTop ? flangeY + capH - 4 : flangeY, bw + capOver * 2 - 4, 4);
+            } else if (bm.id === 'halloween') {
+              bCtx.fillStyle = '#1c1917';
+              bCtx.fillRect(bx, by, bw, bh);
+              bCtx.fillStyle = '#f97316';
+              bCtx.beginPath();
+              bCtx.ellipse(bx + bw * 0.5, shaftY + shaftH * 0.5, 9, 7, 0, 0, Math.PI * 2);
+              bCtx.fill();
+              bCtx.fillStyle = '#581c87';
+              bCtx.beginPath();
+              bCtx.roundRect(bx - capOver, flangeY, bw + capOver * 2, capH, 3);
+              bCtx.fill();
+              bCtx.fillStyle = '#f97316';
+              bCtx.fillRect(bx - capOver + 2, isTop ? flangeY + capH - 4 : flangeY, bw + capOver * 2 - 4, 4);
+            } else if (bm.id === 'easter') {
+              bCtx.fillStyle = '#6ee7b7';
+              bCtx.fillRect(bx, by, bw, bh);
+              bCtx.fillStyle = '#f472b6';
+              bCtx.beginPath();
+              bCtx.ellipse(bx + bw * 0.5, shaftY + shaftH * 0.5, 7, 9, 0, 0, Math.PI * 2);
+              bCtx.fill();
+              bCtx.fillStyle = '#c084fc';
+              bCtx.beginPath();
+              bCtx.roundRect(bx - capOver, flangeY, bw + capOver * 2, capH, 3);
+              bCtx.fill();
+              bCtx.fillStyle = '#fde047';
+              bCtx.fillRect(bx - capOver + 2, isTop ? flangeY + capH - 4 : flangeY, bw + capOver * 2 - 4, 4);
+            } else if (bm.id === 'midsummer') {
+              bCtx.fillStyle = '#1d4ed8';
+              bCtx.fillRect(bx, by, bw, bh);
+              bCtx.fillStyle = '#facc15';
+              bCtx.fillRect(bx + bw * 0.5 - 3, by, 6, bh);
+              bCtx.strokeStyle = '#16a34a';
+              bCtx.lineWidth = 4;
+              bCtx.beginPath();
+              bCtx.moveTo(bx, shaftY + shaftH * 0.5);
+              bCtx.quadraticCurveTo(bx + bw * 0.5, shaftY + shaftH * 0.5 + 10, bx + bw, shaftY + shaftH * 0.5);
+              bCtx.stroke();
+              bCtx.fillStyle = '#15803d';
+              bCtx.beginPath();
+              bCtx.roundRect(bx - capOver, flangeY, bw + capOver * 2, capH, 3);
+              bCtx.fill();
+              bCtx.fillStyle = '#facc15';
+              bCtx.fillRect(bx - capOver + 2, isTop ? flangeY + capH - 4 : flangeY, bw + capOver * 2 - 4, 4);
+            } else if (bm.id === 'neon') {
+              bCtx.fillStyle = '#090d16';
+              bCtx.fillRect(bx, by, bw, bh);
+              bCtx.strokeStyle = '#22d3ee';
+              bCtx.lineWidth = 2;
+              bCtx.strokeRect(bx + 8, by + 2, bw - 16, bh - 4);
+              bCtx.fillStyle = '#0e7490';
+              bCtx.beginPath();
+              bCtx.roundRect(bx - capOver, flangeY, bw + capOver * 2, capH, 3);
+              bCtx.fill();
+              bCtx.fillStyle = '#f472b6';
+              bCtx.fillRect(bx - capOver + 2, isTop ? flangeY + capH - 4 : flangeY, bw + capOver * 2 - 4, 4);
+            } else {
+              bCtx.fillStyle = '#334155';
+              bCtx.fillRect(bx, by, bw, bh);
+              bCtx.fillStyle = '#94a3b8';
+              bCtx.fillRect(bx + 5, by, 5, bh);
+              bCtx.fillStyle = '#1e293b';
+              bCtx.beginPath();
+              bCtx.roundRect(bx - capOver, flangeY, bw + capOver * 2, capH, 3);
+              bCtx.fill();
+              bCtx.fillStyle = '#eab308';
+              bCtx.fillRect(bx - capOver + 2, isTop ? flangeY + capH - 4 : flangeY, bw + capOver * 2 - 4, 4);
+            }
+          };
+
+          drawMiniBeam(54, 4, 52, 62, true);
+          drawMiniBeam(54, 104, 52, 62, false);
+        });
+
+        grid.querySelectorAll('[data-beam-id]').forEach((card) => {
+          card.addEventListener('click', () => {
+            const bm = getBeamThemeById(card.dataset.beamId);
+            if (state.unlockedBeams.includes(bm.id)) {
+              audio.playClick();
+              state.equippedBeam = bm.id;
+              saveShopData();
+              renderPaintShop();
+              showShopBanner(`${bm.icon} Equipped ${bm.name} beams!`, true);
+            } else if (state.coins >= bm.cost) {
+              state.coins -= bm.cost;
+              state.unlockedBeams.push(bm.id);
+              state.equippedBeam = bm.id;
+              saveShopData();
+              audio.playSkinUnlock();
+              renderPaintShop();
+              showShopBanner(`🎉 Unlocked & equipped ${bm.name} beams!`, true);
+            } else {
+              audio.playClick();
+              showShopBanner(`Need ${bm.cost - state.coins} more ${getNuggetSvg(14, 'gold')} nuggets for ${bm.name}!`, false);
+            }
+          });
+        });
+        return;
+      }
+
       if (state.shopTab === 'stages') {
         const isRandom = state.stageSelection === 'random';
         const randomCardClass = isRandom ? 'skin-card equipped' : 'skin-card affordable';
@@ -5681,9 +5923,10 @@
 
           return `
             <button type="button" class="${cardClass}" data-stage-id="${b.id}">
-              <div style="width:84px; height:36px; border-radius:9px; margin:2px 0; background:linear-gradient(180deg, ${b.daySkyTop} 0%, ${b.daySkyBottom} 72%, ${b.groundTop} 72%, ${b.groundDirt} 100%); border:1px solid rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:center; font-size:1.3rem;">
-                ${b.icon}
-              </div>
+            <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+              <span style="font-size:0.64rem; font-weight:800; letter-spacing:0.11em; color:#fbbf24;">EARTHMOVER ARCADE</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.20</span>
+            </div>
               <div class="font-display" style="font-size:0.8rem; font-weight:700; color:#f8fafc; margin-top:2px;">${b.name}</div>
               <div style="font-size:0.6rem; color:#94a3b8;">${b.subtitle}</div>
               ${badgeHtml}
