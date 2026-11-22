@@ -1149,7 +1149,7 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.64rem; font-weight:800; letter-spacing:0.11em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.23</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.25</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.55rem, 6.6vw, 2.05rem); font-weight:700; line-height:1.04; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.32rem; flex-wrap:nowrap;">
@@ -2388,7 +2388,7 @@
     // =========================================================================
     // 3. GAME STATE, PER-PLAYER PROFILES, TOP 10 & CROSS-DEVICE SYNC
     // =========================================================================
-    const APP_VERSION = 'v5.9.23';
+    const APP_VERSION = 'v5.9.24';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -4442,365 +4442,10 @@
 
       drawProceduralBackdrop(biome, lighting, horizonY);
 
-      const drawThemedBeamSegment = (targetCtx, bx, by, bw, bh, isTop, themeId, animTime = 0) => {
-        if (bh <= 0) return;
-        const capH = 20;
-        const capOverhang = 8;
-        const flangeY = isTop ? by + bh - capH : by;
-        const shaftH = Math.max(0, bh - capH);
-        const shaftY = isTop ? by : by + capH;
-
-        if (themeId === 'christmas') {
-          // Festive Pine-Green Steel Column with Red & Green Garlands + Golden Bells
-          targetCtx.fillStyle = '#14532d';
-          targetCtx.fillRect(bx, by, bw, bh);
-          targetCtx.fillStyle = '#22c55e';
-          targetCtx.fillRect(bx + 6, by, 7, bh);
-          targetCtx.fillStyle = '#052e16';
-          targetCtx.fillRect(bx + bw - 10, by, 10, bh);
-
-          // Intertwined Red & Bright Green Garlands
-          if (shaftH > 12) {
-            targetCtx.save();
-            targetCtx.beginPath();
-            targetCtx.rect(bx - 3, shaftY, bw + 6, shaftH);
-            targetCtx.clip();
-
-            const stepY = 46;
-            const startStep = Math.floor(shaftY / stepY) * stepY - stepY;
-            for (let gy = startStep; gy < shaftY + shaftH + stepY; gy += stepY) {
-              // Red garland loop
-              targetCtx.strokeStyle = '#dc2626';
-              targetCtx.lineWidth = 4.2;
-              targetCtx.lineCap = 'round';
-              targetCtx.beginPath();
-              targetCtx.moveTo(bx - 2, gy);
-              targetCtx.bezierCurveTo(bx + bw * 0.35, gy + 18, bx + bw * 0.65, gy - 6, bx + bw + 2, gy + 14);
-              targetCtx.stroke();
-
-              // Green garland loop
-              targetCtx.strokeStyle = '#4ade80';
-              targetCtx.lineWidth = 3.8;
-              targetCtx.beginPath();
-              targetCtx.moveTo(bx - 2, gy + 16);
-              targetCtx.bezierCurveTo(bx + bw * 0.35, gy - 2, bx + bw * 0.65, gy + 24, bx + bw + 2, gy + 4);
-              targetCtx.stroke();
-
-              // Golden Jingle Bell & Red Ribbon Bow
-              const bellX = bx + ((Math.abs(Math.round(gy / stepY)) % 2 === 0) ? bw * 0.3 : bw * 0.7);
-              const bellY = gy + 11;
-              targetCtx.save();
-              targetCtx.translate(bellX, bellY);
-              targetCtx.rotate((Math.abs(Math.round(gy / stepY)) % 2 === 0) ? -0.18 : 0.18);
-
-              // Top hanging ring
-              targetCtx.strokeStyle = '#fef08a';
-              targetCtx.lineWidth = 1.6;
-              targetCtx.beginPath();
-              targetCtx.arc(0, -8.5, 2.2, 0, Math.PI * 2);
-              targetCtx.stroke();
-
-              // Flared golden bell silhouette
-              targetCtx.fillStyle = '#facc15';
-              targetCtx.strokeStyle = '#78350f';
-              targetCtx.lineWidth = 1.4;
-              targetCtx.beginPath();
-              targetCtx.moveTo(-4.2, -6.5);
-              targetCtx.quadraticCurveTo(0, -8.2, 4.2, -6.5);
-              targetCtx.bezierCurveTo(5.2, -1.5, 6.4, 2.2, 8.8, 4.8);
-              targetCtx.quadraticCurveTo(0, 6.8, -8.8, 4.8);
-              targetCtx.bezierCurveTo(-6.4, 2.2, -5.2, -1.5, -4.2, -6.5);
-              targetCtx.closePath();
-              targetCtx.fill();
-              targetCtx.stroke();
-
-              // Specular gold shine & lower rim band
-              targetCtx.strokeStyle = '#fef9c3';
-              targetCtx.lineWidth = 1.3;
-              targetCtx.beginPath();
-              targetCtx.moveTo(-2.4, -4.5);
-              targetCtx.quadraticCurveTo(-3.4, 0.2, -5.2, 3.2);
-              targetCtx.stroke();
-
-              // Bell clapper
-              targetCtx.fillStyle = '#d97706';
-              targetCtx.strokeStyle = '#78350f';
-              targetCtx.lineWidth = 1.1;
-              targetCtx.beginPath();
-              targetCtx.arc(0, 6.6, 2.4, 0, Math.PI * 2);
-              targetCtx.fill();
-              targetCtx.stroke();
-
-              // Festive red ribbon bow at top
-              targetCtx.fillStyle = '#ef4444';
-              targetCtx.beginPath();
-              targetCtx.moveTo(0, -7);
-              targetCtx.lineTo(-4.8, -10.2);
-              targetCtx.lineTo(-4.2, -5.2);
-              targetCtx.closePath();
-              targetCtx.moveTo(0, -7);
-              targetCtx.lineTo(4.8, -10.2);
-              targetCtx.lineTo(4.2, -5.2);
-              targetCtx.closePath();
-              targetCtx.fill();
-              targetCtx.restore();
-            }
-            targetCtx.restore();
-          }
-
-          // Candy-Cane Red & White Flange Cap with Gold Trim
-          targetCtx.fillStyle = '#991b1b';
-          targetCtx.beginPath();
-          targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
-          targetCtx.fill();
-
-          targetCtx.save();
-          targetCtx.beginPath();
-          targetCtx.roundRect(bx - capOverhang + 2, flangeY + 2, bw + capOverhang * 2 - 4, capH - 8, 3);
-          targetCtx.clip();
-          targetCtx.fillStyle = '#f8fafc';
-          for (let sx = bx - capOverhang - 16; sx < bx + bw + capOverhang + 16; sx += 16) {
-            targetCtx.beginPath();
-            targetCtx.moveTo(sx, flangeY);
-            targetCtx.lineTo(sx + 8, flangeY);
-            targetCtx.lineTo(sx + 2, flangeY + capH);
-            targetCtx.lineTo(sx - 6, flangeY + capH);
-            targetCtx.closePath();
-            targetCtx.fill();
-          }
-          targetCtx.restore();
-
-          targetCtx.fillStyle = '#facc15';
-          targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
-          return;
-        }
-
-        if (themeId === 'halloween') {
-          // Haunted Obsidian Beam with Cobwebs & Glowing Jack-o'-Lanterns
-          targetCtx.fillStyle = '#1c1917';
-          targetCtx.fillRect(bx, by, bw, bh);
-          targetCtx.fillStyle = '#44403c';
-          targetCtx.fillRect(bx + 6, by, 7, bh);
-          targetCtx.fillStyle = '#090d16';
-          targetCtx.fillRect(bx + bw - 10, by, 10, bh);
-
-          if (shaftH > 16) {
-            targetCtx.save();
-            targetCtx.beginPath();
-            targetCtx.rect(bx, shaftY, bw, shaftH);
-            targetCtx.clip();
-
-            // Corner Cobweb Arcs
-            targetCtx.strokeStyle = 'rgba(226, 232, 240, 0.35)';
-            targetCtx.lineWidth = 1.3;
-            const webY = isTop ? flangeY - 2 : flangeY + capH + 2;
-            const dirY = isTop ? -1 : 1;
-            [12, 22, 32].forEach((rad) => {
-              targetCtx.beginPath();
-              targetCtx.arc(bx, webY, rad, isTop ? -Math.PI * 0.5 : 0, isTop ? 0 : Math.PI * 0.5);
-              targetCtx.stroke();
-            });
-
-            // Glowing Jack-o'-Lanterns along the shaft
-            const pStep = 68;
-            const pStart = Math.floor(shaftY / pStep) * pStep + 34;
-            for (let py = pStart; py < shaftY + shaftH - 16; py += pStep) {
-              const px = bx + bw * 0.5;
-              targetCtx.fillStyle = '#f97316';
-              targetCtx.beginPath();
-              targetCtx.ellipse(px, py, 12, 9.5, 0, 0, Math.PI * 2);
-              targetCtx.fill();
-              targetCtx.fillStyle = '#16a34a';
-              targetCtx.fillRect(px - 2, py - 12, 4, 4);
-
-              // Glowing eyes & grin
-              targetCtx.fillStyle = '#fef08a';
-              targetCtx.beginPath();
-              targetCtx.moveTo(px - 6, py - 2);
-              targetCtx.lineTo(px - 3, py - 5);
-              targetCtx.lineTo(px - 1, py - 2);
-              targetCtx.moveTo(px + 6, py - 2);
-              targetCtx.lineTo(px + 3, py - 5);
-              targetCtx.lineTo(px + 1, py - 2);
-              targetCtx.fill();
-              targetCtx.fillRect(px - 5, py + 2, 10, 2.5);
-            }
-            targetCtx.restore();
-          }
-
-          targetCtx.fillStyle = '#581c87';
-          targetCtx.beginPath();
-          targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
-          targetCtx.fill();
-          targetCtx.fillStyle = '#f97316';
-          targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
-          return;
-        }
-
-        if (themeId === 'easter') {
-          // Spring Pastel Mint & Lavender Column with Painted Easter Eggs
-          targetCtx.fillStyle = '#6ee7b7';
-          targetCtx.fillRect(bx, by, bw, bh);
-          targetCtx.fillStyle = '#a7f3d0';
-          targetCtx.fillRect(bx + 6, by, 7, bh);
-          targetCtx.fillStyle = '#059669';
-          targetCtx.fillRect(bx + bw - 10, by, 10, bh);
-
-          if (shaftH > 16) {
-            targetCtx.save();
-            targetCtx.beginPath();
-            targetCtx.rect(bx, shaftY, bw, shaftH);
-            targetCtx.clip();
-
-            const eStep = 56;
-            const eStart = Math.floor(shaftY / eStep) * eStep + 28;
-            const eggColors = ['#f472b6', '#c084fc', '#fde047', '#38bdf8'];
-            let eIdx = 0;
-            for (let ey = eStart; ey < shaftY + shaftH - 12; ey += eStep) {
-              const ex = bx + bw * 0.5 + (eIdx % 2 === 0 ? -6 : 6);
-              const eCol = eggColors[eIdx % eggColors.length];
-              targetCtx.fillStyle = eCol;
-              targetCtx.strokeStyle = '#0f172a';
-              targetCtx.lineWidth = 1.4;
-              targetCtx.beginPath();
-              targetCtx.ellipse(ex, ey, 8.5, 11, 0, 0, Math.PI * 2);
-              targetCtx.fill();
-              targetCtx.stroke();
-
-              targetCtx.strokeStyle = '#ffffff';
-              targetCtx.lineWidth = 1.6;
-              targetCtx.beginPath();
-              targetCtx.moveTo(ex - 6, ey);
-              targetCtx.lineTo(ex - 2, ey - 3);
-              targetCtx.lineTo(ex + 2, ey + 2);
-              targetCtx.lineTo(ex + 6, ey - 1);
-              targetCtx.stroke();
-              eIdx++;
-            }
-            targetCtx.restore();
-          }
-
-          targetCtx.fillStyle = '#c084fc';
-          targetCtx.beginPath();
-          targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
-          targetCtx.fill();
-          targetCtx.fillStyle = '#fde047';
-          targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
-          return;
-        }
-
-        if (themeId === 'midsummer') {
-          // Swedish Midsummer Maypole: Royal Blue & Yellow with Birch Leaf Rings
-          targetCtx.fillStyle = '#1d4ed8';
-          targetCtx.fillRect(bx, by, bw, bh);
-          targetCtx.fillStyle = '#60a5fa';
-          targetCtx.fillRect(bx + 6, by, 7, bh);
-          targetCtx.fillStyle = '#1e3a8a';
-          targetCtx.fillRect(bx + bw - 10, by, 10, bh);
-
-          if (shaftH > 16) {
-            targetCtx.save();
-            targetCtx.beginPath();
-            targetCtx.rect(bx - 4, shaftY, bw + 8, shaftH);
-            targetCtx.clip();
-
-            // Golden Vertical Ribbon
-            targetCtx.fillStyle = '#facc15';
-            targetCtx.fillRect(bx + bw * 0.5 - 4, shaftY, 8, shaftH);
-
-            // Green Birch Leaf Garlands & Wildflowers
-            const mStep = 52;
-            const mStart = Math.floor(shaftY / mStep) * mStep + 26;
-            for (let my = mStart; my < shaftY + shaftH - 10; my += mStep) {
-              targetCtx.strokeStyle = '#16a34a';
-              targetCtx.lineWidth = 5;
-              targetCtx.beginPath();
-              targetCtx.moveTo(bx - 2, my - 6);
-              targetCtx.quadraticCurveTo(bx + bw * 0.5, my + 12, bx + bw + 2, my - 6);
-              targetCtx.stroke();
-
-              targetCtx.fillStyle = '#fef08a';
-              targetCtx.beginPath();
-              targetCtx.arc(bx + bw * 0.25, my + 2, 3.2, 0, Math.PI * 2);
-              targetCtx.arc(bx + bw * 0.75, my + 2, 3.2, 0, Math.PI * 2);
-              targetCtx.fill();
-            }
-            targetCtx.restore();
-          }
-
-          targetCtx.fillStyle = '#15803d';
-          targetCtx.beginPath();
-          targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
-          targetCtx.fill();
-          targetCtx.fillStyle = '#facc15';
-          targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
-          return;
-        }
-
-        if (themeId === 'neon') {
-          // Cyber Neon Laser Circuitry Column
-          const pulse = 0.65 + 0.35 * Math.sin(animTime * 6);
-          targetCtx.fillStyle = '#090d16';
-          targetCtx.fillRect(bx, by, bw, bh);
-          targetCtx.fillStyle = '#1e293b';
-          targetCtx.fillRect(bx + 6, by, 6, bh);
-
-          targetCtx.save();
-          targetCtx.strokeStyle = `rgba(34, 211, 238, ${pulse.toFixed(2)})`;
-          targetCtx.lineWidth = 2.4;
-          targetCtx.beginPath();
-          targetCtx.moveTo(bx + 18, by);
-          targetCtx.lineTo(bx + 18, by + bh);
-          targetCtx.moveTo(bx + bw - 18, by);
-          targetCtx.lineTo(bx + bw - 18, by + bh);
-          targetCtx.stroke();
-
-          targetCtx.fillStyle = '#f472b6';
-          for (let ny = by + 24; ny < by + bh - 16; ny += 36) {
-            targetCtx.fillRect(bx + 15, ny, 6, 6);
-            targetCtx.fillRect(bx + bw - 21, ny + 14, 6, 6);
-          }
-          targetCtx.restore();
-
-          targetCtx.fillStyle = '#0e7490';
-          targetCtx.beginPath();
-          targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
-          targetCtx.fill();
-          targetCtx.fillStyle = '#f472b6';
-          targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
-          return;
-        }
-
-        // Default: Classic Industrial Steel I-Beam
-        targetCtx.fillStyle = lighting.beamMain;
-        targetCtx.fillRect(bx, by, bw, bh);
-
-        targetCtx.fillStyle = lighting.beamHighlight;
-        targetCtx.fillRect(bx + 6, by, 7, bh);
-        targetCtx.fillStyle = lighting.beamShadow;
-        targetCtx.fillRect(bx + bw - 10, by, 10, bh);
-
-        targetCtx.fillStyle = 'rgba(15, 23, 42, 0.45)';
-        for (let ry = by + 16; ry < by + bh - 12; ry += 26) {
-          targetCtx.beginPath();
-          targetCtx.arc(bx + 18, ry, 2.5, 0, Math.PI * 2);
-          targetCtx.arc(bx + bw - 18, ry, 2.5, 0, Math.PI * 2);
-          targetCtx.fill();
-        }
-
-        targetCtx.fillStyle = '#1e293b';
-        targetCtx.beginPath();
-        targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
-        targetCtx.fill();
-
-        targetCtx.fillStyle = '#eab308';
-        targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
-      };
-
       state.obstacles.forEach((obs) => {
-        drawThemedBeamSegment(ctx, obs.x, 0, obs.width, obs.topHeight, true, state.equippedBeam, state.time);
+        drawThemedBeamSegment(ctx, obs.x, 0, obs.width, obs.topHeight, true, state.equippedBeam, state.time, lighting);
         const botY = obs.topHeight + obs.gap;
-        drawThemedBeamSegment(ctx, obs.x, botY, obs.width, horizonY - botY, false, state.equippedBeam, state.time);
+        drawThemedBeamSegment(ctx, obs.x, botY, obs.width, horizonY - botY, false, state.equippedBeam, state.time, lighting);
 
         if (obs.hasWreckingBall) {
           const anchorX = obs.x + obs.width * 0.5;
@@ -4808,43 +4453,113 @@
           const ballX = anchorX + Math.sin(obs.ballPhase) * 14;
           const ballY = anchorY + obs.ballDrop;
 
-          ctx.strokeStyle = '#94a3b8';
-          ctx.lineWidth = 3;
+          // High-contrast steel chain with bright links
+          ctx.strokeStyle = '#0f172a';
+          ctx.lineWidth = 5;
           ctx.beginPath();
           ctx.moveTo(anchorX, anchorY);
           ctx.lineTo(ballX, ballY);
           ctx.stroke();
 
-          ctx.fillStyle = '#0f172a';
+          ctx.strokeStyle = '#e2e8f0';
+          ctx.lineWidth = 2.6;
+          ctx.setLineDash([4, 3]);
           ctx.beginPath();
-          ctx.arc(ballX, ballY, obs.ballRadius, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = '#475569';
+          ctx.moveTo(anchorX, anchorY);
+          ctx.lineTo(ballX, ballY);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // High-visibility Demolition Wrecking Ball (pops against dark & light skies)
+          ctx.save();
+          ctx.translate(ballX, ballY);
+          ctx.fillStyle = '#1e293b';
+          ctx.strokeStyle = '#fbbf24';
+          ctx.lineWidth = 2.4;
           ctx.beginPath();
-          ctx.arc(ballX - 4, ballY - 4, obs.ballRadius * 0.35, 0, Math.PI * 2);
+          ctx.arc(0, 0, obs.ballRadius, 0, Math.PI * 2);
           ctx.fill();
+          ctx.stroke();
+
+          // Hazard yellow center band clipped inside the sphere
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(0, 0, obs.ballRadius - 1.2, 0, Math.PI * 2);
+          ctx.clip();
+          ctx.fillStyle = '#f59e0b';
+          ctx.fillRect(-obs.ballRadius, -2.6, obs.ballRadius * 2, 5.2);
+          ctx.restore();
+
+          // Metallic top-left specular gleam
+          ctx.fillStyle = '#f8fafc';
+          ctx.beginPath();
+          ctx.arc(-3.5, -4, obs.ballRadius * 0.28, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
         }
 
         if (obs.isElectricWire) {
           const wireY = obs.topHeight + obs.wireOffset;
           const pulse = 0.55 + 0.45 * Math.sin(state.time * 14 + obs.x * 0.05);
+          const midX = obs.x + obs.width * 0.5;
+          const jitter = Math.sin(state.time * 28) * 3.2;
 
-          ctx.fillStyle = '#0f172a';
-          ctx.fillRect(obs.x - 4, wireY - 5, 8, 10);
-          ctx.fillRect(obs.x + obs.width - 4, wireY - 5, 8, 10);
+          // High-contrast insulator brackets at both beam edges
+          [-2, obs.width - 8].forEach((ix) => {
+            ctx.fillStyle = '#0f172a';
+            ctx.strokeStyle = '#fbbf24';
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.roundRect(obs.x + ix, wireY - 7, 10, 14, 3);
+            ctx.fill();
+            ctx.stroke();
+          });
 
           ctx.save();
-          ctx.strokeStyle = `rgba(56, 189, 248, ${pulse.toFixed(2)})`;
-          ctx.shadowColor = '#38bdf8';
-          ctx.shadowBlur = 10;
-          ctx.lineWidth = 3.5;
+          // Dark outline stroke so the wire stands out sharply against bright blue daytime sky
+          ctx.strokeStyle = '#0f172a';
+          ctx.lineWidth = 6.5;
+          ctx.lineCap = 'round';
           ctx.beginPath();
-          ctx.moveTo(obs.x, wireY);
-          const midX = obs.x + obs.width * 0.5;
-          const jitter = Math.sin(state.time * 28) * 3.5;
+          ctx.moveTo(obs.x + 6, wireY);
           ctx.lineTo(midX, wireY + jitter);
-          ctx.lineTo(obs.x + obs.width, wireY);
+          ctx.lineTo(obs.x + obs.width - 6, wireY);
           ctx.stroke();
+
+          // Vivid electric arc core + glow
+          ctx.strokeStyle = `rgba(2, 132, 199, 0.95)`;
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 11;
+          ctx.lineWidth = 3.6;
+          ctx.beginPath();
+          ctx.moveTo(obs.x + 6, wireY);
+          ctx.lineTo(midX, wireY + jitter);
+          ctx.lineTo(obs.x + obs.width - 6, wireY);
+          ctx.stroke();
+
+          ctx.strokeStyle = `rgba(224, 242, 254, ${(0.5 + pulse * 0.5).toFixed(2)})`;
+          ctx.shadowBlur = 0;
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.moveTo(obs.x + 8, wireY);
+          ctx.lineTo(midX, wireY + jitter);
+          ctx.lineTo(obs.x + obs.width - 8, wireY);
+          ctx.stroke();
+
+          // Compact high-voltage warning badge in center
+          ctx.fillStyle = '#0f172a';
+          ctx.strokeStyle = '#fbbf24';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.roundRect(midX - 9, wireY - 15, 18, 12, 4);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = '#fde047';
+          ctx.font = '800 8.5px "Chakra Petch", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('⚡', midX, wireY - 9);
           ctx.restore();
         }
       });
@@ -5107,6 +4822,361 @@
       ctx.restore();
     }
 
+    function drawThemedBeamSegment(targetCtx, bx, by, bw, bh, isTop, themeId, animTime = 0, lightingOverride = null) {
+      if (bh <= 0) return;
+      const lighting = lightingOverride || SHIFT_LIGHTING[state.shift] || SHIFT_LIGHTING.day;
+      const capH = 20;
+      const capOverhang = 8;
+      const flangeY = isTop ? by + bh - capH : by;
+      const shaftH = Math.max(0, bh - capH);
+      const shaftY = isTop ? by : by + capH;
+
+      if (themeId === 'christmas') {
+        // Festive Pine-Green Steel Column with Red & Green Garlands + Golden Bells
+        targetCtx.fillStyle = '#14532d';
+        targetCtx.fillRect(bx, by, bw, bh);
+        targetCtx.fillStyle = '#22c55e';
+        targetCtx.fillRect(bx + 6, by, 7, bh);
+        targetCtx.fillStyle = '#052e16';
+        targetCtx.fillRect(bx + bw - 10, by, 10, bh);
+
+        // Intertwined Red & Bright Green Garlands
+        if (shaftH > 12) {
+          targetCtx.save();
+          targetCtx.beginPath();
+          targetCtx.rect(bx - 3, shaftY, bw + 6, shaftH);
+          targetCtx.clip();
+
+          const stepY = 46;
+          const startStep = Math.floor(shaftY / stepY) * stepY - stepY;
+          for (let gy = startStep; gy < shaftY + shaftH + stepY; gy += stepY) {
+            // Red garland loop
+            targetCtx.strokeStyle = '#dc2626';
+            targetCtx.lineWidth = 4.2;
+            targetCtx.lineCap = 'round';
+            targetCtx.beginPath();
+            targetCtx.moveTo(bx - 2, gy);
+            targetCtx.bezierCurveTo(bx + bw * 0.35, gy + 18, bx + bw * 0.65, gy - 6, bx + bw + 2, gy + 14);
+            targetCtx.stroke();
+
+            // Green garland loop
+            targetCtx.strokeStyle = '#4ade80';
+            targetCtx.lineWidth = 3.8;
+            targetCtx.beginPath();
+            targetCtx.moveTo(bx - 2, gy + 16);
+            targetCtx.bezierCurveTo(bx + bw * 0.35, gy - 2, bx + bw * 0.65, gy + 24, bx + bw + 2, gy + 4);
+            targetCtx.stroke();
+
+            // Golden Jingle Bell & Red Ribbon Bow
+            const bellX = bx + ((Math.abs(Math.round(gy / stepY)) % 2 === 0) ? bw * 0.3 : bw * 0.7);
+            const bellY = gy + 11;
+            targetCtx.save();
+            targetCtx.translate(bellX, bellY);
+            targetCtx.rotate((Math.abs(Math.round(gy / stepY)) % 2 === 0) ? -0.18 : 0.18);
+
+            // Top hanging ring
+            targetCtx.strokeStyle = '#fef08a';
+            targetCtx.lineWidth = 1.6;
+            targetCtx.beginPath();
+            targetCtx.arc(0, -8.5, 2.2, 0, Math.PI * 2);
+            targetCtx.stroke();
+
+            // Flared golden bell silhouette
+            targetCtx.fillStyle = '#facc15';
+            targetCtx.strokeStyle = '#78350f';
+            targetCtx.lineWidth = 1.4;
+            targetCtx.beginPath();
+            targetCtx.moveTo(-4.2, -6.5);
+            targetCtx.quadraticCurveTo(0, -8.2, 4.2, -6.5);
+            targetCtx.bezierCurveTo(5.2, -1.5, 6.4, 2.2, 8.8, 4.8);
+            targetCtx.quadraticCurveTo(0, 6.8, -8.8, 4.8);
+            targetCtx.bezierCurveTo(-6.4, 2.2, -5.2, -1.5, -4.2, -6.5);
+            targetCtx.closePath();
+            targetCtx.fill();
+            targetCtx.stroke();
+
+            // Specular gold shine
+            targetCtx.strokeStyle = '#fef9c3';
+            targetCtx.lineWidth = 1.3;
+            targetCtx.beginPath();
+            targetCtx.moveTo(-2.4, -4.5);
+            targetCtx.quadraticCurveTo(-3.4, 0.2, -5.2, 3.2);
+            targetCtx.stroke();
+
+            // Bell clapper
+            targetCtx.fillStyle = '#d97706';
+            targetCtx.strokeStyle = '#78350f';
+            targetCtx.lineWidth = 1.1;
+            targetCtx.beginPath();
+            targetCtx.arc(0, 6.6, 2.4, 0, Math.PI * 2);
+            targetCtx.fill();
+            targetCtx.stroke();
+
+            // Festive red ribbon bow at top
+            targetCtx.fillStyle = '#ef4444';
+            targetCtx.beginPath();
+            targetCtx.moveTo(0, -7);
+            targetCtx.lineTo(-4.8, -10.2);
+            targetCtx.lineTo(-4.2, -5.2);
+            targetCtx.closePath();
+            targetCtx.moveTo(0, -7);
+            targetCtx.lineTo(4.8, -10.2);
+            targetCtx.lineTo(4.2, -5.2);
+            targetCtx.closePath();
+            targetCtx.fill();
+            targetCtx.restore();
+          }
+          targetCtx.restore();
+        }
+
+        // Candy-Cane Red & White Flange Cap with Gold Trim
+        targetCtx.fillStyle = '#991b1b';
+        targetCtx.beginPath();
+        targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
+        targetCtx.fill();
+
+        targetCtx.save();
+        targetCtx.beginPath();
+        targetCtx.roundRect(bx - capOverhang + 2, flangeY + 2, bw + capOverhang * 2 - 4, capH - 8, 3);
+        targetCtx.clip();
+        targetCtx.fillStyle = '#f8fafc';
+        for (let sx = bx - capOverhang - 16; sx < bx + bw + capOverhang + 16; sx += 16) {
+          targetCtx.beginPath();
+          targetCtx.moveTo(sx, flangeY);
+          targetCtx.lineTo(sx + 8, flangeY);
+          targetCtx.lineTo(sx + 2, flangeY + capH);
+          targetCtx.lineTo(sx - 6, flangeY + capH);
+          targetCtx.closePath();
+          targetCtx.fill();
+        }
+        targetCtx.restore();
+
+        targetCtx.fillStyle = '#facc15';
+        targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
+        return;
+      }
+
+      if (themeId === 'halloween') {
+        // Haunted Obsidian Beam with Cobwebs & Glowing Jack-o'-Lanterns
+        targetCtx.fillStyle = '#1c1917';
+        targetCtx.fillRect(bx, by, bw, bh);
+        targetCtx.fillStyle = '#44403c';
+        targetCtx.fillRect(bx + 6, by, 7, bh);
+        targetCtx.fillStyle = '#090d16';
+        targetCtx.fillRect(bx + bw - 10, by, 10, bh);
+
+        if (shaftH > 16) {
+          targetCtx.save();
+          targetCtx.beginPath();
+          targetCtx.rect(bx, shaftY, bw, shaftH);
+          targetCtx.clip();
+
+          // Corner Cobweb Arcs
+          targetCtx.strokeStyle = 'rgba(226, 232, 240, 0.35)';
+          targetCtx.lineWidth = 1.3;
+          const webY = isTop ? flangeY - 2 : flangeY + capH + 2;
+          [12, 22, 32].forEach((rad) => {
+            targetCtx.beginPath();
+            targetCtx.arc(bx, webY, rad, isTop ? -Math.PI * 0.5 : 0, isTop ? 0 : Math.PI * 0.5);
+            targetCtx.stroke();
+          });
+
+          // Glowing Jack-o'-Lanterns along the shaft
+          const pStep = 68;
+          const pStart = Math.floor(shaftY / pStep) * pStep + 34;
+          for (let py = pStart; py < shaftY + shaftH - 12; py += pStep) {
+            const px = bx + bw * 0.5;
+            targetCtx.fillStyle = '#f97316';
+            targetCtx.beginPath();
+            targetCtx.ellipse(px, py, 12, 9.5, 0, 0, Math.PI * 2);
+            targetCtx.fill();
+            targetCtx.fillStyle = '#16a34a';
+            targetCtx.fillRect(px - 2, py - 12, 4, 4);
+
+            // Glowing eyes & grin
+            targetCtx.fillStyle = '#fef08a';
+            targetCtx.beginPath();
+            targetCtx.moveTo(px - 6, py - 2);
+            targetCtx.lineTo(px - 3, py - 5);
+            targetCtx.lineTo(px - 1, py - 2);
+            targetCtx.moveTo(px + 6, py - 2);
+            targetCtx.lineTo(px + 3, py - 5);
+            targetCtx.lineTo(px + 1, py - 2);
+            targetCtx.fill();
+            targetCtx.fillRect(px - 5, py + 2, 10, 2.5);
+          }
+          targetCtx.restore();
+        }
+
+        targetCtx.fillStyle = '#581c87';
+        targetCtx.beginPath();
+        targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
+        targetCtx.fill();
+        targetCtx.fillStyle = '#f97316';
+        targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
+        return;
+      }
+
+      if (themeId === 'easter') {
+        // Spring Pastel Mint & Lavender Column with Painted Easter Eggs
+        targetCtx.fillStyle = '#6ee7b7';
+        targetCtx.fillRect(bx, by, bw, bh);
+        targetCtx.fillStyle = '#a7f3d0';
+        targetCtx.fillRect(bx + 6, by, 7, bh);
+        targetCtx.fillStyle = '#059669';
+        targetCtx.fillRect(bx + bw - 10, by, 10, bh);
+
+        if (shaftH > 16) {
+          targetCtx.save();
+          targetCtx.beginPath();
+          targetCtx.rect(bx, shaftY, bw, shaftH);
+          targetCtx.clip();
+
+          const eStep = 56;
+          const eStart = Math.floor(shaftY / eStep) * eStep + 28;
+          const eggColors = ['#f472b6', '#c084fc', '#fde047', '#38bdf8'];
+          let eIdx = 0;
+          for (let ey = eStart; ey < shaftY + shaftH - 10; ey += eStep) {
+            const ex = bx + bw * 0.5 + (eIdx % 2 === 0 ? -6 : 6);
+            const eCol = eggColors[eIdx % eggColors.length];
+            targetCtx.fillStyle = eCol;
+            targetCtx.strokeStyle = '#0f172a';
+            targetCtx.lineWidth = 1.4;
+            targetCtx.beginPath();
+            targetCtx.ellipse(ex, ey, 8.5, 11, 0, 0, Math.PI * 2);
+            targetCtx.fill();
+            targetCtx.stroke();
+
+            targetCtx.strokeStyle = '#ffffff';
+            targetCtx.lineWidth = 1.6;
+            targetCtx.beginPath();
+            targetCtx.moveTo(ex - 6, ey);
+            targetCtx.lineTo(ex - 2, ey - 3);
+            targetCtx.lineTo(ex + 2, ey + 2);
+            targetCtx.lineTo(ex + 6, ey - 1);
+            targetCtx.stroke();
+            eIdx++;
+          }
+          targetCtx.restore();
+        }
+
+        targetCtx.fillStyle = '#c084fc';
+        targetCtx.beginPath();
+        targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
+        targetCtx.fill();
+        targetCtx.fillStyle = '#fde047';
+        targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
+        return;
+      }
+
+      if (themeId === 'midsummer') {
+        // Swedish Midsummer Maypole: Royal Blue & Yellow with Birch Leaf Rings
+        targetCtx.fillStyle = '#1d4ed8';
+        targetCtx.fillRect(bx, by, bw, bh);
+        targetCtx.fillStyle = '#60a5fa';
+        targetCtx.fillRect(bx + 6, by, 7, bh);
+        targetCtx.fillStyle = '#1e3a8a';
+        targetCtx.fillRect(bx + bw - 10, by, 10, bh);
+
+        if (shaftH > 16) {
+          targetCtx.save();
+          targetCtx.beginPath();
+          targetCtx.rect(bx - 4, shaftY, bw + 8, shaftH);
+          targetCtx.clip();
+
+          // Golden Vertical Ribbon
+          targetCtx.fillStyle = '#facc15';
+          targetCtx.fillRect(bx + bw * 0.5 - 4, shaftY, 8, shaftH);
+
+          // Green Birch Leaf Garlands & Wildflowers
+          const mStep = 52;
+          const mStart = Math.floor(shaftY / mStep) * mStep + 26;
+          for (let my = mStart; my < shaftY + shaftH - 8; my += mStep) {
+            targetCtx.strokeStyle = '#16a34a';
+            targetCtx.lineWidth = 5;
+            targetCtx.beginPath();
+            targetCtx.moveTo(bx - 2, my - 6);
+            targetCtx.quadraticCurveTo(bx + bw * 0.5, my + 12, bx + bw + 2, my - 6);
+            targetCtx.stroke();
+
+            targetCtx.fillStyle = '#fef08a';
+            targetCtx.beginPath();
+            targetCtx.arc(bx + bw * 0.25, my + 2, 3.2, 0, Math.PI * 2);
+            targetCtx.arc(bx + bw * 0.75, my + 2, 3.2, 0, Math.PI * 2);
+            targetCtx.fill();
+          }
+          targetCtx.restore();
+        }
+
+        targetCtx.fillStyle = '#15803d';
+        targetCtx.beginPath();
+        targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
+        targetCtx.fill();
+        targetCtx.fillStyle = '#facc15';
+        targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
+        return;
+      }
+
+      if (themeId === 'neon') {
+        // Cyber Neon Laser Circuitry Column
+        const pulse = 0.65 + 0.35 * Math.sin(animTime * 6);
+        targetCtx.fillStyle = '#090d16';
+        targetCtx.fillRect(bx, by, bw, bh);
+        targetCtx.fillStyle = '#1e293b';
+        targetCtx.fillRect(bx + 6, by, 6, bh);
+
+        targetCtx.save();
+        targetCtx.strokeStyle = `rgba(34, 211, 238, ${pulse.toFixed(2)})`;
+        targetCtx.lineWidth = 2.4;
+        targetCtx.beginPath();
+        targetCtx.moveTo(bx + 18, by);
+        targetCtx.lineTo(bx + 18, by + bh);
+        targetCtx.moveTo(bx + bw - 18, by);
+        targetCtx.lineTo(bx + bw - 18, by + bh);
+        targetCtx.stroke();
+
+        targetCtx.fillStyle = '#f472b6';
+        for (let ny = by + 24; ny < by + bh - 12; ny += 36) {
+          targetCtx.fillRect(bx + 15, ny, 6, 6);
+          targetCtx.fillRect(bx + bw - 21, ny + 14, 6, 6);
+        }
+        targetCtx.restore();
+
+        targetCtx.fillStyle = '#0e7490';
+        targetCtx.beginPath();
+        targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
+        targetCtx.fill();
+        targetCtx.fillStyle = '#f472b6';
+        targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
+        return;
+      }
+
+      // Default: Classic Industrial Steel I-Beam
+      targetCtx.fillStyle = lighting.beamMain;
+      targetCtx.fillRect(bx, by, bw, bh);
+
+      targetCtx.fillStyle = lighting.beamHighlight;
+      targetCtx.fillRect(bx + 6, by, 7, bh);
+      targetCtx.fillStyle = lighting.beamShadow;
+      targetCtx.fillRect(bx + bw - 10, by, 10, bh);
+
+      targetCtx.fillStyle = 'rgba(15, 23, 42, 0.45)';
+      for (let ry = by + 16; ry < by + bh - 12; ry += 26) {
+        targetCtx.beginPath();
+        targetCtx.arc(bx + 18, ry, 2.5, 0, Math.PI * 2);
+        targetCtx.arc(bx + bw - 18, ry, 2.5, 0, Math.PI * 2);
+        targetCtx.fill();
+      }
+
+      targetCtx.fillStyle = '#1e293b';
+      targetCtx.beginPath();
+      targetCtx.roundRect(bx - capOverhang, flangeY, bw + capOverhang * 2, capH, 4);
+      targetCtx.fill();
+
+      targetCtx.fillStyle = '#eab308';
+      targetCtx.fillRect(bx - capOverhang + 3, isTop ? flangeY + capH - 5 : flangeY, bw + capOverhang * 2 - 6, 5);
+    }
+
     // =========================================================================
     // 6. SIMULATION PHYSICS & COLLISION DETECTION
     // =========================================================================
@@ -5288,8 +5358,8 @@
       if (state.mode === 'gameover') return;
       state.mode = 'gameover';
 
-      const currentName = state.playerNames[state.activePlayerIndex] || `Player ${state.activePlayerIndex + 1}`;
       const earnedCoins = state.score;
+      const currentName = state.playerNames[state.activePlayerIndex] || `Player ${state.activePlayerIndex + 1}`;
       if (earnedCoins > 0) {
         state.coins += earnedCoins;
         saveShopData(currentName);
@@ -6068,139 +6138,12 @@
           const bCtx = bCanvas.getContext('2d');
           bCtx.clearRect(0, 0, bCanvas.width, bCanvas.height);
 
-          const drawMiniBeam = (bx, by, bw, bh, isTop) => {
-            const capH = 14;
-            const capOver = 6;
-            const flangeY = isTop ? by + bh - capH : by;
-            const shaftY = isTop ? by : by + capH;
-            const shaftH = Math.max(0, bh - capH);
-
-            if (bm.id === 'christmas') {
-              bCtx.fillStyle = '#14532d';
-              bCtx.fillRect(bx, by, bw, bh);
-              bCtx.fillStyle = '#22c55e';
-              bCtx.fillRect(bx + 5, by, 5, bh);
-              bCtx.save();
-              bCtx.beginPath();
-              bCtx.rect(bx - 2, shaftY, bw + 4, shaftH);
-              bCtx.clip();
-              for (let gy = shaftY - 8; gy < shaftY + shaftH + 16; gy += 28) {
-                bCtx.strokeStyle = '#dc2626';
-                bCtx.lineWidth = 3;
-                bCtx.beginPath();
-                bCtx.moveTo(bx, gy);
-                bCtx.bezierCurveTo(bx + bw * 0.4, gy + 12, bx + bw * 0.6, gy - 4, bx + bw, gy + 9);
-                bCtx.stroke();
-                bCtx.strokeStyle = '#4ade80';
-                bCtx.lineWidth = 2.6;
-                bCtx.beginPath();
-                bCtx.moveTo(bx, gy + 10);
-                bCtx.bezierCurveTo(bx + bw * 0.4, gy - 2, bx + bw * 0.6, gy + 14, bx + bw, gy + 2);
-                bCtx.stroke();
-
-                // Flared golden bell in shop preview
-                bCtx.save();
-                bCtx.translate(bx + bw * 0.5, gy + 7);
-                bCtx.fillStyle = '#facc15';
-                bCtx.strokeStyle = '#78350f';
-                bCtx.lineWidth = 1.1;
-                bCtx.beginPath();
-                bCtx.moveTo(-3, -4.5);
-                bCtx.quadraticCurveTo(0, -5.8, 3, -4.5);
-                bCtx.bezierCurveTo(3.8, -1, 4.6, 1.5, 6.4, 3.5);
-                bCtx.quadraticCurveTo(0, 5, -6.4, 3.5);
-                bCtx.bezierCurveTo(-4.6, 1.5, -3.8, -1, -3, -4.5);
-                bCtx.closePath();
-                bCtx.fill();
-                bCtx.stroke();
-                bCtx.fillStyle = '#d97706';
-                bCtx.beginPath();
-                bCtx.arc(0, 4.6, 1.7, 0, Math.PI * 2);
-                bCtx.fill();
-                bCtx.fillStyle = '#ef4444';
-                bCtx.beginPath();
-                bCtx.arc(0, -5, 1.6, 0, Math.PI * 2);
-                bCtx.fill();
-                bCtx.restore();
-              }
-              bCtx.restore();
-              bCtx.fillStyle = '#dc2626';
-              bCtx.beginPath();
-              bCtx.roundRect(bx - capOver, flangeY, bw + capOver * 2, capH, 3);
-              bCtx.fill();
-              bCtx.fillStyle = '#facc15';
-              bCtx.fillRect(bx - capOver + 2, isTop ? flangeY + capH - 4 : flangeY, bw + capOver * 2 - 4, 4);
-            } else if (bm.id === 'halloween') {
-              bCtx.fillStyle = '#1c1917';
-              bCtx.fillRect(bx, by, bw, bh);
-              bCtx.fillStyle = '#f97316';
-              bCtx.beginPath();
-              bCtx.ellipse(bx + bw * 0.5, shaftY + shaftH * 0.5, 9, 7, 0, 0, Math.PI * 2);
-              bCtx.fill();
-              bCtx.fillStyle = '#581c87';
-              bCtx.beginPath();
-              bCtx.roundRect(bx - capOver, flangeY, bw + capOver * 2, capH, 3);
-              bCtx.fill();
-              bCtx.fillStyle = '#f97316';
-              bCtx.fillRect(bx - capOver + 2, isTop ? flangeY + capH - 4 : flangeY, bw + capOver * 2 - 4, 4);
-            } else if (bm.id === 'easter') {
-              bCtx.fillStyle = '#6ee7b7';
-              bCtx.fillRect(bx, by, bw, bh);
-              bCtx.fillStyle = '#f472b6';
-              bCtx.beginPath();
-              bCtx.ellipse(bx + bw * 0.5, shaftY + shaftH * 0.5, 7, 9, 0, 0, Math.PI * 2);
-              bCtx.fill();
-              bCtx.fillStyle = '#c084fc';
-              bCtx.beginPath();
-              bCtx.roundRect(bx - capOver, flangeY, bw + capOver * 2, capH, 3);
-              bCtx.fill();
-              bCtx.fillStyle = '#fde047';
-              bCtx.fillRect(bx - capOver + 2, isTop ? flangeY + capH - 4 : flangeY, bw + capOver * 2 - 4, 4);
-            } else if (bm.id === 'midsummer') {
-              bCtx.fillStyle = '#1d4ed8';
-              bCtx.fillRect(bx, by, bw, bh);
-              bCtx.fillStyle = '#facc15';
-              bCtx.fillRect(bx + bw * 0.5 - 3, by, 6, bh);
-              bCtx.strokeStyle = '#16a34a';
-              bCtx.lineWidth = 4;
-              bCtx.beginPath();
-              bCtx.moveTo(bx, shaftY + shaftH * 0.5);
-              bCtx.quadraticCurveTo(bx + bw * 0.5, shaftY + shaftH * 0.5 + 10, bx + bw, shaftY + shaftH * 0.5);
-              bCtx.stroke();
-              bCtx.fillStyle = '#15803d';
-              bCtx.beginPath();
-              bCtx.roundRect(bx - capOver, flangeY, bw + capOver * 2, capH, 3);
-              bCtx.fill();
-              bCtx.fillStyle = '#facc15';
-              bCtx.fillRect(bx - capOver + 2, isTop ? flangeY + capH - 4 : flangeY, bw + capOver * 2 - 4, 4);
-            } else if (bm.id === 'neon') {
-              bCtx.fillStyle = '#090d16';
-              bCtx.fillRect(bx, by, bw, bh);
-              bCtx.strokeStyle = '#22d3ee';
-              bCtx.lineWidth = 2;
-              bCtx.strokeRect(bx + 8, by + 2, bw - 16, bh - 4);
-              bCtx.fillStyle = '#0e7490';
-              bCtx.beginPath();
-              bCtx.roundRect(bx - capOver, flangeY, bw + capOver * 2, capH, 3);
-              bCtx.fill();
-              bCtx.fillStyle = '#f472b6';
-              bCtx.fillRect(bx - capOver + 2, isTop ? flangeY + capH - 4 : flangeY, bw + capOver * 2 - 4, 4);
-            } else {
-              bCtx.fillStyle = '#334155';
-              bCtx.fillRect(bx, by, bw, bh);
-              bCtx.fillStyle = '#94a3b8';
-              bCtx.fillRect(bx + 5, by, 5, bh);
-              bCtx.fillStyle = '#1e293b';
-              bCtx.beginPath();
-              bCtx.roundRect(bx - capOver, flangeY, bw + capOver * 2, capH, 3);
-              bCtx.fill();
-              bCtx.fillStyle = '#eab308';
-              bCtx.fillRect(bx - capOver + 2, isTop ? flangeY + capH - 4 : flangeY, bw + capOver * 2 - 4, 4);
-            }
-          };
-
-          drawMiniBeam(54, 4, 52, 62, true);
-          drawMiniBeam(54, 104, 52, 62, false);
+          // Render exact in-game themed beams at scaled proportions so shop & gameplay match 1:1
+          bCtx.save();
+          bCtx.scale(0.84, 0.84);
+          drawThemedBeamSegment(bCtx, 62, 0, 66, 76, true, bm.id, 0.6, SHIFT_LIGHTING.day);
+          drawThemedBeamSegment(bCtx, 62, 122, 66, 80, false, bm.id, 0.6, SHIFT_LIGHTING.day);
+          bCtx.restore();
         });
 
         grid.querySelectorAll('[data-beam-id]').forEach((card) => {
