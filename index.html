@@ -2394,10 +2394,35 @@
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
     const PROFILES_COOKIE = 'heavy_flap_profiles_v1';
     const AUDIO_COOKIE = 'heavy_flap_audio_v1';
+    const STAGE_PREF_COOKIE = 'heavy_flap_stage_v1';
     const MAX_LEADERBOARD_ENTRIES = 10;
 
     function normalizeProfileKey(name) {
       return String(name || 'Player 1').trim().toLowerCase() || 'player 1';
+    }
+
+    function readSavedStagePref(profileName = null) {
+      const key = normalizeProfileKey(profileName || (state && state.playerNames && state.playerNames[0]) || 'Player 1');
+      const rawMap = readRawJsonStore(STAGE_PREF_COOKIE, STAGE_PREF_COOKIE, 'stagePrefs');
+      if (rawMap && typeof rawMap === 'object') {
+        if (typeof rawMap[key] === 'string' && rawMap[key].trim()) {
+          return rawMap[key].trim();
+        }
+        if (typeof rawMap._last === 'string' && rawMap._last.trim()) {
+          return rawMap._last.trim();
+        }
+      }
+      return null;
+    }
+
+    function writeSavedStagePref(stageSel, profileName = null) {
+      const cleanSel = typeof stageSel === 'string' && stageSel.trim() ? stageSel.trim() : 'random';
+      const key = normalizeProfileKey(profileName || (state && state.playerNames && state.playerNames[state.activePlayerIndex]) || 'Player 1');
+      const existing = readRawJsonStore(STAGE_PREF_COOKIE, STAGE_PREF_COOKIE, 'stagePrefs');
+      const map = (existing && typeof existing === 'object') ? { ...existing } : {};
+      map[key] = cleanSel;
+      map._last = cleanSel;
+      writeRawJsonStore(STAGE_PREF_COOKIE, STAGE_PREF_COOKIE, 'stagePrefs', map);
     }
 
     function createDefaultShopProfile() {
@@ -2418,13 +2443,19 @@
       };
     }
 
-    function sanitizeShopProfile(data) {
+    function sanitizeShopProfile(data, fallbackStageSel = null) {
       const validIds = new Set(MACHINE_SKINS.map((s) => s.id));
       const validRigs = new Set(Object.keys(RIG_SPECS));
       const validTrails = new Set(EXHAUST_TRAILS.map((t) => t.id));
       const validBeams = new Set(BEAM_THEMES.map((b) => b.id));
       const validStages = new Set(PROCEDURAL_BIOMES.map((b) => b.id));
-      if (!data || typeof data !== 'object') return createDefaultShopProfile();
+      if (!data || typeof data !== 'object') {
+        const def = createDefaultShopProfile();
+        if (fallbackStageSel && (fallbackStageSel === 'random' || validStages.has(fallbackStageSel))) {
+          def.stageSelection = fallbackStageSel;
+        }
+        return def;
+      }
 
       const rawUnlocked = Array.isArray(data.unlocked) ? data.unlocked : [];
       const unlocked = Array.from(new Set(['classic', ...rawUnlocked.filter((id) => validIds.has(id))]));
@@ -2433,8 +2464,10 @@
       const unlockedTrails = Array.from(new Set(['classic', ...(Array.isArray(data.unlockedTrails) ? data.unlockedTrails.filter((t) => validTrails.has(t)) : [])]));
       const unlockedBeams = Array.from(new Set(['classic', ...(Array.isArray(data.unlockedBeams) ? data.unlockedBeams.filter((b) => validBeams.has(b)) : [])]));
       const unlockedStages = Array.from(new Set([...DEFAULT_UNLOCKED_STAGES, ...(Array.isArray(data.unlockedStages) ? data.unlockedStages.filter((s) => validStages.has(s)) : [])]));
-      const rawStageSel = typeof data.stageSelection === 'string' ? data.stageSelection : 'random';
-      const stageSelection = (rawStageSel === 'random' || unlockedStages.includes(rawStageSel)) ? rawStageSel : 'random';
+      const candidateStage = (typeof data.stageSelection === 'string' && data.stageSelection.trim())
+        ? data.stageSelection.trim()
+        : (typeof fallbackStageSel === 'string' && fallbackStageSel.trim() ? fallbackStageSel.trim() : 'random');
+      const stageSelection = (candidateStage === 'random' || unlockedStages.includes(candidateStage)) ? candidateStage : 'random';
       const shift = (data.shift === 'night' || data.shift === 'day') ? data.shift : 'day';
       const equippedTrail = unlockedTrails.includes(data.equippedTrail) ? data.equippedTrail : 'classic';
       const equippedBeam = unlockedBeams.includes(data.equippedBeam) ? data.equippedBeam : 'classic';
@@ -2502,19 +2535,23 @@
 
     function loadAllProfilesMap(primaryName) {
       const rawProfiles = readRawJsonStore(PROFILES_COOKIE, PROFILES_COOKIE, 'profiles');
+      const savedStagePref = readSavedStagePref(primaryName);
       const map = {};
       if (rawProfiles && typeof rawProfiles === 'object') {
         Object.keys(rawProfiles).forEach((k) => {
-          map[k] = sanitizeShopProfile(rawProfiles[k]);
+          map[k] = sanitizeShopProfile(rawProfiles[k], savedStagePref);
         });
       }
       const primaryKey = normalizeProfileKey(primaryName);
       if (Object.keys(map).length === 0) {
         const legacyData = readRawJsonStore(SHOP_COOKIE, SHOP_COOKIE, 'shop');
-        map[primaryKey] = sanitizeShopProfile(legacyData);
+        map[primaryKey] = sanitizeShopProfile(legacyData, savedStagePref);
         writeRawJsonStore(PROFILES_COOKIE, PROFILES_COOKIE, 'profiles', map);
       } else if (!map[primaryKey]) {
         map[primaryKey] = createDefaultShopProfile();
+        if (savedStagePref) {
+          map[primaryKey].stageSelection = savedStagePref;
+        }
       }
       return map;
     }
@@ -2527,14 +2564,20 @@
         profileStore = loadAllProfilesMap(targetName);
       }
       const key = normalizeProfileKey(targetName);
+      const savedStagePref = readSavedStagePref(targetName);
       if (!profileStore[key]) {
         profileStore[key] = createDefaultShopProfile();
       }
-      return sanitizeShopProfile(profileStore[key]);
+      const sanitized = sanitizeShopProfile(profileStore[key], savedStagePref);
+      if (savedStagePref && (savedStagePref === 'random' || sanitized.unlockedStages.includes(savedStagePref))) {
+        sanitized.stageSelection = savedStagePref;
+      }
+      profileStore[key] = sanitized;
+      return sanitized;
     }
 
     function applyShopProfileToState(profile) {
-      const clean = sanitizeShopProfile(profile);
+      const clean = sanitizeShopProfile(profile, readSavedStagePref());
       state.coins = clean.coins;
       state.unlockedSkins = clean.unlocked;
       state.equippedSkin = clean.equipped;
@@ -2548,6 +2591,7 @@
       state.stageSelection = clean.stageSelection;
       state.shift = clean.shift;
       state.ownedBoosts = clean.ownedBoosts;
+      writeSavedStagePref(state.stageSelection);
       syncShiftSelectorUI();
     }
 
@@ -2574,9 +2618,10 @@
         stageSelection: state.stageSelection,
         shift: state.shift,
         ownedBoosts: state.ownedBoosts
-      });
+      }, state.stageSelection);
       profileStore[key] = payload;
       writeRawJsonStore(PROFILES_COOKIE, PROFILES_COOKIE, 'profiles', profileStore);
+      writeSavedStagePref(payload.stageSelection, activeName);
       if (state.activePlayerIndex === 0) {
         writeRawJsonStore(SHOP_COOKIE, SHOP_COOKIE, 'shop', payload);
       }
@@ -6260,6 +6305,7 @@
               state.pendingPurchaseKey = null;
               audio.playClick();
               state.stageSelection = 'random';
+              writeSavedStagePref('random');
               saveShopData();
               rollNewProceduralBiome(true);
               renderPaintShop();
@@ -6272,6 +6318,7 @@
               state.pendingPurchaseKey = null;
               audio.playClick();
               state.stageSelection = stageId;
+              writeSavedStagePref(stageId);
               saveShopData();
               rollNewProceduralBiome(false);
               renderPaintShop();
@@ -6288,6 +6335,7 @@
               state.coins -= stage.cost;
               state.unlockedStages.push(stageId);
               state.stageSelection = stageId;
+              writeSavedStagePref(stageId);
               saveShopData();
               audio.playSkinUnlock();
               rollNewProceduralBiome(false);
