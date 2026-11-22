@@ -97,8 +97,9 @@
       top: 0;
       left: 0;
       width: 100vw;
-      height: 100vh;
-      height: 100dvh;
+      height: 100lvh;
+      height: calc(100vh + var(--safe-bottom));
+      height: calc(100lvh + var(--safe-bottom));
       display: block;
       z-index: 1;
       touch-action: none;
@@ -1141,7 +1142,7 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.64rem; font-weight:800; letter-spacing:0.11em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.17</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.18</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.55rem, 6.6vw, 2.05rem); font-weight:700; line-height:1.04; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.32rem; flex-wrap:nowrap;">
@@ -2330,7 +2331,7 @@
     // =========================================================================
     // 3. GAME STATE, PER-PLAYER PROFILES, TOP 10 & CROSS-DEVICE SYNC
     // =========================================================================
-    const APP_VERSION = 'v5.9.17';
+    const APP_VERSION = 'v5.9.18';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -3017,8 +3018,9 @@
       const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
       const safeBottom = getSafeBottomInset();
       const vvHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-      state.width = window.innerWidth;
-      state.height = Math.max(window.innerHeight, Math.round(vvHeight));
+      const rect = canvas.getBoundingClientRect();
+      state.width = Math.max(window.innerWidth, Math.round(rect.width || 0));
+      state.height = Math.max(window.innerHeight + safeBottom, Math.round(vvHeight + safeBottom), Math.round(rect.height || 0));
 
       canvas.width = Math.floor(state.width * dpr);
       canvas.height = Math.floor(state.height * dpr);
