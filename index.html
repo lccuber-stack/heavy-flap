@@ -704,6 +704,13 @@
       border-color: rgba(251, 191, 36, 0.62);
     }
 
+    .skin-card.confirm-armed {
+      background: rgba(16, 185, 129, 0.24);
+      border-color: #34d399;
+      box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.45), 0 8px 20px rgba(16, 185, 129, 0.25);
+      transform: scale(1.02);
+    }
+
     .skin-card.locked {
       opacity: 0.78;
     }
@@ -1142,7 +1149,7 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.64rem; font-weight:800; letter-spacing:0.11em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.19</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.22</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.55rem, 6.6vw, 2.05rem); font-weight:700; line-height:1.04; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.32rem; flex-wrap:nowrap;">
@@ -2381,7 +2388,7 @@
     // =========================================================================
     // 3. GAME STATE, PER-PLAYER PROFILES, TOP 10 & CROSS-DEVICE SYNC
     // =========================================================================
-    const APP_VERSION = 'v5.9.20';
+    const APP_VERSION = 'v5.9.22';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -2893,6 +2900,7 @@
       stageSelection: initialShop.stageSelection,
       ownedBoosts: initialShop.ownedBoosts,
       shopTab: 'rigs',
+      pendingPurchaseKey: null,
       activeShield: false,
       activeMagnet: false,
       turboTimer: 0,
@@ -3526,7 +3534,7 @@
         context.save();
         context.scale(1.06, 1.06);
 
-        context.fillStyle = '#5ec4c6';
+        context.fillStyle = skin.id === 'classic' ? '#5ec4c6' : skin.body;
         context.strokeStyle = '#0f172a';
         context.lineWidth = 1.15;
         context.beginPath();
@@ -3675,7 +3683,7 @@
         context.save();
         context.scale(0.98, 0.98);
 
-        context.fillStyle = '#f472b6';
+        context.fillStyle = skin.id === 'classic' ? '#f472b6' : skin.body;
         context.strokeStyle = '#0f172a';
         context.lineWidth = 1.15;
         context.beginPath();
@@ -3706,7 +3714,7 @@
         context.fill();
         context.stroke();
 
-        context.fillStyle = '#fb7185';
+        context.fillStyle = skin.id === 'classic' ? '#fb7185' : skin.accent;
         context.beginPath();
         context.arc(-r * 0.48, -r * 0.48, r * 0.11, 0, Math.PI * 2);
         context.arc(r * 0.1, -r * 0.82, r * 0.11, 0, Math.PI * 2);
@@ -3819,7 +3827,7 @@
         context.save();
         context.scale(1.03, 1.03);
 
-        context.fillStyle = '#a78bfa';
+        context.fillStyle = skin.id === 'classic' ? '#a78bfa' : skin.body;
         context.strokeStyle = '#0f172a';
         context.lineWidth = 1.15;
         context.beginPath();
@@ -3875,7 +3883,7 @@
         context.closePath();
         context.fill();
 
-        context.strokeStyle = '#38bdf8';
+        context.strokeStyle = skin.id === 'classic' ? '#38bdf8' : skin.accent;
         context.lineWidth = 2.6;
         context.lineCap = 'round';
         context.beginPath();
@@ -4753,6 +4761,259 @@
         drawThemedBeamSegment(ctx, obs.x, 0, obs.width, obs.topHeight, true, state.equippedBeam, state.time);
         const botY = obs.topHeight + obs.gap;
         drawThemedBeamSegment(ctx, obs.x, botY, obs.width, horizonY - botY, false, state.equippedBeam, state.time);
+
+        if (obs.hasWreckingBall) {
+          const anchorX = obs.x + obs.width * 0.5;
+          const anchorY = obs.topHeight;
+          const ballX = anchorX + Math.sin(obs.ballPhase) * 14;
+          const ballY = anchorY + obs.ballDrop;
+
+          ctx.strokeStyle = '#94a3b8';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(anchorX, anchorY);
+          ctx.lineTo(ballX, ballY);
+          ctx.stroke();
+
+          ctx.fillStyle = '#0f172a';
+          ctx.beginPath();
+          ctx.arc(ballX, ballY, obs.ballRadius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#475569';
+          ctx.beginPath();
+          ctx.arc(ballX - 4, ballY - 4, obs.ballRadius * 0.35, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        if (obs.isElectricWire) {
+          const wireY = obs.topHeight + obs.wireOffset;
+          const pulse = 0.55 + 0.45 * Math.sin(state.time * 14 + obs.x * 0.05);
+
+          ctx.fillStyle = '#0f172a';
+          ctx.fillRect(obs.x - 4, wireY - 5, 8, 10);
+          ctx.fillRect(obs.x + obs.width - 4, wireY - 5, 8, 10);
+
+          ctx.save();
+          ctx.strokeStyle = `rgba(56, 189, 248, ${pulse.toFixed(2)})`;
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 10;
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.moveTo(obs.x, wireY);
+          const midX = obs.x + obs.width * 0.5;
+          const jitter = Math.sin(state.time * 28) * 3.5;
+          ctx.lineTo(midX, wireY + jitter);
+          ctx.lineTo(obs.x + obs.width, wireY);
+          ctx.stroke();
+          ctx.restore();
+        }
+      });
+
+      const isBonusActive = state.streak >= 3;
+      state.collectibles.forEach((nugget) => {
+        if (nugget.collected) return;
+        const tierInfo = nugget.tier || NUGGET_TIERS.bronze;
+        const bobY = nugget.y + Math.sin(state.time * 4.5 + nugget.bobPhase) * 5;
+        const blink = 0.5 + 0.5 * Math.sin(state.time * 11 + nugget.bobPhase);
+        const mult = isBonusActive ? 2 : 1;
+        const dispVal = tierInfo.value * mult;
+        ctx.save();
+        ctx.translate(nugget.x, bobY);
+
+        ctx.fillStyle = isBonusActive ? 'rgba(15, 23, 42, 0.74)' : 'rgba(15, 23, 42, 0.58)';
+        ctx.beginPath();
+        ctx.arc(0, 0, 21, 0, Math.PI * 2);
+        ctx.fill();
+
+        const ringRadius = isBonusActive ? 22 + blink * 3.2 : 21;
+        ctx.strokeStyle = isBonusActive ? (blink > 0.5 ? '#34d399' : tierInfo.body) : tierInfo.highlight;
+        ctx.lineWidth = isBonusActive ? 2.4 : 1.6;
+        ctx.beginPath();
+        ctx.arc(0, 0, ringRadius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Faceted Ore Nugget Shape
+        ctx.fillStyle = tierInfo.body;
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 2.1;
+        ctx.beginPath();
+        ctx.moveTo(-7, -11);
+        ctx.lineTo(7, -11);
+        ctx.lineTo(13, -1);
+        ctx.lineTo(9, 11);
+        ctx.lineTo(-9, 11);
+        ctx.lineTo(-13, -1);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = tierInfo.highlight;
+        ctx.beginPath();
+        ctx.moveTo(-5, -8);
+        ctx.lineTo(4, -8);
+        ctx.lineTo(7, -2);
+        ctx.lineTo(-2, 0);
+        ctx.closePath();
+        ctx.fill();
+
+        // Value Pill (+1 / +2 / +3, doubled on 2X streak)
+        ctx.fillStyle = isBonusActive ? '#064e3b' : '#0f172a';
+        ctx.strokeStyle = isBonusActive ? '#34d399' : tierInfo.body;
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.roundRect(-13, -27, 26, 12, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = isBonusActive ? '#6ee7b7' : tierInfo.textColor;
+        ctx.font = '800 8.5px "Chakra Petch", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`+${dispVal}`, 0, -21);
+
+        ctx.restore();
+      });
+
+      ctx.fillStyle = biome.groundDirt;
+      ctx.fillRect(0, horizonY, state.width, state.groundHeight);
+
+      ctx.fillStyle = biome.groundTop;
+      ctx.fillRect(0, horizonY, state.width, 16);
+
+      const stripeW = 36;
+      const offset = -(state.groundScroll % (stripeW * 2));
+      for (let sx = offset; sx < state.width + stripeW * 2; sx += stripeW * 2) {
+        ctx.fillStyle = '#eab308';
+        ctx.fillRect(sx, horizonY + 16, stripeW, 10);
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(sx + stripeW, horizonY + 16, stripeW, 10);
+      }
+
+      state.particles.forEach((p) => {
+        const alpha = Math.max(0, p.life / p.maxLife);
+        ctx.fillStyle = p.color.replace('0.65', (alpha * 0.65).toFixed(2));
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      state.fallingHazards.forEach((hz) => {
+        if (hz.warnTimer > 0) {
+          const blink = Math.sin(state.time * 24) > 0;
+          const warnY = Math.max(98, state.height * 0.145);
+          ctx.save();
+          ctx.translate(hz.x, warnY);
+
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+          ctx.strokeStyle = blink ? '#fbbf24' : '#ef4444';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.roundRect(-24, -18, 48, 36, 10);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = blink ? '#ef4444' : '#fbbf24';
+          ctx.beginPath();
+          ctx.moveTo(0, -11);
+          ctx.lineTo(12, 8);
+          ctx.lineTo(-12, 8);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.fillStyle = '#0f172a';
+          ctx.font = '800 11px "Chakra Petch", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('!', 0, 2);
+
+          ctx.fillStyle = blink ? '#fbbf24' : '#ef4444';
+          ctx.beginPath();
+          ctx.moveTo(-6, 22);
+          ctx.lineTo(6, 22);
+          ctx.lineTo(0, 30);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        } else {
+          ctx.save();
+          ctx.translate(hz.x, hz.y);
+          if (hz.type === 'boulder') {
+            ctx.rotate(hz.rotation);
+            ctx.fillStyle = '#475569';
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, hz.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#64748b';
+            ctx.beginPath();
+            ctx.arc(-hz.radius * 0.28, -hz.radius * 0.28, hz.radius * 0.34, 0, Math.PI * 2);
+            ctx.fill();
+          } else {
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(0, -hz.y - 20);
+            ctx.lineTo(0, -hz.radius * 0.6);
+            ctx.stroke();
+
+            ctx.fillStyle = '#ea580c';
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(-hz.radius * 1.15, -hz.radius * 0.65, hz.radius * 2.3, hz.radius * 1.3, 5);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillRect(-hz.radius * 1.0, -3, hz.radius * 2.0, 6);
+          }
+          ctx.restore();
+        }
+      });
+
+      if (state.mode !== 'exploding' && state.mode !== 'gameover') {
+        drawConstructionRig(
+          ctx,
+          state.rig,
+          state.player.x,
+          state.player.y,
+          state.player.radius,
+          state.player.rotation,
+          state.player.bucketAngle,
+          state.player.wheelSpin,
+          1
+        );
+
+        if (state.activeShield || state.turboTimer > 0 || state.turboGraceTimer > 0) {
+          const pulse = 0.65 + 0.35 * Math.sin(state.time * 12);
+          const isTurboProtected = state.turboTimer > 0 || state.turboGraceTimer > 0;
+          ctx.save();
+          ctx.strokeStyle = isTurboProtected
+            ? `rgba(251, 191, 36, ${pulse.toFixed(2)})`
+            : `rgba(56, 189, 248, ${pulse.toFixed(2)})`;
+          ctx.fillStyle = isTurboProtected
+            ? 'rgba(251, 191, 36, 0.14)'
+            : 'rgba(56, 189, 248, 0.14)';
+          ctx.lineWidth = 2.6;
+          ctx.beginPath();
+          ctx.arc(state.player.x, state.player.y, state.player.radius + 11, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      state.shockwaves.forEach((sw) => {
+        const prog = 1 - sw.life / sw.maxLife;
+        const rad = 14 + prog * 92;
+        const alpha = Math.max(0, sw.life / sw.maxLife);
+        ctx.save();
+        ctx.strokeStyle = `rgba(251, 191, 36, ${alpha.toFixed(2)})`;
+        ctx.lineWidth = 5 * alpha;
+        ctx.beginPath();
         ctx.arc(sw.x, sw.y, rad, 0, Math.PI * 2);
         ctx.stroke();
 
@@ -5642,8 +5903,11 @@
           const isUnlocked = state.unlockedRigs.includes(rigKey);
           const isEquipped = state.rig === rigKey;
           const canAfford = !isUnlocked && state.coins >= rSpec.cost;
+          const confirmKey = `rigs:${rigKey}`;
+          const isArmed = canAfford && state.pendingPurchaseKey === confirmKey;
           let cardClass = 'skin-card';
           if (isEquipped) cardClass += ' equipped';
+          else if (isArmed) cardClass += ' confirm-armed';
           else if (canAfford) cardClass += ' affordable';
           else if (!isUnlocked) cardClass += ' locked';
 
@@ -5652,6 +5916,8 @@
             badgeHtml = '<div class="skin-badge" style="background:#10b981; color:#022c22;">✓ SELECTED</div>';
           } else if (isUnlocked) {
             badgeHtml = '<div class="skin-badge" style="background:rgba(56,189,248,0.2); color:#7dd3fc; border:1px solid rgba(56,189,248,0.4);">SELECT</div>';
+          } else if (isArmed) {
+            badgeHtml = `<div class="skin-badge" style="background:linear-gradient(135deg,#34d399,#059669); color:#022c22; display:inline-flex; align-items:center; gap:4px;">✓ TAP TO BUY • ${rSpec.cost} ${getNuggetSvg(13, 'gold')}</div>`;
           } else if (canAfford) {
             badgeHtml = `<div class="skin-badge" style="background:linear-gradient(135deg,#fbbf24,#d97706); color:#0f172a; display:inline-flex; align-items:center; gap:4px;">UNLOCK • ${rSpec.cost} ${getNuggetSvg(13, 'gold')}</div>`;
           } else {
@@ -5683,7 +5949,9 @@
           card.addEventListener('click', () => {
             const rigKey = card.dataset.rigShop;
             const rSpec = RIG_SPECS[rigKey];
+            const confirmKey = `rigs:${rigKey}`;
             if (state.unlockedRigs.includes(rigKey)) {
+              state.pendingPurchaseKey = null;
               audio.playClick();
               state.rig = rigKey;
               saveShopData();
@@ -5691,6 +5959,14 @@
               renderPaintShop();
               showShopBanner(`🚜 Selected ${rSpec.name}!`, true);
             } else if (state.coins >= rSpec.cost) {
+              if (state.pendingPurchaseKey !== confirmKey) {
+                state.pendingPurchaseKey = confirmKey;
+                audio.playClick();
+                renderPaintShop();
+                showShopBanner(`Tap ${rSpec.name} again to confirm purchase for ${rSpec.cost} ${getNuggetSvg(14, 'gold')} nuggets!`, false);
+                return;
+              }
+              state.pendingPurchaseKey = null;
               state.coins -= rSpec.cost;
               state.unlockedRigs.push(rigKey);
               state.rig = rigKey;
@@ -5700,7 +5976,9 @@
               renderPaintShop();
               showShopBanner(`🎉 Unlocked ${rSpec.name}!`, true);
             } else {
+              state.pendingPurchaseKey = null;
               audio.playClick();
+              renderPaintShop();
               showShopBanner(`Need ${rSpec.cost - state.coins} more ${getNuggetSvg(14, 'gold')} nuggets for ${rSpec.name}!`, false);
             }
           });
@@ -5713,8 +5991,11 @@
           const isUnlocked = state.unlockedBeams.includes(bm.id);
           const isEquipped = state.equippedBeam === bm.id;
           const canAfford = !isUnlocked && state.coins >= bm.cost;
+          const confirmKey = `beams:${bm.id}`;
+          const isArmed = canAfford && state.pendingPurchaseKey === confirmKey;
           let cardClass = 'skin-card';
           if (isEquipped) cardClass += ' equipped';
+          else if (isArmed) cardClass += ' confirm-armed';
           else if (canAfford) cardClass += ' affordable';
           else if (!isUnlocked) cardClass += ' locked';
 
@@ -5723,6 +6004,8 @@
             badgeHtml = '<div class="skin-badge" style="background:#10b981; color:#022c22;">✓ EQUIPPED</div>';
           } else if (isUnlocked) {
             badgeHtml = '<div class="skin-badge" style="background:rgba(56,189,248,0.2); color:#7dd3fc; border:1px solid rgba(56,189,248,0.4);">EQUIP</div>';
+          } else if (isArmed) {
+            badgeHtml = `<div class="skin-badge" style="background:linear-gradient(135deg,#34d399,#059669); color:#022c22; display:inline-flex; align-items:center; gap:4px;">✓ TAP TO BUY • ${bm.cost} ${getNuggetSvg(13, 'gold')}</div>`;
           } else if (canAfford) {
             badgeHtml = `<div class="skin-badge" style="background:linear-gradient(135deg,#fbbf24,#d97706); color:#0f172a; display:inline-flex; align-items:center; gap:4px;">UNLOCK • ${bm.cost} ${getNuggetSvg(13, 'gold')}</div>`;
           } else {
@@ -5862,13 +6145,23 @@
         grid.querySelectorAll('[data-beam-id]').forEach((card) => {
           card.addEventListener('click', () => {
             const bm = getBeamThemeById(card.dataset.beamId);
+            const confirmKey = `beams:${bm.id}`;
             if (state.unlockedBeams.includes(bm.id)) {
+              state.pendingPurchaseKey = null;
               audio.playClick();
               state.equippedBeam = bm.id;
               saveShopData();
               renderPaintShop();
               showShopBanner(`${bm.icon} Equipped ${bm.name} beams!`, true);
             } else if (state.coins >= bm.cost) {
+              if (state.pendingPurchaseKey !== confirmKey) {
+                state.pendingPurchaseKey = confirmKey;
+                audio.playClick();
+                renderPaintShop();
+                showShopBanner(`Tap ${bm.name} again to confirm purchase for ${bm.cost} ${getNuggetSvg(14, 'gold')} nuggets!`, false);
+                return;
+              }
+              state.pendingPurchaseKey = null;
               state.coins -= bm.cost;
               state.unlockedBeams.push(bm.id);
               state.equippedBeam = bm.id;
@@ -5877,7 +6170,9 @@
               renderPaintShop();
               showShopBanner(`🎉 Unlocked & equipped ${bm.name} beams!`, true);
             } else {
+              state.pendingPurchaseKey = null;
               audio.playClick();
+              renderPaintShop();
               showShopBanner(`Need ${bm.cost - state.coins} more ${getNuggetSvg(14, 'gold')} nuggets for ${bm.name}!`, false);
             }
           });
@@ -5905,8 +6200,11 @@
           const isUnlocked = state.unlockedStages.includes(b.id);
           const isSelected = state.stageSelection === b.id;
           const canAfford = !isUnlocked && state.coins >= b.cost;
+          const confirmKey = `stages:${b.id}`;
+          const isArmed = canAfford && state.pendingPurchaseKey === confirmKey;
           let cardClass = 'skin-card';
           if (isSelected) cardClass += ' equipped';
+          else if (isArmed) cardClass += ' confirm-armed';
           else if (canAfford) cardClass += ' affordable';
           else if (!isUnlocked) cardClass += ' locked';
 
@@ -5915,6 +6213,8 @@
             badgeHtml = '<div class="skin-badge" style="background:#10b981; color:#022c22;">✓ SELECTED</div>';
           } else if (isUnlocked) {
             badgeHtml = '<div class="skin-badge" style="background:rgba(56,189,248,0.2); color:#7dd3fc; border:1px solid rgba(56,189,248,0.4);">SELECT</div>';
+          } else if (isArmed) {
+            badgeHtml = `<div class="skin-badge" style="background:linear-gradient(135deg,#34d399,#059669); color:#022c22; display:inline-flex; align-items:center; gap:4px;">✓ TAP TO BUY • ${b.cost} ${getNuggetSvg(13, 'gold')}</div>`;
           } else if (canAfford) {
             badgeHtml = `<div class="skin-badge" style="background:linear-gradient(135deg,#fbbf24,#d97706); color:#0f172a; display:inline-flex; align-items:center; gap:4px;">UNLOCK • ${b.cost} ${getNuggetSvg(13, 'gold')}</div>`;
           } else {
@@ -5923,10 +6223,9 @@
 
           return `
             <button type="button" class="${cardClass}" data-stage-id="${b.id}">
-            <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
-              <span style="font-size:0.64rem; font-weight:800; letter-spacing:0.11em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.20</span>
-            </div>
+              <div style="width:84px; height:36px; border-radius:9px; margin:2px 0; background:linear-gradient(180deg, ${b.daySkyTop} 0%, ${b.daySkyBottom} 72%, ${b.groundTop} 72%, ${b.groundDirt} 100%); border:1px solid rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:center; font-size:1.3rem;">
+                ${b.icon}
+              </div>
               <div class="font-display" style="font-size:0.8rem; font-weight:700; color:#f8fafc; margin-top:2px;">${b.name}</div>
               <div style="font-size:0.6rem; color:#94a3b8;">${b.subtitle}</div>
               ${badgeHtml}
@@ -5940,6 +6239,7 @@
           card.addEventListener('click', () => {
             const stageId = card.dataset.stageId;
             if (stageId === 'random') {
+              state.pendingPurchaseKey = null;
               audio.playClick();
               state.stageSelection = 'random';
               saveShopData();
@@ -5949,7 +6249,9 @@
               return;
             }
             const stage = getBiomeById(stageId);
+            const confirmKey = `stages:${stageId}`;
             if (state.unlockedStages.includes(stageId)) {
+              state.pendingPurchaseKey = null;
               audio.playClick();
               state.stageSelection = stageId;
               saveShopData();
@@ -5957,6 +6259,14 @@
               renderPaintShop();
               showShopBanner(`${stage.icon} Selected ${stage.name}!`, true);
             } else if (state.coins >= stage.cost) {
+              if (state.pendingPurchaseKey !== confirmKey) {
+                state.pendingPurchaseKey = confirmKey;
+                audio.playClick();
+                renderPaintShop();
+                showShopBanner(`Tap ${stage.name} again to confirm purchase for ${stage.cost} ${getNuggetSvg(14, 'gold')} nuggets!`, false);
+                return;
+              }
+              state.pendingPurchaseKey = null;
               state.coins -= stage.cost;
               state.unlockedStages.push(stageId);
               state.stageSelection = stageId;
@@ -5966,7 +6276,9 @@
               renderPaintShop();
               showShopBanner(`🎉 Unlocked & selected ${stage.name}!`, true);
             } else {
+              state.pendingPurchaseKey = null;
               audio.playClick();
+              renderPaintShop();
               showShopBanner(`Need ${stage.cost - state.coins} more ${getNuggetSvg(14, 'gold')} nuggets to unlock ${stage.name}!`, false);
             }
           });
@@ -5978,10 +6290,14 @@
         grid.innerHTML = `<div style="grid-column: 1 / -1; text-align:center; font-size:0.68rem; font-weight:700; color:#94a3b8; background:rgba(15,23,42,0.65); border:1px solid rgba(255,255,255,0.08); border-radius:9px; padding:4px 8px;">⚡ Single-shift items • Uses 1 from stock per shift</div>` + SHIFT_BOOSTS.map((b) => {
           const owned = state.ownedBoosts[b.id] || 0;
           const canAfford = state.coins >= b.cost;
-          const cardClass = owned > 0 ? 'skin-card equipped' : canAfford ? 'skin-card affordable' : 'skin-card locked';
-          const btnHtml = canAfford
-            ? `<div class="skin-badge" style="background:linear-gradient(135deg,#fbbf24,#d97706); color:#0f172a; display:inline-flex; align-items:center; gap:4px;">BUY +1 • ${b.cost} ${getNuggetSvg(13, 'gold')}</div>`
-            : `<div class="skin-badge" style="background:rgba(15,23,42,0.7); color:#94a3b8; border:1px solid rgba(255,255,255,0.1); display:inline-flex; align-items:center; gap:4px;">${b.cost} ${getNuggetSvg(13, 'gold')}</div>`;
+          const confirmKey = `boosts:${b.id}`;
+          const isArmed = canAfford && state.pendingPurchaseKey === confirmKey;
+          const cardClass = isArmed ? 'skin-card confirm-armed' : owned > 0 ? 'skin-card equipped' : canAfford ? 'skin-card affordable' : 'skin-card locked';
+          const btnHtml = isArmed
+            ? `<div class="skin-badge" style="background:linear-gradient(135deg,#34d399,#059669); color:#022c22; display:inline-flex; align-items:center; gap:4px;">✓ TAP TO BUY • ${b.cost} ${getNuggetSvg(13, 'gold')}</div>`
+            : canAfford
+              ? `<div class="skin-badge" style="background:linear-gradient(135deg,#fbbf24,#d97706); color:#0f172a; display:inline-flex; align-items:center; gap:4px;">BUY +1 • ${b.cost} ${getNuggetSvg(13, 'gold')}</div>`
+              : `<div class="skin-badge" style="background:rgba(15,23,42,0.7); color:#94a3b8; border:1px solid rgba(255,255,255,0.1); display:inline-flex; align-items:center; gap:4px;">${b.cost} ${getNuggetSvg(13, 'gold')}</div>`;
 
           return `
             <button type="button" class="${cardClass}" data-boost-id="${b.id}">
@@ -5998,7 +6314,16 @@
           card.addEventListener('click', () => {
             const b = SHIFT_BOOSTS.find((item) => item.id === card.dataset.boostId);
             if (!b) return;
+            const confirmKey = `boosts:${b.id}`;
             if (state.coins >= b.cost) {
+              if (state.pendingPurchaseKey !== confirmKey) {
+                state.pendingPurchaseKey = confirmKey;
+                audio.playClick();
+                renderPaintShop();
+                showShopBanner(`Tap ${b.name} again to confirm buying +1 for ${b.cost} ${getNuggetSvg(14, 'gold')} nuggets!`, false);
+                return;
+              }
+              state.pendingPurchaseKey = null;
               state.coins -= b.cost;
               state.ownedBoosts[b.id] = (state.ownedBoosts[b.id] || 0) + 1;
               saveShopData();
@@ -6007,7 +6332,9 @@
               renderPaintShop();
               showShopBanner(`${b.icon} Bought ${b.name}! Ready for your next shift.`, true);
             } else {
+              state.pendingPurchaseKey = null;
               audio.playClick();
+              renderPaintShop();
               showShopBanner(`Need ${b.cost - state.coins} more ${getNuggetSvg(14, 'gold')} nuggets for ${b.name}!`, false);
             }
           });
@@ -6020,8 +6347,11 @@
           const isUnlocked = state.unlockedTrails.includes(tr.id);
           const isEquipped = state.equippedTrail === tr.id;
           const canAfford = !isUnlocked && state.coins >= tr.cost;
+          const confirmKey = `trails:${tr.id}`;
+          const isArmed = canAfford && state.pendingPurchaseKey === confirmKey;
           let cardClass = 'skin-card';
           if (isEquipped) cardClass += ' equipped';
+          else if (isArmed) cardClass += ' confirm-armed';
           else if (canAfford) cardClass += ' affordable';
           else if (!isUnlocked) cardClass += ' locked';
 
@@ -6031,6 +6361,8 @@
             badgeHtml = '<div class="skin-badge" style="background:#10b981; color:#022c22;">✓ EQUIPPED</div>';
           } else if (isUnlocked) {
             badgeHtml = '<div class="skin-badge" style="background:rgba(56,189,248,0.2); color:#7dd3fc; border:1px solid rgba(56,189,248,0.4);">EQUIP</div>';
+          } else if (isArmed) {
+            badgeHtml = `<div class="skin-badge" style="background:linear-gradient(135deg,#34d399,#059669); color:#022c22; display:inline-flex; align-items:center; gap:4px;">✓ TAP TO BUY • ${tr.cost} ${getNuggetSvg(13, 'gold')}</div>`;
           } else if (canAfford) {
             badgeHtml = `<div class="skin-badge" style="background:linear-gradient(135deg,#fbbf24,#d97706); color:#0f172a; display:inline-flex; align-items:center; gap:4px;">UNLOCK • ${tr.cost} ${getNuggetSvg(13, 'gold')}</div>`;
           } else {
@@ -6049,13 +6381,23 @@
         grid.querySelectorAll('[data-trail-id]').forEach((card) => {
           card.addEventListener('click', () => {
             const tr = getTrailById(card.dataset.trailId);
+            const confirmKey = `trails:${tr.id}`;
             if (state.unlockedTrails.includes(tr.id)) {
+              state.pendingPurchaseKey = null;
               audio.playClick();
               state.equippedTrail = tr.id;
               saveShopData();
               renderPaintShop();
               showShopBanner(`🔥 Equipped ${tr.name} exhaust trail!`, true);
             } else if (state.coins >= tr.cost) {
+              if (state.pendingPurchaseKey !== confirmKey) {
+                state.pendingPurchaseKey = confirmKey;
+                audio.playClick();
+                renderPaintShop();
+                showShopBanner(`Tap ${tr.name} again to confirm purchase for ${tr.cost} ${getNuggetSvg(14, 'gold')} nuggets!`, false);
+                return;
+              }
+              state.pendingPurchaseKey = null;
               state.coins -= tr.cost;
               state.unlockedTrails.push(tr.id);
               state.equippedTrail = tr.id;
@@ -6064,7 +6406,9 @@
               renderPaintShop();
               showShopBanner(`🎉 Unlocked ${tr.name} trail!`, true);
             } else {
+              state.pendingPurchaseKey = null;
               audio.playClick();
+              renderPaintShop();
               showShopBanner(`Need ${tr.cost - state.coins} more ${getNuggetSvg(14, 'gold')} nuggets for ${tr.name}!`, false);
             }
           });
@@ -6076,9 +6420,12 @@
         const isUnlocked = state.unlockedSkins.includes(skin.id);
         const isEquipped = state.equippedSkin === skin.id;
         const canAfford = !isUnlocked && state.coins >= skin.cost;
+        const confirmKey = `skins:${skin.id}`;
+        const isArmed = canAfford && state.pendingPurchaseKey === confirmKey;
 
         let cardClass = 'skin-card';
         if (isEquipped) cardClass += ' equipped';
+        else if (isArmed) cardClass += ' confirm-armed';
         else if (canAfford) cardClass += ' affordable';
         else if (!isUnlocked) cardClass += ' locked';
 
@@ -6087,6 +6434,8 @@
           badgeHtml = '<div class="skin-badge" style="background:#10b981; color:#022c22;">✓ EQUIPPED</div>';
         } else if (isUnlocked) {
           badgeHtml = '<div class="skin-badge" style="background:rgba(56,189,248,0.2); color:#7dd3fc; border:1px solid rgba(56,189,248,0.4);">EQUIP</div>';
+        } else if (isArmed) {
+          badgeHtml = `<div class="skin-badge" style="background:linear-gradient(135deg,#34d399,#059669); color:#022c22; display:inline-flex; align-items:center; gap:4px;">✓ TAP TO BUY • ${skin.cost} ${getNuggetSvg(13, 'gold')}</div>`;
         } else if (canAfford) {
           badgeHtml = `<div class="skin-badge" style="background:linear-gradient(135deg,#fbbf24,#d97706); color:#0f172a; display:inline-flex; align-items:center; gap:4px;">UNLOCK • ${skin.cost} ${getNuggetSvg(13, 'gold')}</div>`;
         } else {
@@ -6116,7 +6465,9 @@
         card.addEventListener('click', () => {
           const skinId = card.dataset.skinId;
           const skin = getSkinById(skinId);
+          const confirmKey = `skins:${skinId}`;
           if (state.unlockedSkins.includes(skinId)) {
+            state.pendingPurchaseKey = null;
             audio.playClick();
             state.equippedSkin = skinId;
             saveShopData();
@@ -6124,6 +6475,14 @@
             renderPaintShop();
             showShopBanner(`🎨 Equipped ${skin.name}!`, true);
           } else if (state.coins >= skin.cost) {
+            if (state.pendingPurchaseKey !== confirmKey) {
+              state.pendingPurchaseKey = confirmKey;
+              audio.playClick();
+              renderPaintShop();
+              showShopBanner(`Tap ${skin.name} again to confirm purchase for ${skin.cost} ${getNuggetSvg(14, 'gold')} nuggets!`, false);
+              return;
+            }
+            state.pendingPurchaseKey = null;
             state.coins -= skin.cost;
             state.unlockedSkins.push(skinId);
             state.equippedSkin = skinId;
@@ -6133,7 +6492,9 @@
             renderPaintShop();
             showShopBanner(`🎉 Unlocked & equipped ${skin.name}!`, true);
           } else {
+            state.pendingPurchaseKey = null;
             audio.playClick();
+            renderPaintShop();
             const needed = skin.cost - state.coins;
             showShopBanner(`Need ${needed} more ${getNuggetSvg(14, 'gold')} nuggets to unlock ${skin.name}!`, false);
           }
@@ -6143,6 +6504,7 @@
 
     function openPaintShop(focusRigKey = null, initialTab = 'rigs') {
       state.shopTab = initialTab;
+      state.pendingPurchaseKey = null;
       const banner = document.getElementById('shop-feedback-banner');
       if (banner) {
         if (focusRigKey && RIG_SPECS[focusRigKey]) {
@@ -6163,6 +6525,7 @@
     }
 
     function closePaintShop(goToGarage = false) {
+      state.pendingPurchaseKey = null;
       document.getElementById('shop-modal').classList.add('hidden');
       updateRecordDisplay();
       renderRigPreviews();
@@ -6508,6 +6871,7 @@
       btn.addEventListener('click', () => {
         audio.playClick();
         state.shopTab = btn.dataset.tab || 'rigs';
+        state.pendingPurchaseKey = null;
         const banner = document.getElementById('shop-feedback-banner');
         if (banner) banner.classList.add('hidden');
         renderPaintShop();
