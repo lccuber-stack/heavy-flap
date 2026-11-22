@@ -2388,7 +2388,7 @@
     // =========================================================================
     // 3. GAME STATE, PER-PLAYER PROFILES, TOP 10 & CROSS-DEVICE SYNC
     // =========================================================================
-    const APP_VERSION = 'v5.9.24';
+    const APP_VERSION = 'v5.9.25';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -2413,6 +2413,7 @@
         equippedBeam: 'classic',
         unlockedStages: [...DEFAULT_UNLOCKED_STAGES],
         stageSelection: 'random',
+        shift: 'day',
         ownedBoosts: { shield: 0, magnet: 0, turbo: 0 }
       };
     }
@@ -2432,7 +2433,9 @@
       const unlockedTrails = Array.from(new Set(['classic', ...(Array.isArray(data.unlockedTrails) ? data.unlockedTrails.filter((t) => validTrails.has(t)) : [])]));
       const unlockedBeams = Array.from(new Set(['classic', ...(Array.isArray(data.unlockedBeams) ? data.unlockedBeams.filter((b) => validBeams.has(b)) : [])]));
       const unlockedStages = Array.from(new Set([...DEFAULT_UNLOCKED_STAGES, ...(Array.isArray(data.unlockedStages) ? data.unlockedStages.filter((s) => validStages.has(s)) : [])]));
-      const stageSelection = (data.stageSelection === 'random' || unlockedStages.includes(data.stageSelection)) ? data.stageSelection : 'random';
+      const rawStageSel = typeof data.stageSelection === 'string' ? data.stageSelection : 'random';
+      const stageSelection = (rawStageSel === 'random' || unlockedStages.includes(rawStageSel)) ? rawStageSel : 'random';
+      const shift = (data.shift === 'night' || data.shift === 'day') ? data.shift : 'day';
       const equippedTrail = unlockedTrails.includes(data.equippedTrail) ? data.equippedTrail : 'classic';
       const equippedBeam = unlockedBeams.includes(data.equippedBeam) ? data.equippedBeam : 'classic';
       const equippedRig = unlockedRigs.includes(data.equippedRig) ? data.equippedRig : 'loader';
@@ -2455,6 +2458,7 @@
         equippedBeam,
         unlockedStages,
         stageSelection,
+        shift,
         ownedBoosts
       };
     }
@@ -2542,7 +2546,15 @@
       state.equippedBeam = clean.equippedBeam;
       state.unlockedStages = clean.unlockedStages;
       state.stageSelection = clean.stageSelection;
+      state.shift = clean.shift;
       state.ownedBoosts = clean.ownedBoosts;
+      syncShiftSelectorUI();
+    }
+
+    function syncShiftSelectorUI() {
+      document.querySelectorAll('#shift-selector .shift-btn').forEach((btn) => {
+        btn.classList.toggle('selected', btn.dataset.shift === state.shift);
+      });
     }
 
     function saveShopData(profileName = null) {
@@ -2560,6 +2572,7 @@
         equippedBeam: state.equippedBeam,
         unlockedStages: state.unlockedStages,
         stageSelection: state.stageSelection,
+        shift: state.shift,
         ownedBoosts: state.ownedBoosts
       });
       profileStore[key] = payload;
@@ -2744,6 +2757,7 @@
         equippedBeam: incoming.equippedBeam || existing.equippedBeam,
         unlockedStages: Array.from(new Set([...existing.unlockedStages, ...incoming.unlockedStages])),
         stageSelection: incoming.stageSelection || existing.stageSelection,
+        shift: incoming.shift || existing.shift,
         ownedBoosts: {
           shield: Math.max(existing.ownedBoosts.shield || 0, incoming.ownedBoosts.shield || 0),
           magnet: Math.max(existing.ownedBoosts.magnet || 0, incoming.ownedBoosts.magnet || 0),
@@ -2909,7 +2923,7 @@
       turboUsedThisShift: false,
       boostsCommitted: false,
       coins: initialShop.coins,
-      shift: 'day',
+      shift: initialShop.shift || 'day',
       biome: PROCEDURAL_BIOMES[0],
       biomeSeed: Math.random() * 1000,
       score: 0,
@@ -6885,9 +6899,9 @@
     document.querySelectorAll('#shift-selector .shift-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         audio.playClick();
-        document.querySelectorAll('#shift-selector .shift-btn').forEach((b) => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        state.shift = btn.dataset.shift;
+        state.shift = btn.dataset.shift || 'day';
+        syncShiftSelectorUI();
+        saveShopData();
       });
     });
 
@@ -7207,6 +7221,7 @@
       b.classList.toggle('selected', Number(b.dataset.count) === state.playerCount);
     });
     const importedResult = importSharedChallengeFromUrl();
+    applyShopProfileToState(loadShopData(state.playerNames[state.activePlayerIndex] || state.playerNames[0]));
     updateRecordDisplay();
     rollNewProceduralBiome(false);
     updateMenuStageLabel();
