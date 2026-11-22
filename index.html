@@ -1149,7 +1149,7 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.64rem; font-weight:800; letter-spacing:0.11em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.22</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.23</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.55rem, 6.6vw, 2.05rem); font-weight:700; line-height:1.04; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.32rem; flex-wrap:nowrap;">
@@ -2388,7 +2388,7 @@
     // =========================================================================
     // 3. GAME STATE, PER-PLAYER PROFILES, TOP 10 & CROSS-DEVICE SYNC
     // =========================================================================
-    const APP_VERSION = 'v5.9.22';
+    const APP_VERSION = 'v5.9.23';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -4486,24 +4486,64 @@
               targetCtx.bezierCurveTo(bx + bw * 0.35, gy - 2, bx + bw * 0.65, gy + 24, bx + bw + 2, gy + 4);
               targetCtx.stroke();
 
-              // Golden Jingle Bell & Ornament
-              const bellX = bx + ((Math.abs(Math.round(gy / stepY)) % 2 === 0) ? bw * 0.28 : bw * 0.72);
-              const bellY = gy + 12;
+              // Golden Jingle Bell & Red Ribbon Bow
+              const bellX = bx + ((Math.abs(Math.round(gy / stepY)) % 2 === 0) ? bw * 0.3 : bw * 0.7);
+              const bellY = gy + 11;
+              targetCtx.save();
+              targetCtx.translate(bellX, bellY);
+              targetCtx.rotate((Math.abs(Math.round(gy / stepY)) % 2 === 0) ? -0.18 : 0.18);
+
+              // Top hanging ring
+              targetCtx.strokeStyle = '#fef08a';
+              targetCtx.lineWidth = 1.6;
+              targetCtx.beginPath();
+              targetCtx.arc(0, -8.5, 2.2, 0, Math.PI * 2);
+              targetCtx.stroke();
+
+              // Flared golden bell silhouette
               targetCtx.fillStyle = '#facc15';
               targetCtx.strokeStyle = '#78350f';
               targetCtx.lineWidth = 1.4;
               targetCtx.beginPath();
-              targetCtx.arc(bellX, bellY, 6.2, Math.PI, 0);
-              targetCtx.lineTo(bellX + 7.5, bellY + 5);
-              targetCtx.lineTo(bellX - 7.5, bellY + 5);
+              targetCtx.moveTo(-4.2, -6.5);
+              targetCtx.quadraticCurveTo(0, -8.2, 4.2, -6.5);
+              targetCtx.bezierCurveTo(5.2, -1.5, 6.4, 2.2, 8.8, 4.8);
+              targetCtx.quadraticCurveTo(0, 6.8, -8.8, 4.8);
+              targetCtx.bezierCurveTo(-6.4, 2.2, -5.2, -1.5, -4.2, -6.5);
               targetCtx.closePath();
               targetCtx.fill();
               targetCtx.stroke();
 
-              targetCtx.fillStyle = '#fef08a';
+              // Specular gold shine & lower rim band
+              targetCtx.strokeStyle = '#fef9c3';
+              targetCtx.lineWidth = 1.3;
               targetCtx.beginPath();
-              targetCtx.arc(bellX, bellY + 6, 2.2, 0, Math.PI * 2);
+              targetCtx.moveTo(-2.4, -4.5);
+              targetCtx.quadraticCurveTo(-3.4, 0.2, -5.2, 3.2);
+              targetCtx.stroke();
+
+              // Bell clapper
+              targetCtx.fillStyle = '#d97706';
+              targetCtx.strokeStyle = '#78350f';
+              targetCtx.lineWidth = 1.1;
+              targetCtx.beginPath();
+              targetCtx.arc(0, 6.6, 2.4, 0, Math.PI * 2);
               targetCtx.fill();
+              targetCtx.stroke();
+
+              // Festive red ribbon bow at top
+              targetCtx.fillStyle = '#ef4444';
+              targetCtx.beginPath();
+              targetCtx.moveTo(0, -7);
+              targetCtx.lineTo(-4.8, -10.2);
+              targetCtx.lineTo(-4.2, -5.2);
+              targetCtx.closePath();
+              targetCtx.moveTo(0, -7);
+              targetCtx.lineTo(4.8, -10.2);
+              targetCtx.lineTo(4.2, -5.2);
+              targetCtx.closePath();
+              targetCtx.fill();
+              targetCtx.restore();
             }
             targetCtx.restore();
           }
@@ -6057,10 +6097,31 @@
                 bCtx.moveTo(bx, gy + 10);
                 bCtx.bezierCurveTo(bx + bw * 0.4, gy - 2, bx + bw * 0.6, gy + 14, bx + bw, gy + 2);
                 bCtx.stroke();
+
+                // Flared golden bell in shop preview
+                bCtx.save();
+                bCtx.translate(bx + bw * 0.5, gy + 7);
                 bCtx.fillStyle = '#facc15';
+                bCtx.strokeStyle = '#78350f';
+                bCtx.lineWidth = 1.1;
                 bCtx.beginPath();
-                bCtx.arc(bx + bw * 0.5, gy + 8, 4.2, 0, Math.PI * 2);
+                bCtx.moveTo(-3, -4.5);
+                bCtx.quadraticCurveTo(0, -5.8, 3, -4.5);
+                bCtx.bezierCurveTo(3.8, -1, 4.6, 1.5, 6.4, 3.5);
+                bCtx.quadraticCurveTo(0, 5, -6.4, 3.5);
+                bCtx.bezierCurveTo(-4.6, 1.5, -3.8, -1, -3, -4.5);
+                bCtx.closePath();
                 bCtx.fill();
+                bCtx.stroke();
+                bCtx.fillStyle = '#d97706';
+                bCtx.beginPath();
+                bCtx.arc(0, 4.6, 1.7, 0, Math.PI * 2);
+                bCtx.fill();
+                bCtx.fillStyle = '#ef4444';
+                bCtx.beginPath();
+                bCtx.arc(0, -5, 1.6, 0, Math.PI * 2);
+                bCtx.fill();
+                bCtx.restore();
               }
               bCtx.restore();
               bCtx.fillStyle = '#dc2626';
