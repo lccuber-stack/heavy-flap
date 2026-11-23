@@ -1197,7 +1197,7 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.64rem; font-weight:800; letter-spacing:0.11em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.32</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.34</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.55rem, 6.6vw, 2.05rem); font-weight:700; line-height:1.04; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.32rem; flex-wrap:nowrap;">
@@ -2031,7 +2031,7 @@
     // =========================================================================
     // 3. GAME STATE, PER-PLAYER PROFILES, TOP 10 & CROSS-DEVICE SYNC
     // =========================================================================
-    const APP_VERSION = 'v5.9.32';
+    const APP_VERSION = 'v5.9.34';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -4112,8 +4112,8 @@
         }
       }
 
-      // Spawn New Beam Pairs
-      const spacing = (state.width < 600 ? 275 : 315) + (state.isTajmulMode ? 95 : 0);
+      // Spawn New Beam Pairs (Original tight 235-265px spacing for standard mode; wider 350-380px in Tajmul Mode)
+      const spacing = (state.width < 600 ? 235 : 265) + (state.isTajmulMode ? 115 : 0);
       if (state.obstacles.length === 0) {
         spawnObstaclePair(state.width + 40);
       } else {
@@ -4144,12 +4144,9 @@
         const botY = obs.gapY + obs.gapHeight * 0.5;
         const botH = Math.max(0, floorY - botY);
 
-        // Score when passing beam center
+        // Track beam clearance for Turbo Boost without adding +1 beam point (only nuggets score)
         if (!obs.passed && obs.x + obs.width * 0.5 < state.player.x) {
           obs.passed = true;
-          state.score += 1;
-          updateScoreHUD(true);
-          updateTierHUD();
           audio.playBeamScore();
 
           if (state.activeBoosts.turbo) {
@@ -5197,8 +5194,8 @@
         saveShopData();
       }
 
-      const spacing = (state.width < 600 ? 275 : 315) + (state.isTajmulMode ? 95 : 0);
-      const firstSpawnX = Math.max(state.player.x + 360, Math.min(state.width + 40, state.player.x + 430));
+      const spacing = (state.width < 600 ? 235 : 265) + (state.isTajmulMode ? 115 : 0);
+      const firstSpawnX = Math.max(state.player.x + 340, Math.min(state.width + 40, state.player.x + 410));
       spawnObstaclePair(firstSpawnX);
       if (firstSpawnX + spacing <= state.width + 80) {
         spawnObstaclePair(firstSpawnX + spacing);
