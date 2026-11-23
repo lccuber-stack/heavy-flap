@@ -420,7 +420,17 @@
 
     .tactical-count {
       background: rgba(15, 23, 42, 0.72);
-      100% { transform: scale(1); }
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: #fde047;
+    }
+
+    @keyframes floatPulse {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-8px); }
     }
 
     @keyframes spin360 {
@@ -1232,7 +1242,7 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.64rem; font-weight:800; letter-spacing:0.11em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.42</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.43</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.55rem, 6.6vw, 2.05rem); font-weight:700; line-height:1.04; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.32rem; flex-wrap:nowrap;">
@@ -2066,7 +2076,7 @@
     // =========================================================================
     // 3. GAME STATE, PER-PLAYER PROFILES, TOP 10 & CROSS-DEVICE SYNC
     // =========================================================================
-    const APP_VERSION = 'v5.9.42';
+    const APP_VERSION = 'v5.9.43';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -4379,18 +4389,21 @@
         ctx.fill();
       });
 
-      // Parallax Stage-Specific Scenery (Unique architecture & silhouettes per biome)
+      // Parallax Stage-Specific Scenery (Stable world-indexed columns across all biomes)
       const farColor = lighting.isNight ? biome.nightFar : biome.dayFar;
       const midColor = lighting.isNight ? biome.nightMid : biome.dayMid;
 
       if (biome.id === 'city') {
         // Metro Skyline: Tall Stepped Skyscrapers, Spires & Illuminated Windows
         const farStep = 175;
-        const farOffset = -(state.bgScroll * 0.45) % farStep;
+        const farScroll = state.bgScroll * 0.45;
+        const firstFar = Math.floor(farScroll / farStep) - 1;
+        const lastFar = Math.ceil((farScroll + state.width) / farStep) + 1;
         const farHeights = [165, 220, 140, 195, 175];
-        for (let i = -1; i <= Math.ceil(state.width / farStep) + 1; i++) {
-          const bx = farOffset + i * farStep;
-          const bh = farHeights[Math.abs(i) % farHeights.length];
+        for (let idx = firstFar; idx <= lastFar; idx++) {
+          const bx = idx * farStep - farScroll;
+          const hIdx = ((idx % farHeights.length) + farHeights.length) % farHeights.length;
+          const bh = farHeights[hIdx];
           ctx.fillStyle = farColor;
           ctx.fillRect(bx + 6, floorY - bh, 58, bh);
           ctx.fillRect(bx + 70, floorY - bh * 0.78, 48, bh * 0.78);
@@ -4407,19 +4420,24 @@
         }
 
         const midStep = 150;
-        const midOffset = -(state.bgScroll * 0.85) % midStep;
+        const midScroll = state.bgScroll * 0.85;
+        const firstMid = Math.floor(midScroll / midStep) - 1;
+        const lastMid = Math.ceil((midScroll + state.width) / midStep) + 1;
         const midHeights = [115, 150, 95, 132];
-        for (let i = -1; i <= Math.ceil(state.width / midStep) + 1; i++) {
-          const bx = midOffset + i * midStep;
-          const bh = midHeights[Math.abs(i) % midHeights.length];
+        for (let idx = firstMid; idx <= lastMid; idx++) {
+          const bx = idx * midStep - midScroll;
+          const hIdx = ((idx % midHeights.length) + midHeights.length) % midHeights.length;
+          const bh = midHeights[hIdx];
           ctx.fillStyle = midColor;
           ctx.fillRect(bx + 4, floorY - bh, 64, bh);
           ctx.fillRect(bx + 74, floorY - bh * 0.74, 68, bh * 0.74);
 
           ctx.fillStyle = lighting.isNight ? '#fde047' : 'rgba(254, 249, 195, 0.55)';
-          for (let wy = floorY - bh + 12; wy < floorY - 14; wy += 16) {
-            for (let wx = bx + 14; wx < bx + 58; wx += 14) {
-              if ((Math.abs(i) + Math.floor(wy)) % 3 !== 0) {
+          for (let row = 0; floorY - bh + 12 + row * 16 < floorY - 14; row++) {
+            const wy = floorY - bh + 12 + row * 16;
+            for (let col = 0; col < 3; col++) {
+              const wx = bx + 14 + col * 14;
+              if ((((idx + row + col) % 3) + 3) % 3 !== 0) {
                 ctx.fillRect(wx, wy, 7, 8);
               }
             }
@@ -4428,16 +4446,16 @@
       } else if (biome.id === 'harbor') {
         // Coastal Harbor: Ship-to-Shore Gantry Cranes, Bridge Towers & Stacked Shipping Containers
         const farStep = 240;
-        const farOffset = -(state.bgScroll * 0.45) % farStep;
-        for (let i = -1; i <= Math.ceil(state.width / farStep) + 1; i++) {
-          const cx = farOffset + i * farStep;
+        const farScroll = state.bgScroll * 0.45;
+        const firstFar = Math.floor(farScroll / farStep) - 1;
+        const lastFar = Math.ceil((farScroll + state.width) / farStep) + 1;
+        for (let idx = firstFar; idx <= lastFar; idx++) {
+          const cx = idx * farStep - farScroll;
           ctx.fillStyle = farColor;
-          // Gantry crane legs & high boom
           ctx.fillRect(cx + 30, floorY - 155, 8, 155);
           ctx.fillRect(cx + 68, floorY - 155, 8, 155);
           ctx.fillRect(cx + 12, floorY - 142, 118, 8);
           ctx.fillRect(cx + 26, floorY - 110, 54, 6);
-          // Crane cables
           ctx.strokeStyle = farColor;
           ctx.lineWidth = 2;
           ctx.beginPath();
@@ -4449,17 +4467,17 @@
         }
 
         const midStep = 180;
-        const midOffset = -(state.bgScroll * 0.85) % midStep;
+        const midScroll = state.bgScroll * 0.85;
+        const firstMid = Math.floor(midScroll / midStep) - 1;
+        const lastMid = Math.ceil((midScroll + state.width) / midStep) + 1;
         const containerColors = ['#dc2626', '#0284c7', '#d97706', '#059669'];
-        for (let i = -1; i <= Math.ceil(state.width / midStep) + 1; i++) {
-          const bx = midOffset + i * midStep;
-          // Dock warehouse silhouette
+        for (let idx = firstMid; idx <= lastMid; idx++) {
+          const bx = idx * midStep - midScroll;
           ctx.fillStyle = midColor;
           ctx.fillRect(bx + 8, floorY - 56, 74, 56);
-          // Stacked intermodal shipping containers
           for (let row = 0; row < 3; row++) {
             for (let col = 0; col < 2; col++) {
-              const cIdx = (Math.abs(i) + row + col) % containerColors.length;
+              const cIdx = (((idx + row + col) % containerColors.length) + containerColors.length) % containerColors.length;
               ctx.fillStyle = lighting.isNight ? midColor : containerColors[cIdx];
               ctx.fillRect(bx + 90 + col * 42, floorY - (row + 1) * 18, 39, 16);
               ctx.strokeStyle = '#0f172a';
@@ -4472,10 +4490,13 @@
         // Deep Pine Forest: Rolling Ridges & Tiered Evergreen Pine Trees
         ctx.fillStyle = farColor;
         const farStep = 150;
-        const farOffset = -(state.bgScroll * 0.45) % farStep;
+        const farScroll = state.bgScroll * 0.45;
+        const firstFar = Math.floor(farScroll / farStep) - 1;
+        const lastFar = Math.ceil((farScroll + state.width) / farStep) + 1;
         ctx.beginPath();
         ctx.moveTo(0, floorY);
-        for (let fx = farOffset - farStep; fx <= state.width + farStep; fx += farStep) {
+        for (let idx = firstFar; idx <= lastFar; idx++) {
+          const fx = idx * farStep - farScroll;
           ctx.lineTo(fx + farStep * 0.5, floorY - 115);
           ctx.lineTo(fx + farStep, floorY - 55);
         }
@@ -4491,7 +4512,6 @@
           const tx = treeIdx * treeStep - treeScroll;
           const th = 72 + (((treeIdx % 3) + 3) % 3) * 18;
           ctx.fillStyle = midColor;
-          // 3-tier pine silhouette
           for (let tierIdx = 0; tierIdx < 3; tierIdx++) {
             const tierY = floorY - th + tierIdx * (th * 0.24);
             const tierW = 14 + tierIdx * 7;
@@ -4506,10 +4526,12 @@
       } else if (biome.id === 'alpine') {
         // Alpine Peaks: Jagged Mountains with Bright Snow Caps
         const farStep = 170;
-        const farOffset = -(state.bgScroll * 0.45) % farStep;
-        for (let i = -1; i <= Math.ceil(state.width / farStep) + 1; i++) {
-          const mx = farOffset + i * farStep;
-          const peakH = 155 + (Math.abs(i) % 2) * 35;
+        const farScroll = state.bgScroll * 0.45;
+        const firstFar = Math.floor(farScroll / farStep) - 1;
+        const lastFar = Math.ceil((farScroll + state.width) / farStep) + 1;
+        for (let idx = firstFar; idx <= lastFar; idx++) {
+          const mx = idx * farStep - farScroll;
+          const peakH = 155 + (((idx % 2) + 2) % 2) * 35;
           ctx.fillStyle = farColor;
           ctx.beginPath();
           ctx.moveTo(mx - 20, floorY);
@@ -4518,7 +4540,6 @@
           ctx.closePath();
           ctx.fill();
 
-          // Snow cap
           ctx.fillStyle = lighting.isNight ? '#94a3b8' : '#f8fafc';
           ctx.beginPath();
           ctx.moveTo(mx + farStep * 0.5, floorY - peakH);
@@ -4532,10 +4553,13 @@
 
         ctx.fillStyle = midColor;
         const midStep = 120;
-        const midOffset = -(state.bgScroll * 0.85) % midStep;
+        const midScroll = state.bgScroll * 0.85;
+        const firstMid = Math.floor(midScroll / midStep) - 1;
+        const lastMid = Math.ceil((midScroll + state.width) / midStep) + 1;
         ctx.beginPath();
         ctx.moveTo(0, floorY);
-        for (let mx = midOffset - midStep; mx <= state.width + midStep; mx += midStep) {
+        for (let idx = firstMid; idx <= lastMid; idx++) {
+          const mx = idx * midStep - midScroll;
           ctx.lineTo(mx + midStep * 0.5, floorY - 82);
           ctx.lineTo(mx + midStep, floorY - 24);
         }
@@ -4545,10 +4569,12 @@
       } else if (biome.id === 'canyon') {
         // Red Rock Canyon: Flat-Topped Stepped Mesas & Buttes
         const farStep = 210;
-        const farOffset = -(state.bgScroll * 0.45) % farStep;
-        for (let i = -1; i <= Math.ceil(state.width / farStep) + 1; i++) {
-          const cx = farOffset + i * farStep;
-          const mh = 120 + (Math.abs(i) % 2) * 32;
+        const farScroll = state.bgScroll * 0.45;
+        const firstFar = Math.floor(farScroll / farStep) - 1;
+        const lastFar = Math.ceil((farScroll + state.width) / farStep) + 1;
+        for (let idx = firstFar; idx <= lastFar; idx++) {
+          const cx = idx * farStep - farScroll;
+          const mh = 120 + (((idx % 2) + 2) % 2) * 32;
           ctx.fillStyle = farColor;
           ctx.beginPath();
           ctx.moveTo(cx + 10, floorY);
@@ -4560,9 +4586,11 @@
         }
 
         const midStep = 165;
-        const midOffset = -(state.bgScroll * 0.85) % midStep;
-        for (let i = -1; i <= Math.ceil(state.width / midStep) + 1; i++) {
-          const cx = midOffset + i * midStep;
+        const midScroll = state.bgScroll * 0.85;
+        const firstMid = Math.floor(midScroll / midStep) - 1;
+        const lastMid = Math.ceil((midScroll + state.width) / midStep) + 1;
+        for (let idx = firstMid; idx <= lastMid; idx++) {
+          const cx = idx * midStep - midScroll;
           ctx.fillStyle = midColor;
           ctx.beginPath();
           ctx.moveTo(cx + 6, floorY);
@@ -4575,10 +4603,12 @@
       } else if (biome.id === 'volcano') {
         // Volcanic Foundry: Caldera Peaks with Glowing Lava Craters
         const farStep = 220;
-        const farOffset = -(state.bgScroll * 0.45) % farStep;
-        for (let i = -1; i <= Math.ceil(state.width / farStep) + 1; i++) {
-          const vx = farOffset + i * farStep;
-          const vh = 145 + (Math.abs(i) % 2) * 25;
+        const farScroll = state.bgScroll * 0.45;
+        const firstFar = Math.floor(farScroll / farStep) - 1;
+        const lastFar = Math.ceil((farScroll + state.width) / farStep) + 1;
+        for (let idx = firstFar; idx <= lastFar; idx++) {
+          const vx = idx * farStep - farScroll;
+          const vh = 145 + (((idx % 2) + 2) % 2) * 25;
           ctx.fillStyle = farColor;
           ctx.beginPath();
           ctx.moveTo(vx - 15, floorY);
@@ -4588,17 +4618,19 @@
           ctx.closePath();
           ctx.fill();
 
-          // Glowing lava rim
           ctx.fillStyle = '#f97316';
           ctx.fillRect(vx + 80, floorY - vh, 36, 6);
         }
 
         ctx.fillStyle = midColor;
         const midStep = 120;
-        const midOffset = -(state.bgScroll * 0.85) % midStep;
+        const midScroll = state.bgScroll * 0.85;
+        const firstMid = Math.floor(midScroll / midStep) - 1;
+        const lastMid = Math.ceil((midScroll + state.width) / midStep) + 1;
         ctx.beginPath();
         ctx.moveTo(0, floorY);
-        for (let mx = midOffset - midStep; mx <= state.width + midStep; mx += midStep) {
+        for (let idx = firstMid; idx <= lastMid; idx++) {
+          const mx = idx * midStep - midScroll;
           ctx.lineTo(mx + midStep * 0.45, floorY - 74);
           ctx.lineTo(mx + midStep, floorY - 26);
         }
@@ -4608,9 +4640,11 @@
       } else if (biome.id === 'glacier') {
         // Arctic Glacier: Crystalline Ice Spires & Faceted Icebergs
         const farStep = 160;
-        const farOffset = -(state.bgScroll * 0.45) % farStep;
-        for (let i = -1; i <= Math.ceil(state.width / farStep) + 1; i++) {
-          const gx = farOffset + i * farStep;
+        const farScroll = state.bgScroll * 0.45;
+        const firstFar = Math.floor(farScroll / farStep) - 1;
+        const lastFar = Math.ceil((farScroll + state.width) / farStep) + 1;
+        for (let idx = firstFar; idx <= lastFar; idx++) {
+          const gx = idx * farStep - farScroll;
           ctx.fillStyle = farColor;
           ctx.beginPath();
           ctx.moveTo(gx, floorY);
@@ -4624,10 +4658,13 @@
 
         ctx.fillStyle = midColor;
         const midStep = 115;
-        const midOffset = -(state.bgScroll * 0.85) % midStep;
+        const midScroll = state.bgScroll * 0.85;
+        const firstMid = Math.floor(midScroll / midStep) - 1;
+        const lastMid = Math.ceil((midScroll + state.width) / midStep) + 1;
         ctx.beginPath();
         ctx.moveTo(0, floorY);
-        for (let mx = midOffset - midStep; mx <= state.width + midStep; mx += midStep) {
+        for (let idx = firstMid; idx <= lastMid; idx++) {
+          const mx = idx * midStep - midScroll;
           ctx.lineTo(mx + 28, floorY - 84);
           ctx.lineTo(mx + 62, floorY - 52);
           ctx.lineTo(mx + 92, floorY - 76);
@@ -4640,10 +4677,13 @@
         // Lunar Base: Crater Rims, Geodesic Habitation Domes & Comm Dishes
         ctx.fillStyle = farColor;
         const farStep = 180;
-        const farOffset = -(state.bgScroll * 0.45) % farStep;
+        const farScroll = state.bgScroll * 0.45;
+        const firstFar = Math.floor(farScroll / farStep) - 1;
+        const lastFar = Math.ceil((farScroll + state.width) / farStep) + 1;
         ctx.beginPath();
         ctx.moveTo(0, floorY);
-        for (let fx = farOffset - farStep; fx <= state.width + farStep; fx += farStep) {
+        for (let idx = firstFar; idx <= lastFar; idx++) {
+          const fx = idx * farStep - farScroll;
           ctx.lineTo(fx + 45, floorY - 88);
           ctx.quadraticCurveTo(fx + 90, floorY - 62, fx + 135, floorY - 94);
           ctx.lineTo(fx + farStep, floorY - 40);
@@ -4653,10 +4693,11 @@
         ctx.fill();
 
         const midStep = 220;
-        const midOffset = -(state.bgScroll * 0.85) % midStep;
-        for (let i = -1; i <= Math.ceil(state.width / midStep) + 1; i++) {
-          const lx = midOffset + i * midStep;
-          // Geodesic dome
+        const midScroll = state.bgScroll * 0.85;
+        const firstMid = Math.floor(midScroll / midStep) - 1;
+        const lastMid = Math.ceil((midScroll + state.width) / midStep) + 1;
+        for (let idx = firstMid; idx <= lastMid; idx++) {
+          const lx = idx * midStep - midScroll;
           ctx.fillStyle = midColor;
           ctx.beginPath();
           ctx.arc(lx + 65, floorY, 44, Math.PI, 0);
@@ -4666,7 +4707,6 @@
           ctx.beginPath();
           ctx.arc(lx + 65, floorY, 44, Math.PI, 0);
           ctx.stroke();
-          // Comm tower
           ctx.fillRect(lx + 136, floorY - 64, 4, 64);
           ctx.beginPath();
           ctx.arc(lx + 138, floorY - 68, 11, 0.2, Math.PI - 0.2);
@@ -4675,10 +4715,13 @@
       } else {
         ctx.fillStyle = farColor;
         const farStep = 140;
-        const farOffset = -(state.bgScroll * 0.45) % farStep;
+        const farScroll = state.bgScroll * 0.45;
+        const firstFar = Math.floor(farScroll / farStep) - 1;
+        const lastFar = Math.ceil((farScroll + state.width) / farStep) + 1;
         ctx.beginPath();
         ctx.moveTo(0, floorY);
-        for (let fx = farOffset - farStep; fx <= state.width + farStep; fx += farStep) {
+        for (let idx = firstFar; idx <= lastFar; idx++) {
+          const fx = idx * farStep - farScroll;
           ctx.lineTo(fx + farStep * 0.5, floorY - 125);
           ctx.lineTo(fx + farStep, floorY - 48);
         }
@@ -4688,10 +4731,13 @@
 
         ctx.fillStyle = midColor;
         const midStep = 110;
-        const midOffset = -(state.bgScroll * 0.85) % midStep;
+        const midScroll = state.bgScroll * 0.85;
+        const firstMid = Math.floor(midScroll / midStep) - 1;
+        const lastMid = Math.ceil((midScroll + state.width) / midStep) + 1;
         ctx.beginPath();
         ctx.moveTo(0, floorY);
-        for (let mx = midOffset - midStep; mx <= state.width + midStep; mx += midStep) {
+        for (let idx = firstMid; idx <= lastMid; idx++) {
+          const mx = idx * midStep - midScroll;
           ctx.lineTo(mx + midStep * 0.45, floorY - 76);
           ctx.lineTo(mx + midStep, floorY - 26);
         }
