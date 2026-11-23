@@ -1197,7 +1197,7 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.64rem; font-weight:800; letter-spacing:0.11em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.30</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.32</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.55rem, 6.6vw, 2.05rem); font-weight:700; line-height:1.04; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.32rem; flex-wrap:nowrap;">
@@ -1254,6 +1254,12 @@
             <span style="font-size:0.62rem; font-weight:700; color:#34d399;" id="menu-active-skin-label">🎨 Classic Yellow</span>
           </div>
           <div class="rig-grid" id="rig-selector">
+            <button type="button" class="rig-card" data-rig="flappytajmul">
+              <canvas class="rig-preview" id="preview-flappytajmul" width="240" height="156"></canvas>
+              <div class="font-display" style="font-size:0.72rem; font-weight:700; color:#7dd3fc; line-height:1.1;">Flappy Tajmul</div>
+              <div style="font-size:0.55rem; color:#38bdf8; margin-top:1px;" id="rig-sub-flappytajmul">Tutorial Rig</div>
+            </button>
+
             <button type="button" class="rig-card selected" data-rig="loader">
               <canvas class="rig-preview" id="preview-loader" width="240" height="156"></canvas>
               <div class="font-display" style="font-size:0.74rem; font-weight:700; color:#fff; line-height:1.1;">Wheel Loader</div>
@@ -1306,12 +1312,6 @@
               <canvas class="rig-preview" id="preview-flappyemma" width="240" height="156"></canvas>
               <div class="font-display" style="font-size:0.72rem; font-weight:700; color:#c4b5fd; line-height:1.1;">Flappy Emma</div>
               <div style="font-size:0.55rem; color:#fbbf24; margin-top:1px;" id="rig-sub-flappyemma">🔒 1000</div>
-            </button>
-
-            <button type="button" class="rig-card" data-rig="flappytajmul">
-              <canvas class="rig-preview" id="preview-flappytajmul" width="240" height="156"></canvas>
-              <div class="font-display" style="font-size:0.72rem; font-weight:700; color:#7dd3fc; line-height:1.1;">Flappy Tajmul</div>
-              <div style="font-size:0.55rem; color:#38bdf8; margin-top:1px;" id="rig-sub-flappytajmul">Tutorial Rig</div>
             </button>
           </div>
           <div id="menu-active-boosts" class="active-boosts-bar hidden"></div>
@@ -1775,6 +1775,17 @@
     // 2. HEAVY RIG CONFIGURATIONS, BEAM THEMES, SKINS, NUGGETS & BIOMES
     // =========================================================================
     const RIG_SPECS = {
+      flappytajmul: {
+        name: 'Flappy Tajmul',
+        subtitle: 'Tutorial Rig',
+        cost: 0,
+        gravity: 1320,
+        flapVel: -445,
+        maxFall: 595,
+        primaryColor: '#d99b66',
+        secondaryColor: '#1e3a8a',
+        cabColor: '#0f172a'
+      },
       loader: {
         name: 'Wheel Loader',
         subtitle: 'Balanced',
@@ -1872,17 +1883,6 @@
         maxFall: 590,
         primaryColor: '#fef08a',
         secondaryColor: '#a78bfa',
-        cabColor: '#0f172a'
-      },
-      flappytajmul: {
-        name: 'Flappy Tajmul',
-        subtitle: 'Tutorial Rig',
-        cost: 0,
-        gravity: 1320,
-        flapVel: -445,
-        maxFall: 595,
-        primaryColor: '#d99b66',
-        secondaryColor: '#1e3a8a',
         cabColor: '#0f172a'
       }
     };
@@ -2031,7 +2031,7 @@
     // =========================================================================
     // 3. GAME STATE, PER-PLAYER PROFILES, TOP 10 & CROSS-DEVICE SYNC
     // =========================================================================
-    const APP_VERSION = 'v5.9.30';
+    const APP_VERSION = 'v5.9.32';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -3889,9 +3889,12 @@
       const playableH = state.height - state.groundHeight;
       const baseGap = Math.max(146, Math.min(198, playableH * 0.285));
       const gapHeight = Math.round(baseGap * tier.gapScale);
-      const minMargin = 68;
-      const maxCenter = playableH - minMargin - gapHeight * 0.5;
-      const minCenter = minMargin + gapHeight * 0.5;
+      const topSafeMargin = state.width < 600
+        ? Math.max(145, playableH * 0.22)
+        : Math.max(118, playableH * 0.18);
+      const bottomSafeMargin = 76;
+      const maxCenter = playableH - bottomSafeMargin - gapHeight * 0.5;
+      const minCenter = topSafeMargin + gapHeight * 0.5;
       const gapY = minCenter + Math.random() * Math.max(20, maxCenter - minCenter);
 
       const isMoving = Math.random() < tier.movingChance;
@@ -3907,27 +3910,28 @@
         passed: false,
         isMoving,
         movePhase: Math.random() * Math.PI * 2,
-        moveAmp: isMoving ? 28 + Math.random() * 24 : 0,
+        moveAmp: isMoving ? Math.min(30, Math.max(14, (maxCenter - minCenter) * 0.25)) : 0,
         moveSpeed: (1.7 + Math.random() * 0.7) * tier.movingSpeedMult,
         isWreckingBall,
         swingPhase: Math.random() * Math.PI * 2,
         isElectricWire,
-        wireCycle: Math.random() * 4.0
+        wireOffset: Math.round(gapHeight * 0.24)
       };
       state.obstacles.push(obs);
 
-      // Spawn Bronze / Silver / Gold Ore Nugget inside or between beams (100% in Tajmul Mode)
-      if (state.isTajmulMode || Math.random() < 0.85) {
-        const nuggetTier = rollNuggetTier();
-        state.collectibles.push({
-          x: xPos + obs.width * 0.5,
-          y: gapY + (Math.random() - 0.5) * (gapHeight * 0.34),
-          radius: 15,
-          collected: false,
-          bobPhase: Math.random() * Math.PI * 2,
-          tier: nuggetTier
-        });
-      }
+      // Spawn Bronze / Silver / Gold Ore Nugget between every pair of beams
+      const nuggetTier = rollNuggetTier();
+      const safeOffsetY = (isWreckingBall || isElectricWire)
+        ? gapHeight * 0.18
+        : (Math.random() - 0.5) * (gapHeight * 0.34);
+      state.collectibles.push({
+        x: xPos + obs.width * 0.5,
+        y: gapY + safeOffsetY,
+        radius: 15,
+        collected: false,
+        bobPhase: Math.random() * Math.PI * 2,
+        tier: nuggetTier
+      });
     }
 
     function spawnFallingHazard() {
@@ -4127,13 +4131,13 @@
 
         if (obs.isMoving) {
           obs.movePhase += obs.moveSpeed * dt;
-          obs.gapY = obs.baseGapY + Math.sin(obs.movePhase) * obs.moveAmp;
+          const rawGapY = obs.baseGapY + Math.sin(obs.movePhase) * obs.moveAmp;
+          const minGapCenter = (state.width < 600 ? Math.max(145, floorY * 0.22) : Math.max(118, floorY * 0.18)) + obs.gapHeight * 0.5;
+          const maxGapCenter = floorY - 76 - obs.gapHeight * 0.5;
+          obs.gapY = Math.max(minGapCenter, Math.min(maxGapCenter, rawGapY));
         }
         if (obs.isWreckingBall) {
           obs.swingPhase += 2.6 * dt;
-        }
-        if (obs.isElectricWire) {
-          obs.wireCycle = (obs.wireCycle + dt) % 4.0;
         }
 
         const topH = Math.max(0, obs.gapY - obs.gapHeight * 0.5);
@@ -4179,9 +4183,9 @@
               reason = 'HIT WRECKING BALL';
             }
           }
-
-          if (!hit && obs.isElectricWire && obs.wireCycle < 2.3) {
-            if (circleRectOverlap(state.player.x, state.player.y, hitR, obs.x + obs.width * 0.5 - 4, topH, 8, obs.gapHeight)) {
+          if (!hit && obs.isElectricWire) {
+            const wy = topH + obs.wireOffset;
+            if (circleRectOverlap(state.player.x, state.player.y, hitR, obs.x, wy - 4, obs.width, 8)) {
               hit = true;
               reason = 'ZAPPED BY HIGH VOLTAGE';
             }
@@ -4413,81 +4417,81 @@
           ctx.lineTo(ballX, ballY);
           ctx.stroke();
 
+          ctx.save();
+          ctx.translate(ballX, ballY);
           ctx.fillStyle = '#1e293b';
           ctx.strokeStyle = '#fbbf24';
           ctx.lineWidth = 2.6;
           ctx.beginPath();
-          ctx.arc(ballX, ballY, 14, 0, Math.PI * 2);
+          ctx.arc(0, 0, 14, 0, Math.PI * 2);
           ctx.fill();
           ctx.stroke();
 
-          ctx.strokeStyle = '#f59e0b';
-          ctx.lineWidth = 3;
-          ctx.beginPath();
-          ctx.moveTo(ballX - 9, ballY - 6);
-          ctx.lineTo(ballX + 9, ballY + 6);
-          ctx.stroke();
+          ctx.fillStyle = '#fbbf24';
+          ctx.fillRect(-10, -2.5, 20, 5);
 
-          ctx.fillStyle = '#e2e8f0';
+          ctx.fillStyle = '#94a3b8';
           ctx.beginPath();
-          ctx.arc(ballX - 4, ballY - 5, 3.2, 0, Math.PI * 2);
+          ctx.arc(-4.5, -5, 3.5, 0, Math.PI * 2);
           ctx.fill();
+          ctx.restore();
         }
 
-        // High-Contrast Electric Wire
+        // High-Contrast Horizontal Electric Wire (upper section of gap, passable underneath)
         if (obs.isElectricWire) {
-          const wx = obs.x + obs.width * 0.5;
-          const active = obs.wireCycle < 2.3;
-          if (active) {
-            ctx.strokeStyle = '#0f172a';
-            ctx.lineWidth = 8;
-            ctx.beginPath();
-            ctx.moveTo(wx, topH);
-            ctx.lineTo(wx, botY);
-            ctx.stroke();
+          const wy = topH + obs.wireOffset;
+          const pulse = 0.65 + 0.35 * Math.sin(state.time * 16 + obs.x * 0.05);
 
-            ctx.strokeStyle = '#0284c7';
-            ctx.lineWidth = 4.5;
-            ctx.beginPath();
-            ctx.moveTo(wx, topH);
-            ctx.lineTo(wx, botY);
-            ctx.stroke();
+          // Dark Contrast Backing Bar
+          ctx.strokeStyle = '#0f172a';
+          ctx.lineWidth = 8;
+          ctx.beginPath();
+          ctx.moveTo(obs.x, wy);
+          ctx.lineTo(obs.x + obs.width, wy);
+          ctx.stroke();
 
-            ctx.strokeStyle = '#e0f2fe';
-            ctx.lineWidth = 1.8;
-            ctx.beginPath();
-            ctx.moveTo(wx + Math.sin(state.time * 40) * 2.5, topH);
-            ctx.lineTo(wx - Math.cos(state.time * 40) * 2.5, botY);
-            ctx.stroke();
-          } else {
-            ctx.strokeStyle = 'rgba(15, 23, 42, 0.45)';
-            ctx.setLineDash([5, 6]);
-            ctx.lineWidth = 2.5;
-            ctx.beginPath();
-            ctx.moveTo(wx, topH);
-            ctx.lineTo(wx, botY);
-            ctx.stroke();
-            ctx.setLineDash([]);
-          }
+          // Bright Electric Core
+          ctx.save();
+          ctx.strokeStyle = `rgba(2, 132, 199, ${pulse.toFixed(2)})`;
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 10;
+          ctx.lineWidth = 4.5;
+          ctx.beginPath();
+          ctx.moveTo(obs.x, wy);
+          ctx.lineTo(obs.x + obs.width * 0.5, wy + Math.sin(state.time * 32) * 3);
+          ctx.lineTo(obs.x + obs.width, wy);
+          ctx.stroke();
 
-          // Yellow/Black Insulator Caps
-          [topH + 4, botY - 4].forEach((iy) => {
+          // White-Cyan Inner Arc
+          ctx.strokeStyle = '#e0f2fe';
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.moveTo(obs.x, wy);
+          ctx.lineTo(obs.x + obs.width * 0.5, wy - Math.sin(state.time * 32) * 2.5);
+          ctx.lineTo(obs.x + obs.width, wy);
+          ctx.stroke();
+          ctx.restore();
+
+          // Yellow/Black Insulator Caps on Beam Edges
+          [obs.x, obs.x + obs.width].forEach((ix) => {
             ctx.fillStyle = '#fbbf24';
             ctx.strokeStyle = '#0f172a';
             ctx.lineWidth = 1.8;
             ctx.beginPath();
-            ctx.roundRect(wx - 7, iy - 4, 14, 8, 3);
+            ctx.roundRect(ix - 5, wy - 6, 10, 12, 3);
             ctx.fill();
             ctx.stroke();
           });
         }
       });
 
-      // Ore Nuggets (Bronze, Silver & Gold)
+      // Ore Nuggets (Bronze, Silver & Gold) with 2X Streak Aura
+      const isDoubleStreak = state.streak >= 3;
       state.collectibles.forEach((col) => {
         if (col.collected) return;
         const drawY = col.y + Math.sin(col.bobPhase) * 5;
         const t = col.tier || NUGGET_TIERS.bronze;
+        const blink = 0.5 + 0.5 * Math.sin(state.time * 11 + col.bobPhase);
 
         ctx.save();
         ctx.translate(col.x, drawY);
@@ -4495,6 +4499,14 @@
         ctx.beginPath();
         ctx.arc(0, 0, col.radius + 7, 0, Math.PI * 2);
         ctx.fill();
+
+        if (isDoubleStreak) {
+          ctx.strokeStyle = blink > 0.5 ? '#34d399' : '#fbbf24';
+          ctx.lineWidth = 2.4;
+          ctx.beginPath();
+          ctx.arc(0, 0, col.radius + 6 + blink * 2.5, 0, Math.PI * 2);
+          ctx.stroke();
+        }
 
         ctx.fillStyle = t.body;
         ctx.strokeStyle = '#0f172a';
@@ -4518,6 +4530,22 @@
         ctx.lineTo(-2, -1);
         ctx.closePath();
         ctx.fill();
+
+        if (isDoubleStreak) {
+          ctx.fillStyle = '#064e3b';
+          ctx.strokeStyle = '#34d399';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.roundRect(-12, -25, 24, 11, 5);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = '#6ee7b7';
+          ctx.font = '800 8px "Chakra Petch", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('2X', 0, -19.5);
+        }
         ctx.restore();
       });
 
