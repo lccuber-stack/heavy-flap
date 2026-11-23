@@ -1232,7 +1232,7 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.64rem; font-weight:800; letter-spacing:0.11em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.41</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.42</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.55rem, 6.6vw, 2.05rem); font-weight:700; line-height:1.04; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.32rem; flex-wrap:nowrap;">
@@ -2066,7 +2066,7 @@
     // =========================================================================
     // 3. GAME STATE, PER-PLAYER PROFILES, TOP 10 & CROSS-DEVICE SYNC
     // =========================================================================
-    const APP_VERSION = 'v5.9.41';
+    const APP_VERSION = 'v5.9.42';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -4484,9 +4484,12 @@
         ctx.fill();
 
         const treeStep = 56;
-        const treeOffset = -(state.bgScroll * 0.85) % treeStep;
-        for (let tx = treeOffset - treeStep; tx <= state.width + treeStep; tx += treeStep) {
-          const th = 72 + (Math.abs(Math.floor((tx - treeOffset) / treeStep)) % 3) * 18;
+        const treeScroll = state.bgScroll * 0.85;
+        const firstTreeIdx = Math.floor(treeScroll / treeStep) - 1;
+        const lastTreeIdx = Math.ceil((treeScroll + state.width) / treeStep) + 1;
+        for (let treeIdx = firstTreeIdx; treeIdx <= lastTreeIdx; treeIdx++) {
+          const tx = treeIdx * treeStep - treeScroll;
+          const th = 72 + (((treeIdx % 3) + 3) % 3) * 18;
           ctx.fillStyle = midColor;
           // 3-tier pine silhouette
           for (let tierIdx = 0; tierIdx < 3; tierIdx++) {
