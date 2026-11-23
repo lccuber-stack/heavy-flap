@@ -621,6 +621,18 @@
       margin-bottom: 0.06rem;
     }
 
+    .rig-swipe-hint {
+      color: #7dd3fc;
+      font-weight: 700;
+      margin-left: 0.25rem;
+    }
+
+    @media (min-width: 540px) {
+      .rig-swipe-hint {
+        display: none;
+      }
+    }
+
     .shop-tabs {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
@@ -1295,7 +1307,7 @@
         <!-- Choose Heavy Equipment Rig -->
         <div style="margin-top:0.36rem;">
           <div style="display:flex; align-items:center; justify-content:space-between; gap:0.4rem;">
-            <label style="font-size:0.64rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8;">SELECT MACHINE</label>
+            <label style="font-size:0.64rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8;">SELECT MACHINE<span class="rig-swipe-hint">• Swipe to see more machines</span></label>
             <span style="font-size:0.62rem; font-weight:700; color:#34d399;" id="menu-active-skin-label">🎨 Classic Yellow</span>
           </div>
           <div class="rig-grid" id="rig-selector">
