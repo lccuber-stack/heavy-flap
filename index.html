@@ -296,18 +296,28 @@
       -webkit-backdrop-filter: blur(12px);
       border: 2px solid var(--cat-yellow);
       border-radius: 999px;
-      padding: 0.62rem 1.2rem;
+      padding: 0.56rem 1.05rem;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
+      gap: 0.45rem;
       font-family: 'Chakra Petch', sans-serif;
       font-weight: 700;
-      font-size: clamp(0.86rem, 3.5vw, 1.04rem);
-      letter-spacing: 0.04em;
+      font-size: clamp(0.76rem, 3.1vw, 1.02rem);
+      letter-spacing: 0.03em;
       color: #ffffff;
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
-      white-space: nowrap;
+      max-width: 92vw;
+      white-space: normal;
+      line-height: 1.25;
+      text-align: center;
+    }
+
+    @media (min-width: 540px) {
+      .tap-pill {
+        padding: 0.62rem 1.2rem;
+        white-space: nowrap;
+      }
     }
 
     /* Tactical In-Game Power-Up Bar (Centered Above Ground Curb Across All Devices) */
@@ -1254,7 +1264,7 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.64rem; font-weight:800; letter-spacing:0.11em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.44</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.45</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.55rem, 6.6vw, 2.05rem); font-weight:700; line-height:1.04; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.32rem; flex-wrap:nowrap;">
@@ -2088,7 +2098,7 @@
     // =========================================================================
     // 3. GAME STATE, PER-PLAYER PROFILES, TOP 10 & CROSS-DEVICE SYNC
     // =========================================================================
-    const APP_VERSION = 'v5.9.44';
+    const APP_VERSION = 'v5.9.45';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
