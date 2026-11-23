@@ -461,6 +461,12 @@
       animation: cardEntrance 0.28s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
+    @media (min-width: 540px) {
+      #start-modal .industrial-card {
+        max-width: 540px;
+      }
+    }
+
     @keyframes cardEntrance {
       from { opacity: 0; transform: translateY(14px) scale(0.97); }
       to { opacity: 1; transform: translateY(0) scale(1); }
@@ -557,10 +563,14 @@
     @media (min-width: 540px) {
       .rig-grid {
         grid-template-columns: repeat(5, 1fr);
-        grid-template-rows: repeat(2, 1fr);
+        grid-template-rows: auto;
         grid-auto-flow: row;
         grid-auto-columns: auto;
-        overflow-x: visible;
+        max-height: 225px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-right: 2px;
       }
     }
 
@@ -1222,7 +1232,7 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.64rem; font-weight:800; letter-spacing:0.11em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.35</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.39</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.55rem, 6.6vw, 2.05rem); font-weight:700; line-height:1.04; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.32rem; flex-wrap:nowrap;">
@@ -1275,7 +1285,7 @@
         <!-- Choose Heavy Equipment Rig -->
         <div style="margin-top:0.36rem;">
           <div style="display:flex; align-items:center; justify-content:space-between; gap:0.4rem;">
-            <label style="font-size:0.64rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8;">SELECT MACHINE <span style="color:#64748b; font-weight:700;">(SWIPE ⇄)</span></label>
+            <label style="font-size:0.64rem; font-weight:800; letter-spacing:0.07em; color:#94a3b8;">SELECT MACHINE</label>
             <span style="font-size:0.62rem; font-weight:700; color:#34d399;" id="menu-active-skin-label">🎨 Classic Yellow</span>
           </div>
           <div class="rig-grid" id="rig-selector">
@@ -2056,7 +2066,7 @@
     // =========================================================================
     // 3. GAME STATE, PER-PLAYER PROFILES, TOP 10 & CROSS-DEVICE SYNC
     // =========================================================================
-    const APP_VERSION = 'v5.9.35';
+    const APP_VERSION = 'v5.9.39';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -3494,7 +3504,6 @@
       const capY = isTop ? y + h - capH : y;
 
       if (themeId === 'christmas') {
-        // Deep Pine Green Column
         context.fillStyle = '#14532d';
         context.fillRect(x, y, w, h);
         context.fillStyle = '#166534';
@@ -3502,7 +3511,6 @@
         context.fillStyle = '#052e16';
         context.fillRect(x + w - 10, y, 10, h);
 
-        // Intertwined Red & Bright Green Garlands + Golden Bells with Red Bows
         context.save();
         context.beginPath();
         context.rect(x, y, w, h);
@@ -3510,7 +3518,6 @@
 
         const step = 46;
         for (let gy = y - step; gy < y + h + step; gy += step) {
-          // Red Ribbon Garland
           context.strokeStyle = '#ef4444';
           context.lineWidth = 4.5;
           context.beginPath();
@@ -3518,7 +3525,6 @@
           context.bezierCurveTo(x + w * 0.35, gy + 14, x + w * 0.65, gy + 14, x + w + 2, gy + 26);
           context.stroke();
 
-          // Bright Festive Green Pine Garland
           context.strokeStyle = '#22c55e';
           context.lineWidth = 4.5;
           context.beginPath();
@@ -3526,20 +3532,17 @@
           context.bezierCurveTo(x + w * 0.65, gy + 26, x + w * 0.35, gy + 26, x - 2, gy + 38);
           context.stroke();
 
-          // Flared Golden Christmas Bell with Red Bow
           const bx = x + w * 0.5 + Math.sin(gy * 0.08) * (w * 0.18);
           const by = gy + 20;
           context.save();
           context.translate(bx, by);
           context.rotate(Math.sin(animTime * 3 + gy * 0.05) * 0.14);
 
-          // Clapper
           context.fillStyle = '#b45309';
           context.beginPath();
           context.arc(0, 7.5, 2.5, 0, Math.PI * 2);
           context.fill();
 
-          // Bell Skirt
           context.fillStyle = '#facc15';
           context.strokeStyle = '#78350f';
           context.lineWidth = 1.2;
@@ -3552,13 +3555,11 @@
           context.fill();
           context.stroke();
 
-          // Highlight
           context.fillStyle = '#fef9c3';
           context.beginPath();
           context.ellipse(-2, 0, 1.4, 3.8, -0.2, 0, Math.PI * 2);
           context.fill();
 
-          // Red Bow on Top
           context.fillStyle = '#ef4444';
           context.beginPath();
           context.moveTo(0, -6);
@@ -3574,7 +3575,6 @@
         }
         context.restore();
 
-        // Candy-Striped Red & Gold End Cap
         context.fillStyle = '#b91c1c';
         context.beginPath();
         context.roundRect(x - 7, capY, w + 14, capH, 4);
@@ -3582,7 +3582,6 @@
         context.fillStyle = '#facc15';
         context.fillRect(x - 5, isTop ? capY + capH - 5 : capY, w + 10, 5);
       } else if (themeId === 'easter') {
-        // Pastel Mint & Lilac Beam
         context.fillStyle = '#a7f3d0';
         context.fillRect(x, y, w, h);
         context.fillStyle = '#ddd6fe';
@@ -3593,7 +3592,6 @@
         context.rect(x, y, w, h);
         context.clip();
 
-        // Painted Easter Eggs
         const eggColors = ['#f472b6', '#fde047', '#38bdf8'];
         for (let ey = y + 26; ey < y + h - 18; ey += 48) {
           const idx = Math.abs(Math.floor(ey / 48)) % eggColors.length;
@@ -3623,7 +3621,6 @@
         context.fillStyle = '#fef08a';
         context.fillRect(x - 5, isTop ? capY + capH - 5 : capY, w + 10, 5);
       } else if (themeId === 'midsummer') {
-        // Swedish Blue & Yellow Midsummer Pole
         context.fillStyle = '#1d4ed8';
         context.fillRect(x, y, w, h);
         context.fillStyle = '#facc15';
@@ -3634,7 +3631,6 @@
         context.rect(x, y, w, h);
         context.clip();
 
-        // Birch Leaf Wreaths & Wildflowers
         for (let wy = y + 28; wy < y + h - 18; wy += 52) {
           context.strokeStyle = '#15803d';
           context.lineWidth = 5;
@@ -3659,7 +3655,6 @@
         context.fillStyle = '#1e40af';
         context.fillRect(x - 5, isTop ? capY + capH - 5 : capY, w + 10, 5);
       } else if (themeId === 'halloween') {
-        // Midnight Obsidian Column with Cobwebs & Glowing Jack-O'-Lanterns
         context.fillStyle = '#18181b';
         context.fillRect(x, y, w, h);
         context.fillStyle = '#27272a';
@@ -3671,14 +3666,12 @@
         context.clip();
 
         for (let py = y + 32; py < y + h - 20; py += 58) {
-          // Cobweb arc
           context.strokeStyle = 'rgba(226, 232, 240, 0.35)';
           context.lineWidth = 1.2;
           context.beginPath();
           context.arc(x, py - 22, 18, 0, Math.PI * 0.5);
           context.stroke();
 
-          // Jack-O'-Lantern
           context.fillStyle = '#f97316';
           context.beginPath();
           context.ellipse(x + w * 0.5, py, 10, 8.5, 0, 0, Math.PI * 2);
@@ -3699,7 +3692,6 @@
         context.fillStyle = '#f97316';
         context.fillRect(x - 5, isTop ? capY + capH - 5 : capY, w + 10, 5);
       } else if (themeId === 'neon') {
-        // Cyber Neon Grid Column
         context.fillStyle = '#090d16';
         context.fillRect(x, y, w, h);
         context.strokeStyle = '#22d3ee';
@@ -3721,7 +3713,6 @@
         context.fillStyle = '#22d3ee';
         context.fillRect(x - 5, isTop ? capY + capH - 5 : capY, w + 10, 5);
       } else {
-        // Classic Industrial Riveted Steel I-Beam
         context.fillStyle = lighting.beamMain;
         context.fillRect(x, y, w, h);
         context.fillStyle = lighting.beamHighlight;
@@ -4138,15 +4129,14 @@
         }
       }
 
-      // Spawn New Beam Pairs (Original tight 235-265px spacing for standard mode; wider 350-380px in Tajmul Mode)
+      // Spawn New Beam Pairs across full desktop/iPad/mobile screen width
       const spacing = (state.width < 600 ? 235 : 265) + (state.isTajmulMode ? 115 : 0);
       if (state.obstacles.length === 0) {
         spawnObstaclePair(state.width + 40);
-      } else {
+      }
+      while (state.obstacles[state.obstacles.length - 1].x + spacing <= state.width + spacing) {
         const lastObs = state.obstacles[state.obstacles.length - 1];
-        if (lastObs.x + spacing <= state.width + 80) {
-          spawnObstaclePair(lastObs.x + spacing);
-        }
+        spawnObstaclePair(lastObs.x + spacing);
       }
 
       // Update Obstacles & Check Collisions
@@ -5264,11 +5254,13 @@
         saveShopData();
       }
 
+      // Pre-populate beams across the entire desktop / iPad / mobile screen width before the first flap
       const spacing = (state.width < 600 ? 235 : 265) + (state.isTajmulMode ? 115 : 0);
       const firstSpawnX = Math.max(state.player.x + 340, Math.min(state.width + 40, state.player.x + 410));
-      spawnObstaclePair(firstSpawnX);
-      if (firstSpawnX + spacing <= state.width + 80) {
-        spawnObstaclePair(firstSpawnX + spacing);
+      let nextSpawnX = firstSpawnX;
+      while (nextSpawnX <= state.width + spacing) {
+        spawnObstaclePair(nextSpawnX);
+        nextSpawnX += spacing;
       }
 
       const activeName = state.isTajmulMode
@@ -5564,7 +5556,7 @@
 
     // Prevent iOS rubber-band scrolling outside scrollable modal lists
     document.addEventListener('touchmove', (e) => {
-      if (!e.target.closest('.card-body, .leaderboard-box, [style*="overflow-y:auto"]')) {
+      if (!e.target.closest('.card-body, .rig-grid, .leaderboard-box, [style*="overflow-y:auto"]')) {
         e.preventDefault();
       }
     }, { passive: false });
@@ -5727,10 +5719,6 @@
     document.getElementById('btn-close-leaderboard-bottom').addEventListener('click', () => {
       audio.playClick();
       state.pendingDeleteTs = null;
-      document.getElementById('leaderboard-modal').classList.add('hidden');
-    });
-    document.getElementById('btn-close-leaderboard-bottom').addEventListener('click', () => {
-      audio.playClick();
       document.getElementById('leaderboard-modal').classList.add('hidden');
     });
 
