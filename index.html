@@ -983,6 +983,31 @@
       border-bottom: none;
     }
 
+    .lb-del-btn {
+      background: rgba(244, 63, 94, 0.14);
+      border: 1px solid rgba(251, 113, 133, 0.42);
+      color: #fda4af;
+      border-radius: 8px;
+      padding: 2px 7px;
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.14s ease;
+    }
+
+    .lb-del-btn:hover {
+      background: rgba(244, 63, 94, 0.26);
+      border-color: #fb7185;
+    }
+
+    .lb-del-btn.armed {
+      background: #e11d48;
+      border-color: #fda4af;
+      color: #ffffff;
+    }
+
     .record-btn {
       background: rgba(251, 191, 36, 0.14);
       border: 1px solid rgba(251, 191, 36, 0.4);
@@ -1197,7 +1222,7 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.64rem; font-weight:800; letter-spacing:0.11em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.34</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.35</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.55rem, 6.6vw, 2.05rem); font-weight:700; line-height:1.04; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.32rem; flex-wrap:nowrap;">
@@ -1416,7 +1441,7 @@
         </div>
 
         <p style="font-size:0.78rem; color:#94a3b8; margin-top:0.35rem;">
-          All-time best shifts recorded on this device across both Solo and Pass &amp; Play shifts.
+          All-time best shifts recorded on this device. You can delete individual entries belonging to your active player (<strong id="lb-active-owner-label" style="color:#38bdf8;">Player 1</strong>).
         </p>
 
         <div class="leaderboard-box" style="margin-top:0.65rem; max-height:min(440px, calc(100dvh - 15.5rem - var(--safe-top) - var(--safe-bottom))); overflow-y:auto; -webkit-overflow-scrolling:touch;">
@@ -2031,7 +2056,7 @@
     // =========================================================================
     // 3. GAME STATE, PER-PLAYER PROFILES, TOP 10 & CROSS-DEVICE SYNC
     // =========================================================================
-    const APP_VERSION = 'v5.9.34';
+    const APP_VERSION = 'v5.9.35';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -2282,6 +2307,7 @@
       boostsCommitted: false,
       shopTab: 'rigs',
       pendingPurchase: null,
+      pendingDeleteTs: null,
       coins: initialShop.coins,
       shift: initialShop.shift || 'day',
       biome: initialShop.stageSelection !== 'random' ? getBiomeById(initialShop.stageSelection) : PROCEDURAL_BIOMES[0],
@@ -4745,6 +4771,28 @@
       return idx >= 0 ? idx + 1 : null;
     }
 
+    function deleteOwnLeaderboardEntry(index) {
+      const target = state.leaderboard[index];
+      if (!target) return;
+      const activeOwnerKey = normalizeProfileKey(state.playerNames[state.activePlayerIndex] || state.playerNames[0] || 'Player 1');
+      if (normalizeProfileKey(target.name) !== activeOwnerKey) return;
+
+      const entryKey = `${target.ts}:${target.score}:${index}`;
+      if (state.pendingDeleteTs !== entryKey) {
+        state.pendingDeleteTs = entryKey;
+        audio.playClick();
+        refreshLeaderboardDisplays();
+        return;
+      }
+
+      state.pendingDeleteTs = null;
+      state.leaderboard.splice(index, 1);
+      saveLeaderboard(state.leaderboard);
+      state.bestScore = state.leaderboard.length > 0 ? state.leaderboard[0].score : 0;
+      audio.playClick();
+      refreshLeaderboardDisplays();
+    }
+
     function refreshLeaderboardDisplays() {
       const top = state.leaderboard[0];
       const menuBest = document.getElementById('menu-best-score');
@@ -4753,6 +4801,11 @@
       if (menuBest) menuBest.textContent = top ? String(top.score) : '0';
       if (menuHolder) menuHolder.textContent = top ? top.name : 'No shifts yet';
       if (hudBest) hudBest.textContent = top ? String(top.score) : '0';
+
+      const activeOwnerName = state.playerNames[state.activePlayerIndex] || state.playerNames[0] || 'Player 1';
+      const activeOwnerKey = normalizeProfileKey(activeOwnerName);
+      const ownerLabel = document.getElementById('lb-active-owner-label');
+      if (ownerLabel) ownerLabel.textContent = activeOwnerName;
 
       const listEl = document.getElementById('top10-leaderboard-list');
       if (!listEl) return;
@@ -4764,6 +4817,12 @@
         .map((item, idx) => {
           const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
           const rigName = (RIG_SPECS[item.rig] || RIG_SPECS.loader).name;
+          const isOwnedByActive = normalizeProfileKey(item.name) === activeOwnerKey;
+          const entryKey = `${item.ts}:${item.score}:${idx}`;
+          const isArmed = state.pendingDeleteTs === entryKey;
+          const delBtnHtml = isOwnedByActive
+            ? `<button type="button" class="lb-del-btn${isArmed ? ' armed' : ''}" data-del-idx="${idx}" title="Delete your score">${isArmed ? 'Confirm?' : '🗑️'}</button>`
+            : '';
           return `
             <div class="lb-row">
               <div style="display:flex; align-items:center; gap:0.45rem; min-width:0;">
@@ -4773,11 +4832,21 @@
                   <div style="font-size:0.65rem; color:#94a3b8;">${rigName} • ${item.shift === 'night' ? '🌙' : '☀️'}</div>
                 </div>
               </div>
-              <div class="font-display" style="font-weight:700; font-size:1.05rem; color:#fde047;">${item.score}</div>
+              <div style="display:flex; align-items:center; gap:0.45rem; flex-shrink:0;">
+                <div class="font-display" style="font-weight:700; font-size:1.05rem; color:#fde047;">${item.score}</div>
+                ${delBtnHtml}
+              </div>
             </div>
           `;
         })
         .join('');
+
+      listEl.querySelectorAll('button[data-del-idx]').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          deleteOwnLeaderboardEntry(Number(btn.dataset.delIdx));
+        });
+      });
     }
 
     function renderRosterInputs() {
@@ -4815,6 +4884,7 @@
           savePlayerRoster();
           if (i === 0) {
             switchToPlayerProfile(finalName, true);
+            refreshLeaderboardDisplays();
             if (summary && state.playerCount === 1) {
               summary.textContent = `✓ Saved: ${finalName}`;
               summary.style.color = '#34d399';
@@ -5633,21 +5703,30 @@
     // Leaderboard Modal Controls
     document.getElementById('btn-open-leaderboard').addEventListener('click', () => {
       audio.playClick();
+      state.pendingDeleteTs = null;
       refreshLeaderboardDisplays();
       document.getElementById('leaderboard-modal').classList.remove('hidden');
     });
     document.getElementById('btn-hud-leaderboard').addEventListener('click', () => {
       audio.playClick();
+      state.pendingDeleteTs = null;
       refreshLeaderboardDisplays();
       document.getElementById('leaderboard-modal').classList.remove('hidden');
     });
     document.getElementById('btn-go-leaderboard').addEventListener('click', () => {
       audio.playClick();
+      state.pendingDeleteTs = null;
       refreshLeaderboardDisplays();
       document.getElementById('leaderboard-modal').classList.remove('hidden');
     });
     document.getElementById('btn-close-leaderboard').addEventListener('click', () => {
       audio.playClick();
+      state.pendingDeleteTs = null;
+      document.getElementById('leaderboard-modal').classList.add('hidden');
+    });
+    document.getElementById('btn-close-leaderboard-bottom').addEventListener('click', () => {
+      audio.playClick();
+      state.pendingDeleteTs = null;
       document.getElementById('leaderboard-modal').classList.add('hidden');
     });
     document.getElementById('btn-close-leaderboard-bottom').addEventListener('click', () => {
