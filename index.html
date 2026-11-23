@@ -1242,7 +1242,7 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.64rem; font-weight:800; letter-spacing:0.11em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.43</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.44</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.55rem, 6.6vw, 2.05rem); font-weight:700; line-height:1.04; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.32rem; flex-wrap:nowrap;">
@@ -2076,7 +2076,7 @@
     // =========================================================================
     // 3. GAME STATE, PER-PLAYER PROFILES, TOP 10 & CROSS-DEVICE SYNC
     // =========================================================================
-    const APP_VERSION = 'v5.9.43';
+    const APP_VERSION = 'v5.9.44';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
@@ -5147,6 +5147,7 @@
         .map((item, idx) => {
           const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
           const rigName = (RIG_SPECS[item.rig] || RIG_SPECS.loader).name;
+          const rank = getRankDetails(item.score);
           const isOwnedByActive = normalizeProfileKey(item.name) === activeOwnerKey;
           const entryKey = `${item.ts}:${item.score}:${idx}`;
           const isArmed = state.pendingDeleteTs === entryKey;
@@ -5154,12 +5155,13 @@
             ? `<button type="button" class="lb-del-btn${isArmed ? ' armed' : ''}" data-del-idx="${idx}" title="Delete your score">${isArmed ? 'Confirm?' : '🗑️'}</button>`
             : '';
           return `
-            <div class="lb-row">
-              <div style="display:flex; align-items:center; gap:0.45rem; min-width:0;">
-                <span class="font-display" style="font-weight:700; color:${idx < 3 ? '#fbbf24' : '#94a3b8'}; min-width:26px;">${medal}</span>
-                <div style="min-width:0;">
+            <div class="lb-row" style="gap:0.45rem;">
+              <div style="display:flex; align-items:center; gap:0.45rem; min-width:0; flex:1;">
+                <span class="font-display" style="font-weight:700; color:${idx < 3 ? '#fbbf24' : '#94a3b8'}; min-width:26px; flex-shrink:0;">${medal}</span>
+                <div style="min-width:0; flex:1;">
                   <div style="font-weight:700; color:#f8fafc; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.name}</div>
-                  <div style="font-size:0.65rem; color:#94a3b8;">${rigName} • ${item.shift === 'night' ? '🌙' : '☀️'}</div>
+                  <div style="font-size:0.62rem; font-weight:700; color:#fbbf24; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:1px;">${rank.icon} ${rank.title}</div>
+                  <div style="font-size:0.62rem; color:#94a3b8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${rigName} • ${item.shift === 'night' ? '🌙' : '☀️'}</div>
                 </div>
               </div>
               <div style="display:flex; align-items:center; gap:0.45rem; flex-shrink:0;">
