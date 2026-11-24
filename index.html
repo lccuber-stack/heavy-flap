@@ -313,6 +313,12 @@
       text-align: center;
     }
 
+    .tap-pill svg {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+    }
+
     @media (min-width: 540px) {
       .tap-pill {
         padding: 0.62rem 1.2rem;
@@ -1264,7 +1270,7 @@
           <div style="min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
               <span style="font-size:0.64rem; font-weight:800; letter-spacing:0.11em; color:#fbbf24;">EARTHMOVER ARCADE</span>
-              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.45</span>
+              <span id="app-version-badge" style="font-size:0.6rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.35); border-radius:999px; padding:1px 7px;">v5.9.50</span>
             </div>
             <h1 class="font-display" style="font-size:clamp(1.55rem, 6.6vw, 2.05rem); font-weight:700; line-height:1.04; letter-spacing:-0.01em; white-space:nowrap;">HEAVY FLAP</h1>
             <div style="margin-top:4px; display:flex; align-items:center; gap:0.32rem; flex-wrap:nowrap;">
@@ -1797,6 +1803,7 @@
         ic.fillStyle = bgGrad;
         ic.fillRect(0, 0, size, size);
 
+        // Industrial Steel Beams on Right Edge
         ic.fillStyle = '#334155';
         ic.fillRect(412, 28, 52, 118);
         ic.fillStyle = '#475569';
@@ -1829,12 +1836,70 @@
         ic.stroke();
         ic.restore();
 
+        // Iconic Yellow Wheel Loader Centered on the App Icon
+        if (typeof drawConstructionRig === 'function') {
+          drawConstructionRig(
+            ic,
+            'loader',
+            222,
+            274,
+            106,
+            -0.08,
+            0.28,
+            0.35,
+            1,
+            {
+              id: 'classic',
+              body: '#eab308',
+              shade: '#ca8a04',
+              accent: '#fbbf24',
+              rim: '#eab308',
+              cab: '#1e293b',
+              window: '#38bdf8'
+            }
+          );
+        }
+
+        // Bottom Industrial Hazard Stripe Trim
+        const stripeW = 32;
+        for (let sx = -stripeW; sx < size + stripeW; sx += stripeW) {
+          ic.fillStyle = Math.floor((sx + stripeW) / stripeW) % 2 === 0 ? '#fbbf24' : '#0f172a';
+          ic.fillRect(sx, size - 26, stripeW, 26);
+        }
+
         const dataUrl = iconCanvas.toDataURL('image/png');
-        if (!dataUrl) return;
-        const appleLink = document.getElementById('apple-touch-icon');
-        if (appleLink) appleLink.href = dataUrl;
+        if (!dataUrl || dataUrl.length < 100) return;
+
+        // Replace apple-touch-icon so iOS Safari refreshes the Home Screen preview immediately
+        const oldApple = document.getElementById('apple-touch-icon');
+        const newApple = document.createElement('link');
+        newApple.id = 'apple-touch-icon';
+        newApple.rel = 'apple-touch-icon';
+        newApple.setAttribute('sizes', '512x512');
+        newApple.href = dataUrl;
+        if (oldApple && oldApple.parentNode) {
+          oldApple.parentNode.replaceChild(newApple, oldApple);
+        } else {
+          document.head.appendChild(newApple);
+        }
+
         const favLink = document.getElementById('app-favicon');
         if (favLink) favLink.href = dataUrl;
+
+        const manifestLink = document.getElementById('pwa-manifest');
+        if (manifestLink) {
+          const manifestObj = {
+            name: 'Heavy Flap',
+            short_name: 'Heavy Flap',
+            display: 'standalone',
+            background_color: '#0f172a',
+            theme_color: '#0f172a',
+            icons: [
+              { src: dataUrl, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+            ]
+          };
+          manifestLink.href = 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(manifestObj));
+        }
       } catch (e) {}
     }
 
@@ -2098,7 +2163,7 @@
     // =========================================================================
     // 3. GAME STATE, PER-PLAYER PROFILES, TOP 10 & CROSS-DEVICE SYNC
     // =========================================================================
-    const APP_VERSION = 'v5.9.45';
+    const APP_VERSION = 'v5.9.50';
     const LEADERBOARD_COOKIE = 'heavy_flap_lb_v1';
     const ROSTER_COOKIE = 'heavy_flap_roster_v1';
     const SHOP_COOKIE = 'heavy_flap_shop_v1';
